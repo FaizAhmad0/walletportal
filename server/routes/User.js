@@ -1,0 +1,34 @@
+const express = require("express");
+const router = express.Router();
+const createUser = require("../controller/createUser");
+const getUserById = require("../controller/getUserById");
+const getAllUser = require("../controller/getAllUser");
+const getSpecificUserData = require("../controller/getSpecificUserData");
+const getManagerClient = require("../controller/getManagerClient");
+const getAllManagerUser = require("../controller/getAllManagerUser");
+const getAllClients = require("../controller/getAllClients");
+const getAllManager = require("../controller/getAllManager");
+const payOrder = require("../controller/payOrder");
+const createManager = require("../controller/createManager");
+const assignManager = require("../controller/assignManager");
+const getManagerData = require("../controller/getManagerData");
+const updateUserGms = require("../controller/updateUserGms");
+const getClientOfManager = require("../controller/getClientOfManager");
+router.get("/getallusers", getAllUser);
+router.post("/payorder", payOrder);
+router.get("/getallmanagers", getAllManager);
+router.get("/getalluserss", getAllUser);
+router.put("/updategms/:id", updateUserGms);
+router.get("/getallmanageruserss/:manager", getAllManagerUser);
+router.get("/getManagerData/:manager", getManagerData);
+router.get("/getallclients", getAllClients);
+router.get("/getmanagerclient/:name", getManagerClient);
+router.get("/:id", getUserById);
+router.get("/specific/:enrollment", getSpecificUserData);
+router.post("/register", createUser);
+router.post("/registermanager", createManager);
+router.post("/assign-manager", assignManager);
+router.post("/getmanagerclients", getClientOfManager);
+
+
+module.exports = router;
