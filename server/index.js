@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use(
   cors({
     // origin: "http://localhost:3000",
-    origin: "http://wallet.saumiccraft.in",
+    origin: "https://wallet.saumiccraft.in",
 
     methods: "GET,POST,PUT,DELETE",
     credentials: true, // Enable sending of cookies and HTTP Authentication information
