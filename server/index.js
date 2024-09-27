@@ -15,7 +15,9 @@ const PORT = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    // origin: "http://localhost:3000",
+    origin: "https://wallet.saumiccraft.in",
+
     methods: "GET,POST,PUT,DELETE",
     credentials: true, // Enable sending of cookies and HTTP Authentication information
   })
