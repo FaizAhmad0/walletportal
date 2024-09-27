@@ -11,7 +11,9 @@ const router = express.Router();
 
 router.use(
   cors({
-    origin: "http://localhost:3000",
+    // origin: "http://localhost:3000",
+        origin: "https://wallet.saumiccraft.in",
+
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -24,7 +26,7 @@ const INSTAMOJO_URL =
 
 // Initialize Instamojo with your API keys
 Instamojo.setKeys(INSTAMOJO_API_KEY, INSTAMOJO_AUTH_TOKEN);
-Instamojo.isSandboxMode(true); // Set to true for testing; false for production
+Instamojo.isSandboxMode(false); // Set to true for testing; false for production
 
 router.post("/add-balance", async (req, res) => {
   const { userId, amount } = req.body;
