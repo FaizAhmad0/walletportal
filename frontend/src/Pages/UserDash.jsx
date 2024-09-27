@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Modal } from "antd";
+import { Button, message, Modal, Tooltip } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import UserLayout from "../Layout/UserLayout";
 import axios from "axios";
@@ -61,8 +61,8 @@ const UserDash = () => {
       pincode: userData?.user?.pincode,
       mobile: userData?.user?.mobile,
       name: userData?.user?.name,
-      country:userData?.user?.country,
-      gst:userData?.user?.gst,
+      country: userData?.user?.country,
+      gst: userData?.user?.gst,
     };
 
     navigate("/invoice", { state: { orderId: order._id, customer } });
@@ -269,12 +269,29 @@ const UserDash = () => {
                       >
                         View
                       </Button>
-                      <Button
-                        className="mr-2 text-xs"
-                        onClick={() => generateInvoice(order)}
-                      >
-                        Invoice
-                      </Button>
+                      {order.paymentStatus ? (
+                        <Button
+                          className="mr-2 text-xs"
+                          onClick={() => generateInvoice(order)}
+                        >
+                          Invoice
+                        </Button>
+                      ) : (
+                        <Tooltip
+                          className="text-xs"
+                          title="Pay to download the invoice"
+                        >
+                          <Button
+                            style={{
+                              width: "80px",
+                            }}
+                            className="mr-2 text-xs"
+                            disabled
+                          >
+                            Invoice
+                          </Button>
+                        </Tooltip>
+                      )}
                     </td>
                   </tr>
                 ))}
