@@ -45,7 +45,8 @@ router.post("/add-balance", async (req, res) => {
         amount: amount,
         buyer_name: user.name,
         email: user.email,
-        phone: user.mobile,
+        // phone: user.mobile,
+
         redirect_url: "https://wallet.saumiccraft.in/payment-status",
       },
       {
