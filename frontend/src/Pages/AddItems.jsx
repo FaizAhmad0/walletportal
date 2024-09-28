@@ -18,6 +18,7 @@ const AddItems = () => {
       price: "",
       quantity: "",
       amazonOrderId: "",
+      pincode: "",
       trackingId: "",
       shippingPartner: "",
       totalPrice: "",
@@ -151,6 +152,7 @@ const AddItems = () => {
         price: "",
         quantity: "",
         amazonOrderId: "",
+        pincode: "",
         trackingId: "",
         shippingPartner: "",
         customPartner: "",
@@ -177,6 +179,7 @@ const AddItems = () => {
     console.log(dataToSubmit);
 
     try {
+      console.log(dataToSubmit);
       const response = await axios.post(
         `${backendUrl}/orders/${enrollment}`,
         dataToSubmit,
@@ -242,6 +245,9 @@ const AddItems = () => {
                   </th>
                   <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Amazon Order ID
+                  </th>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    PinCode
                   </th>
                   <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Shipping Partner
@@ -314,6 +320,15 @@ const AddItems = () => {
                         type="text"
                         name="amazonOrderId"
                         value={item.amazonOrderId}
+                        onChange={(e) => handleChange(index, e)}
+                        className="w-30 py-1 px-3 border rounded-md focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <input
+                        type="text"
+                        name="pincode"
+                        value={item.pincode}
                         onChange={(e) => handleChange(index, e)}
                         className="w-30 py-1 px-3 border rounded-md focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
                       />

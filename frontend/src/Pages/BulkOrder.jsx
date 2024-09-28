@@ -6,10 +6,9 @@ import ManagerLayout from "../Layout/ManagerLayout";
 import "antd/dist/reset.css";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-
 const { Option } = Select;
 
-const BulkOrderDispatch = () => {
+const BulkOrder = () => {
   const [formData, setFormData] = useState({
     name: "",
     enrollment: "",
@@ -171,4 +170,4 @@ const BulkOrderDispatch = () => {
   );
 };
 
-export default BulkOrderDispatch;
+export default BulkOrder;

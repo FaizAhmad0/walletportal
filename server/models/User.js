@@ -45,6 +45,10 @@ const itemSchema = new Schema({
     type: String,
     required: true,
   },
+  pincode: {
+    type: String,
+    required: true,
+  },
   shippingPartner: {
     type: String,
     required: true,

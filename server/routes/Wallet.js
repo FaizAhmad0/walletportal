@@ -11,7 +11,8 @@ const router = express.Router();
 
 router.use(
   cors({
-    origin: "http://localhost:3000",
+    // origin: "http://localhost:3000",
+    origin: "https://wallet.saumiccraft.in",
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -44,7 +45,8 @@ router.post("/add-balance", async (req, res) => {
         buyer_name: user.name,
         email: user.email,
         phone: user.mobile,
-        redirect_url: "http://localhost:3000/payment-status",
+        // redirect_url: "http://localhost:3000/payment-status",
+        redirect_url: "https://wallet.saumiccraft.in/payment-status",
       },
       {
         headers: {
@@ -56,7 +58,10 @@ router.post("/add-balance", async (req, res) => {
 
     res.status(200).json({ paymentURL: response.data.payment_request.longurl });
   } catch (error) {
-    console.error("Error creating payment request:", error);
+    console.error(
+      "Error details:",
+      error.response ? error.response.data : error.message
+    );
     res.status(500).json({ error: "Failed to create payment request" });
   }
 });
@@ -102,6 +107,5 @@ router.post("/verify-payment", async (req, res) => {
     res.status(500).json({ error: "Failed to verify payment" });
   }
 });
-
 
 module.exports = router;

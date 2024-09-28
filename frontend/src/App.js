@@ -18,7 +18,6 @@ import ManagerDash from "./Pages/ManagerDash";
 import OrderReport from "./Pages/OrderReport";
 import ManagerClients from "./Pages/ManagerClients";
 import OrderHistory from "./Pages/OrderHistory";
-import BulkOrderDispatch from "./Pages/BulkOrderDispatch";
 import ManagerReport from "./Pages/ManagerReport";
 import AdminDash from "./Pages/AdminDash";
 import AllClients from "./Pages/AllClients";
@@ -29,6 +28,7 @@ import InvoicePage from "./Pages/InvoicePage";
 import RegisterManager from "./Pages/RegisterManager";
 import AdminLayout from "./Layout/AdminLayout";
 import AdminReport from "./Pages/AdminReport";
+import BulkOrder from "./Pages/BulkOrder";
 function App() {
   return (
     <>
@@ -60,7 +60,7 @@ function App() {
           />
           <Route path="/manager-dash" exact element={<ManagerDash />} />
           <Route path="/order-history" exact element={<OrderHistory />} />
-          <Route path="/bulkorder" exact element={<BulkOrderDispatch />} />
+          <Route path="/bulkorder" exact element={<BulkOrder />} />
           <Route path="/manager-reports" exact element={<ManagerReport />} />
           <Route path="/admin-dash" exact element={<AdminDash />} />
           <Route path="/view-clients" exact element={<AllClients />} />
