@@ -41,13 +41,23 @@ module.exports = async (req, res) => {
     const updatedOrder = user.orders.find((order) =>
       order.items.id(selectedOrderId)
     );
-
     const finalAmount = updatedOrder.items.reduce((total, currentItem) => {
       return total + Number(currentItem.totalPrice);
     }, 0);
 
-    // console.log(finalAmount);
-    updatedOrder.finalAmount = finalAmount.toString();
+    // Add 18% GST to the finalAmount
+    const gstAmount = finalAmount * 0.18;
+    const finalAmountWithGst = finalAmount + gstAmount;
+
+    // Convert final amount with GST to a string
+    updatedOrder.finalAmount = finalAmountWithGst.toFixed(2).toString();
+
+    // const finalAmount = updatedOrder.items.reduce((total, currentItem) => {
+    //   return total + Number(currentItem.totalPrice);
+    // }, 0);
+
+    // // console.log(finalAmount);
+    // updatedOrder.finalAmount = finalAmount.toString();
     await user.save();
 
     res.status(200).json({
