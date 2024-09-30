@@ -11,7 +11,8 @@ const router = express.Router();
 
 router.use(
   cors({
-    origin: "http://localhost:3000",
+    // origin: "http://localhost:3000",
+    origin: "https://wallet.saumiccraft.in",
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
