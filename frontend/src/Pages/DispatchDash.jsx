@@ -36,6 +36,44 @@ const DispatchDash = () => {
       message.error("Failed to fetch orders. Please try again.");
     }
   };
+  const handleShippedClick = async (orderItems, finalAmount, orderId) => {
+    console.log(orderId, finalAmount);
+
+    try {
+      const response = await axios.put(
+        `${backendUrl}/orders/shipped/${orderId}`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      message.success("Order shipped successfully!");
+      getOrders();
+    } catch (error) {
+      console.error("Error in order shipping:", error);
+      message.error("Could not ship the order, Please try again");
+    }
+  };
+  const handleArchiveClick = async (orderItems, finalAmount, orderId) => {
+    console.log(orderId, finalAmount);
+
+    try {
+      const response = await axios.put(
+        `${backendUrl}/orders/archive/${orderId}`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      message.success("Order status changes successfully!");
+      getOrders();
+    } catch (error) {
+      console.error("Error in order status:", error);
+      message.error("Could not change order status, Please try again");
+    }
+  };
   const handleDeleteclick = async (orderItems, finalAmount, orderId) => {
     console.log("kyu click kiya");
     console.log(orderId, finalAmount);
@@ -103,6 +141,12 @@ const DispatchDash = () => {
     setFilteredOrders(filtered);
   };
   const columns = [
+    {
+      title: <span className="text-xs">Order Id</span>,
+      dataIndex: "orderId",
+      key: "orderId",
+      render: (text) => <span className="text-xs">{text}</span>,
+    },
     {
       title: <span className="text-xs">Name</span>,
       dataIndex: "name",
@@ -208,8 +252,8 @@ const DispatchDash = () => {
               disabled={true}
               style={{
                 background: "rgb(40,167,69)",
-                paddingLeft: "26px",
-                paddingRight: "26px",
+                paddingLeft: "24px",
+                paddingRight: "24px",
                 color: "white",
               }}
             >
@@ -227,29 +271,52 @@ const DispatchDash = () => {
           >
             Delete
           </Button>
+          <Button
+            type="primary"
+            className="text-xs"
+            style={{ marginRight: "10px", background: "green" }}
+            onClick={() =>
+              handleArchiveClick(record.items, record.finalAmount, record._id)
+            }
+          >
+            Archive
+          </Button>
+          <Button
+            type="primary"
+            className="text-xs"
+            style={{ marginRight: "10px", background: "green" }}
+            onClick={() =>
+              handleShippedClick(record.items, record.finalAmount, record._id)
+            }
+          >
+            Shipped
+          </Button>
         </div>
       ),
     },
   ];
   const dataSource = filteredOrders
     .flatMap((user) =>
-      user.orders.map((order) => ({
-        key: order._id,
-        name: user.name,
-        enrollment: user.enrollment,
-        amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
-        manager: user.manager,
-        shippingPartner: order.items[0]?.shippingPartner || "N/A",
-        trackingId: order.items[0]?.trackingId || "N/A",
-        sku: order.items[0]?.sku || "N/A",
-        pincode: order.items[0]?.pincode || "N/A",
-        address: user.address,
-        finalAmount: order.finalAmount,
-        paymentStatus: order.paymentStatus,
-        items: order.items,
-        _id: order._id,
-        createdAt: order.createdAt,
-      }))
+      user.orders
+        .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
+        .map((order) => ({
+          key: order._id,
+          name: user.name,
+          orderId: order.orderId,
+          enrollment: user.enrollment,
+          amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
+          manager: user.manager,
+          shippingPartner: order.items[0]?.shippingPartner || "N/A",
+          trackingId: order.items[0]?.trackingId || "N/A",
+          sku: order.items[0]?.sku || "N/A",
+          pincode: order.items[0]?.pincode || "N/A",
+          address: user.address,
+          finalAmount: order.finalAmount,
+          paymentStatus: order.paymentStatus,
+          items: order.items,
+          _id: order._id,
+          createdAt: order.createdAt,
+        }))
     )
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -356,6 +423,7 @@ const DispatchDash = () => {
   // Save changes to the edited item
   const handleSaveClick = async () => {
     try {
+      console.log(editValues);
       await axios.put(
         `${backendUrl}/orders/update/${editingItem}`,
         editValues,
@@ -384,7 +452,7 @@ const DispatchDash = () => {
   return (
     <DispatchLayout>
       <div className="relative max-w-6xl mx-auto pb-20">
-        <h1 className="text-xl font-semibold text-center text-gray-600 mb-4">
+        <h1 className="text-xl font-semibold text-black-600 mb-4">
           Dispatch Dashboard
         </h1>
         <div className="flex justify-between items-center mb-6">
@@ -417,12 +485,8 @@ const DispatchDash = () => {
               </Link>
             </div>
             {/* Time Filter */}
-            <div className="text-xs">
-              <Radio.Group
-                onChange={handleTimeFilter}
-                value={timeFilter}
-                buttonStyle="solid"
-              >
+            <div className="text-xs items-end">
+              <Radio.Group buttonStyle="solid">
                 <Radio.Button value="today">Today</Radio.Button>
                 <Radio.Button value="week">This Week</Radio.Button>
                 <Radio.Button value="month">This Month</Radio.Button>
@@ -500,6 +564,7 @@ const DispatchDash = () => {
                       name="price"
                       value={editValues.price || ""}
                       type="number"
+                      onChange={handleChange}
                     />
                   </label>
                   <br />
@@ -536,7 +601,25 @@ const DispatchDash = () => {
                       name="totalPrice"
                       value={editValues.totalPrice || ""}
                       type="number"
+                      onChange={handleChange}
                     />
+                  </label>
+                  <br />
+                  <label>
+                    <strong>Product Availability:</strong>
+                    <Select
+                      name="productAction"
+                      placeholder="Select product status"
+                      value={editValues.productAction || "Available"} // Set default to "Available"
+                      onChange={(value) =>
+                        setEditValues({ ...editValues, productAction: value })
+                      }
+                    >
+                      <Option value="Available">Available</Option>
+                      <Option value="Product not available">
+                        Product not available
+                      </Option>
+                    </Select>
                   </label>
                 </>
               ) : (
@@ -558,6 +641,8 @@ const DispatchDash = () => {
                   <strong>Delivery Partner:</strong> {item.shippingPartner}
                   <br />
                   <strong>Total Price:</strong> {item.totalPrice}
+                  <br />
+                  <strong>Product Availability:</strong> {item.productAction}
                   <br />
                   <Button
                     type="primary"

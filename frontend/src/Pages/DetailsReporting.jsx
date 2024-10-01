@@ -293,50 +293,60 @@ const DetailsReporting = () => {
               Filtered Orders
             </h2>
             {filteredOrders.length > 0 ? (
-              <div>
-                {filteredOrders.map((order, index) => (
-                  <div
-                    key={index}
-                    className="p-6 bg-white border border-gray-200 rounded-lg shadow-lg mb-6 transition duration-300 hover:shadow-xl"
-                  >
-                    <div className="flex justify-between items-center mb-3">
-                      <h3 className="text-lg font-semibold text-gray-700">
-                        Order ID: {order._id}
-                      </h3>
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                          order.paymentStatus
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {order.paymentStatus ? "Paid" : "Not Paid"}
-                      </span>
-                    </div>
-
-                    <div className="border-t border-gray-100 pt-3">
-                      <h4 className="font-medium text-gray-600 mb-2">
-                        Products:
-                      </h4>
-                      <ul className="space-y-1 text-gray-600">
-                        {order.items.map((item, i) => (
-                          <li key={i} className="flex items-center">
-                            <span className="text-sm">{item.name}</span>
-                            <span
-                              className={`ml-auto px-2 py-1 text-xs rounded-full ${
-                                item.productAction === "Available"
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {item.productAction}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="table-auto w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-2">Order ID</th>
+                      <th className="px-4 py-2">Payment Status</th>
+                      <th className="px-4 py-2">Product Name</th>
+                      <th className="px-4 py-2">Product Availability</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredOrders.map((order, index) => (
+                      <tr key={index} className="border-t">
+                        <td className="px-4 py-2 font-semibold">
+                          {order.orderId}
+                        </td>
+                        <td className="px-4 py-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                              order.paymentStatus
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {order.paymentStatus ? "Paid" : "Not Paid"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2">
+                          <ul>
+                            {order.items.map((item, i) => (
+                              <li key={i}>{item.name}</li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="px-4 py-2">
+                          <ul>
+                            {order.items.map((item, i) => (
+                              <li
+                                key={i}
+                                className={`px-2 py-1 text-xs rounded-full ${
+                                  item.productAction === "Available"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                }`}
+                              >
+                                {item.productAction}
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ) : (
               <p>No orders found</p>

@@ -12,11 +12,13 @@ module.exports = async (req, res) => {
       quantity,
       pincode,
       shippingPartner,
+      productAction,
     } = req.body;
 
     const user = await User.findOne({
       "orders.items._id": selectedOrderId,
     });
+    console.log(productAction);
 
     if (!user) {
       return res.status(404).json({ error: "User or item not found" });
@@ -35,6 +37,7 @@ module.exports = async (req, res) => {
     item.pincode = pincode;
     item.shippingPartner = shippingPartner;
     item.totalPrice = price * quantity;
+    item.productAction = productAction;
 
     await user.save();
 

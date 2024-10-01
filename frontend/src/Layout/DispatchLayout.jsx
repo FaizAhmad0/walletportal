@@ -10,6 +10,8 @@ import LockIcon from "@mui/icons-material/Lock";
 import logoExpanded from "../assets/logo2.png";
 import logoCollapsed from "../assets/Logoratan.png";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
+import ArchiveIcon from "@mui/icons-material/Archive";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 
 const { Header, Sider, Content } = Layout;
 
@@ -108,6 +110,16 @@ const DispatchLayout = ({ children }) => {
               key: "/details-reporting",
               icon: <SignalCellularAltIcon />,
               label: "Details Reporting",
+            },
+            {
+              key: "/archive-orders",
+              icon: <ArchiveIcon />,
+              label: "Archived",
+            },
+            {
+              key: "/shipped-orders",
+              icon: <LocalShippingIcon />,
+              label: "Shipped",
             },
 
             {

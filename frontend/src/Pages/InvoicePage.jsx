@@ -123,7 +123,7 @@ const InvoicePage = () => {
               TAX INVOICE
             </Title>
             <div>
-              <Text>Invoice No: {orderDetails._id}</Text>
+              <Text>Invoice No: {orderDetails.orderId}</Text>
               <br />
               <Text>
                 Date: {new Date(orderDetails.createdAt).toLocaleDateString()}

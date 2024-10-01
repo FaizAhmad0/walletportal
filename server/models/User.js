@@ -81,6 +81,14 @@ const orderSchema = new Schema(
     orderId: {
       type: Number,
     },
+    archive: {
+      type: Boolean,
+      default: false,
+    },
+    shipped: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

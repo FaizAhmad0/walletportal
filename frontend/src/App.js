@@ -29,6 +29,8 @@ import RegisterManager from "./Pages/RegisterManager";
 import AdminLayout from "./Layout/AdminLayout";
 import AdminReport from "./Pages/AdminReport";
 import BulkOrder from "./Pages/BulkOrder";
+import ArchivedOrders from "./Pages/ArchivedOrders";
+import ShippingOrder from "./Pages/ShippingOrder";
 function App() {
   return (
     <>
@@ -53,6 +55,8 @@ function App() {
             exact
             element={<OrderReport />}
           />
+          <Route path="/archive-orders" exact element={<ArchivedOrders />} />
+          <Route path="/shipped-orders" exact element={<ShippingOrder />} />
           <Route
             path="/details-reporting"
             exact
