@@ -3,7 +3,6 @@ import axios from "axios";
 import AdminLayout from "../Layout/AdminLayout";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-
 const AllManagers = () => {
   const [clients, setClients] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // State for search input
@@ -39,12 +38,13 @@ const AllManagers = () => {
           </h1>
           <input
             type="text"
-            style={{width:"30%"}}
+            style={{ width: "30%" }}
             placeholder="Search by enrollment"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="mb-4 p-2 border rounded w-full"
           />
+          <h2 className="text-sm">Total managers : {clients.length}</h2>
         </div>
 
         {filteredClients?.length > 0 ? (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Radio } from "antd";
+import { Table, Radio, Skeleton } from "antd"; // Import Skeleton
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
 import moment from "moment"; // Import moment.js
@@ -8,7 +8,8 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ArchivedOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [filter, setFilter] = useState("today"); // State to hold the selected filter
+  const [filter, setFilter] = useState("all"); // Default to "all"
+  const [loading, setLoading] = useState(true); // State for loading
   console.log(orders);
 
   const getOrders = async () => {
@@ -22,8 +23,10 @@ const ArchivedOrders = () => {
         }
       );
       setOrders(response.data.orders);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      setLoading(false);
     }
   };
 
@@ -45,6 +48,7 @@ const ArchivedOrders = () => {
         return orderDate.isSame(today, "month");
       case "year":
         return orderDate.isSame(today, "year");
+      case "all": // Return all orders when the filter is "all"
       default:
         return true;
     }
@@ -157,29 +161,34 @@ const ArchivedOrders = () => {
 
   return (
     <DispatchLayout>
-      <div className="relative max-w-6xl mx-auto pb-20">
-        <h1 className="text-xl font-semibold text-black-600 mb-4">
-          Archived Orders
-        </h1>
-        <div className="text-xs">
-          <Radio.Group
-            buttonStyle="solid"
-            value={filter} // Bind the selected filter to the state
-            onChange={(e) => setFilter(e.target.value)} // Update the filter state when the user selects an option
-          >
-            <Radio.Button value="today">Today</Radio.Button>
-            <Radio.Button value="week">This Week</Radio.Button>
-            <Radio.Button value="month">This Month</Radio.Button>
-            <Radio.Button value="year">This Year</Radio.Button>
-          </Radio.Group>
+      {loading ? (
+        <Skeleton active />
+      ) : (
+        <div className="relative max-w-6xl mx-auto pb-20">
+          <h1 className="text-xl font-semibold text-black-600 mb-4">
+            Archived Orders
+          </h1>
+          <div className="text-xs">
+            <Radio.Group
+              buttonStyle="solid"
+              value={filter} // Bind the selected filter to the state
+              onChange={(e) => setFilter(e.target.value)} // Update the filter state when the user selects an option
+            >
+              <Radio.Button value="all">All</Radio.Button>
+              <Radio.Button value="today">Today</Radio.Button>
+              <Radio.Button value="week">This Week</Radio.Button>
+              <Radio.Button value="month">This Month</Radio.Button>
+              <Radio.Button value="year">This Year</Radio.Button>
+            </Radio.Group>
+          </div>
+          <Table
+            bordered
+            columns={columns}
+            dataSource={dataSource}
+            pagination={{ pageSize: 10 }}
+          />
         </div>
-        <Table
-          bordered
-          columns={columns}
-          dataSource={dataSource}
-          pagination={{ pageSize: 10 }}
-        />
-      </div>
+      )}
     </DispatchLayout>
   );
 };

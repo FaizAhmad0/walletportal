@@ -149,6 +149,7 @@ const AllClients = () => {
             onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
             style={{ marginBottom: "20px", width: "30%" }}
           />
+          <h2 className="text-sm">Total clients : {clients.length}</h2>
         </div>
 
         <Table

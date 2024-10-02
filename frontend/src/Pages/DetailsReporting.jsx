@@ -40,6 +40,7 @@ const DetailsReporting = () => {
   const [selectedDate, setSelectedDate] = useState(null); // State for selected date
   const modalRef = useRef(null);
 
+  // Fetch user data and orders from the backend
   const getUserData = async () => {
     try {
       const response = await axios.get(`${backendUrl}/user/getalluserss`, {
@@ -93,7 +94,7 @@ const DetailsReporting = () => {
   };
 
   useEffect(() => {
-    getUserData();
+    getUserData(); // Fetch data when the component is mounted
   }, []);
 
   const filterOrders = (type) => {
@@ -103,14 +104,15 @@ const DetailsReporting = () => {
       const orders = user.orders || [];
 
       orders.forEach((order) => {
-        // Filter by date
+        // Filter by selected date if any
         if (selectedDate) {
           const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
           if (orderDate !== selectedDate) {
-            return;
+            return; // Skip this order if the date doesn't match
           }
         }
 
+        // Filter by paymentStatus or productNotAvailable
         if (type === "paymentStatus") {
           if (order.paymentStatus === false) {
             filtered.push(order);
@@ -123,8 +125,10 @@ const DetailsReporting = () => {
       });
     });
 
-    setFilteredOrders(filtered);
-    setIsModalVisible(true);
+    setFilteredOrders(filtered); // Update the filtered orders state
+    setIsModalVisible(true); // Show the modal with filtered orders
+
+    // Scroll to the modal
     setTimeout(() => {
       if (modalRef.current) {
         modalRef.current.scrollIntoView({ behavior: "smooth" });
@@ -133,7 +137,55 @@ const DetailsReporting = () => {
   };
 
   const handleDateChange = (date) => {
-    setSelectedDate(date ? date.format("YYYY-MM-DD") : null); // Format date for comparison
+    setSelectedDate(date ? date.format("YYYY-MM-DD") : null);
+
+    let filtered = [];
+    let moneyIssueCount = 0;
+    let productNotAvailableCount = 0;
+    let totalHoldOrders = 0;
+    let totalOrders = 0;
+
+    userData.forEach((user) => {
+      const orders = user.orders || [];
+
+      orders.forEach((order) => {
+        // Filter by date
+        if (date) {
+          const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
+          if (orderDate !== date.format("YYYY-MM-DD")) {
+            return;
+          }
+        }
+
+        totalOrders += 1; // Count total orders for the selected date
+        let orderHasHold = false;
+
+        if (order.paymentStatus === false) {
+          moneyIssueCount += 1; // Count hold money issues
+          orderHasHold = true;
+        }
+
+        const productHold = order.items.some(
+          (item) => item.productAction !== "Available"
+        );
+        if (productHold) {
+          productNotAvailableCount += 1; // Count product not available holds
+          orderHasHold = true;
+        }
+
+        if (orderHasHold) {
+          totalHoldOrders += 1; // Count total holds
+        }
+
+        filtered.push(order); // Add filtered orders for the modal
+      });
+    });
+
+    setFilteredOrders(filtered);
+    setTotalOrdersCount(totalOrders); // Update total orders count dynamically
+    setHoldMoneyIssueCount(moneyIssueCount); // Update money issue count dynamically
+    setProductNotAvailableCount(productNotAvailableCount); // Update product not available count dynamically
+    setTotalOrdersHold(totalHoldOrders); // Update total holds dynamically
   };
 
   const managerData = {
@@ -198,7 +250,8 @@ const DetailsReporting = () => {
 
   return (
     <DispatchLayout>
-      <div className="relative max-w-7xl mx-auto  pb-20 min-h-screen">
+      <div className="relative max-w-7xl mx-auto pb-20 min-h-screen">
+        {/* Date Filter */}
         <div className="mb-4">
           <label htmlFor="date-picker" className="mr-2">
             Filter By Date:
@@ -210,6 +263,8 @@ const DetailsReporting = () => {
             placeholder="Select Date"
           />
         </div>
+
+        {/* Manager Performance Dashboard */}
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-1">
           Manager Performance Dashboard
         </h1>
@@ -251,6 +306,7 @@ const DetailsReporting = () => {
           </div>
         </div>
 
+        {/* GMS and Hold Analytics Charts */}
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center underline">
             GMS and Hold Analytics
@@ -263,27 +319,33 @@ const DetailsReporting = () => {
               <Line
                 data={gmsData}
                 options={{
-                  responsive: true,
-                  plugins: { legend: { position: "top" } },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                    },
+                  },
                 }}
               />
             </div>
-            {/* Holds Chart */}
             <div>
               <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Hold Analytics
+                Holds Overview
               </h3>
               <Bar
                 data={holdData}
                 options={{
-                  responsive: true,
-                  plugins: { legend: { position: "top" } },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                    },
+                  },
                 }}
               />
             </div>
           </div>
         </div>
 
+        {/* Modal for displaying filtered orders */}
         {isModalVisible && (
           <div
             ref={modalRef}

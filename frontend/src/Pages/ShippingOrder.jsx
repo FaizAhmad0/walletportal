@@ -8,7 +8,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ShippingOrder = () => {
   const [orders, setOrders] = useState([]);
-  const [filter, setFilter] = useState("today"); // State to hold the selected filter
+  const [filter, setFilter] = useState("all"); // Set default to "all"
   console.log(orders);
 
   const getOrders = async () => {
@@ -45,6 +45,7 @@ const ShippingOrder = () => {
         return orderDate.isSame(today, "month");
       case "year":
         return orderDate.isSame(today, "year");
+      case "all": // Return all orders when the filter is "all"
       default:
         return true;
     }
@@ -54,7 +55,7 @@ const ShippingOrder = () => {
   const dataSource = orders
     .flatMap((user) =>
       user.orders
-        .filter((order) => order.shipped === true && filterOrdersByDate(order)) // Only include archived orders and apply the filter
+        .filter((order) => order.shipped === true && filterOrdersByDate(order)) // Only include shipped orders and apply the filter
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -167,6 +168,7 @@ const ShippingOrder = () => {
             value={filter} // Bind the selected filter to the state
             onChange={(e) => setFilter(e.target.value)} // Update the filter state when the user selects an option
           >
+            <Radio.Button value="all">All</Radio.Button>
             <Radio.Button value="today">Today</Radio.Button>
             <Radio.Button value="week">This Week</Radio.Button>
             <Radio.Button value="month">This Month</Radio.Button>

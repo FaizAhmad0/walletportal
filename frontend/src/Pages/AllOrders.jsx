@@ -13,6 +13,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AllOrders = () => {
   const [orders, setOrders] = useState([]);
+  console.log(orders);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState([]);
   const [selectedOrderAmount, setSelectedOrderAmount] = useState(0);
@@ -26,24 +27,34 @@ const AllOrders = () => {
           Authorization: localStorage.getItem("token"),
         },
       });
-      const allOrders = response.data.orders;
+
+      const allUsers = response.data.orders; // Assuming `orders` is an array of users
 
       // Get filtered orders based on the selected filter
-      const filteredOrders = allOrders.filter((order) => {
-        const orderDate = dayjs(order.createdAt);
-        const now = dayjs();
+      const filteredOrders = allUsers
+        .map((user) => {
+          const filteredUserOrders = user.orders.filter((order) => {
+            const orderDate = dayjs(order.createdAt);
+            const now = dayjs();
 
-        if (filter === "today") {
-          return orderDate.isSame(now, "day");
-        } else if (filter === "week") {
-          return orderDate.isSame(now, "week");
-        } else if (filter === "month") {
-          return orderDate.isSame(now, "month");
-        } else if (filter === "year") {
-          return orderDate.isSame(now, "year");
-        }
-        return true; // "all" filter should return all orders
-      });
+            if (filter === "today") {
+              return orderDate.isSame(now, "day");
+            } else if (filter === "week") {
+              return orderDate.isSame(now, "week");
+            } else if (filter === "month") {
+              return orderDate.isSame(now, "month");
+            } else if (filter === "year") {
+              return orderDate.isSame(now, "year");
+            }
+            return true; // "all" filter should return all orders
+          });
+
+          return {
+            ...user, // Keep the user information
+            orders: filteredUserOrders, // Replace the user's orders with filtered ones
+          };
+        })
+        .filter((user) => user.orders.length > 0); // Remove users with no matching orders
 
       setOrders(filteredOrders);
     } catch (error) {

@@ -5,7 +5,6 @@ import { Modal, Button, Table, DatePicker, Radio } from "antd";
 import moment from "moment";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
@@ -214,7 +213,7 @@ const OrderHistory = () => {
 
   return (
     <ManagerLayout>
-      <div className="container mx-auto sm:p-6 lg:p-8">
+      <div className="container mx-auto sm:p-6 lg:p-6">
         <div>
           <h1 className="text-2xl font-bold text-center">Order History</h1>
 
