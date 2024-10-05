@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Table, Input, Button, Select, message, Popconfirm } from "antd";
+import { Table, Input, Button, Select, message, Popconfirm, Modal } from "antd";
 import { SaveOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import DispatchLayout from "../Layout/DispatchLayout";
 import "antd/dist/reset.css";
+import AdminLayout from "../Layout/AdminLayout";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Option } = Select;
 
 const BulkOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [paymentStages, setPaymentStages] = useState([]);
   const [editingKey, setEditingKey] = useState(""); // Track the currently editing row
   const [formData, setFormData] = useState({
     name: "",
@@ -85,7 +88,20 @@ const BulkOrders = () => {
       message.error("Failed to delete order.");
     }
   };
+  const getTotalPaidAmount = (paymentStage) => {
+    return paymentStage
+      ? paymentStage.reduce((acc, stage) => acc + stage.amount, 0)
+      : 0;
+  };
 
+  const getRemainingAmount = (order) => {
+    const totalPaid = getTotalPaidAmount(order.paymentStage);
+    return order.totalPrice - totalPaid;
+  };
+  const handleShowStages = (paymentStage) => {
+    setPaymentStages(paymentStage); // Set payment stages for the selected order
+    setIsModalVisible(true); // Show modal
+  };
   const columns = [
     {
       title: "Order Id",
@@ -267,9 +283,34 @@ const BulkOrders = () => {
         ),
     },
     {
+      title: "Total Paid Amount",
+      dataIndex: "paymentStage",
+      key: "totalPaidAmount",
+      className: "text-xs",
+
+      render: (paymentStage) => getTotalPaidAmount(paymentStage),
+    },
+    {
+      title: "Remaining Amount",
+      key: "remainingAmount",
+      className: "text-xs",
+      render: (record) => {
+        const remainingAmount = getRemainingAmount(record);
+        if (remainingAmount <= 0) {
+          return (
+            <span style={{ color: "green", fontWeight: "bold" }}>
+              Payment Completed
+            </span>
+          );
+        }
+        return <span>{remainingAmount}</span>;
+      },
+    },
+    {
       title: "Due Date",
       dataIndex: "dueDate",
       key: "dueDate",
+      width: 150,
       className: "text-xs", // Apply text-xs class
 
       render: (text, record) => {
@@ -300,14 +341,17 @@ const BulkOrders = () => {
               type="primary"
               onClick={() => handleSubmitEdit(record)}
               icon={<SaveOutlined />}
-              className="text-xs" // Apply text-xs class to the button
+              className="text-xs"
             >
               Save
             </Button>
           );
         }
+
         return (
-          <>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {" "}
+            {/* Flexbox for row alignment */}
             <Button
               type="primary"
               onClick={() => {
@@ -322,21 +366,20 @@ const BulkOrders = () => {
                   remarks: record.remarks,
                   paymentStatus: record.paymentStatus,
                   address: record.address,
-                  brandName: record.brandName, // Populate with existing data
-                  partyName: record.partyName, // Populate with existing data
-                  shippingAddress: record.shippingAddress, // Populate with existing data
-                  managerName: record.managerName, // Populate with existing data
-                  size: record.size, // Populate with existing data
-                  quantity: record.quantity, // Populate with existing data
-                  price: record.price, // Populate with existing data
-                  totalPrice: record.totalPrice, // Populate with existing data
-                  dueDate: record.dueDate, // Populate with existing data
+                  brandName: record.brandName,
+                  partyName: record.partyName,
+                  shippingAddress: record.shippingAddress,
+                  managerName: record.managerName,
+                  size: record.size,
+                  quantity: record.quantity,
+                  price: record.price,
+                  totalPrice: record.totalPrice,
+                  dueDate: record.dueDate,
                 });
                 setEditingKey(record._id);
               }}
               icon={<EditOutlined />}
-              style={{ marginRight: 8 }}
-              className="text-xs" // Apply text-xs class to the button
+              className="text-xs"
             >
               Edit
             </Button>
@@ -348,19 +391,26 @@ const BulkOrders = () => {
                 style={{ background: "red", color: "white" }}
                 danger
                 icon={<DeleteOutlined />}
-                className="text-xs" // Apply text-xs class to the button
+                className="text-xs"
               >
                 Delete
               </Button>
             </Popconfirm>
-          </>
+            <Button
+              type="default"
+              onClick={() => handleShowStages(record.paymentStage)}
+              className="text-xs"
+            >
+              Show Payment Stages
+            </Button>
+          </div>
         );
       },
     },
   ];
 
   return (
-    <DispatchLayout>
+    <AdminLayout>
       <div className="relative max-w-6xl mx-auto pb-20 z-10">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Bulk Order</h1>
         <Table
@@ -370,8 +420,30 @@ const BulkOrders = () => {
           pagination={false}
           scroll={{ x: 1500 }}
         />
+        <Modal
+          title="Payment Stages"
+          visible={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setIsModalVisible(false)}>
+              Close
+            </Button>,
+          ]}
+        >
+          {paymentStages.length > 0 ? (
+            <ul>
+              {paymentStages.map((stage, index) => (
+                <li key={index}>
+                  Stage: {stage.stage}, Amount: {stage.amount}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No payment stages available</p>
+          )}
+        </Modal>
       </div>
-    </DispatchLayout>
+    </AdminLayout>
   );
 };
 
