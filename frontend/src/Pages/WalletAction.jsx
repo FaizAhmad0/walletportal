@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../Layout/AdminLayout";
 import { Modal, Input, message } from "antd";
+const { Search } = Input;
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const WalletAction = () => {
@@ -11,6 +12,7 @@ const WalletAction = () => {
   const [actionType, setActionType] = useState(""); // To identify Add or Deduct action
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
   const getClients = async () => {
     try {
@@ -72,14 +74,33 @@ const WalletAction = () => {
     }
   };
 
+  // Filter clients based on the search term
+  const filteredClients = clients.filter(
+    (client) =>
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.enrollment.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <AdminLayout>
       <div className="container mx-auto p-6">
         <h1 className="text-2xl font-bold text-center mb-6">
-          {/* Here is all the Clients */}
+          Manage Client Wallet
         </h1>
 
-        {clients?.length > 0 ? (
+        {/* Search box */}
+        <div className="mb-4">
+          <Search
+            style={{ width: "40%" }}
+            placeholder="Search clients by name, email, or enrollment"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            enterButton
+            className="w-full"
+          />
+        </div>
+
+        {filteredClients.length > 0 ? (
           <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg text-xs">
             <thead className="bg-gray-200">
               <tr className="bg-gray-100">
@@ -94,7 +115,7 @@ const WalletAction = () => {
               </tr>
             </thead>
             <tbody>
-              {clients.map((client, index) => (
+              {filteredClients.map((client, index) => (
                 <tr
                   key={index}
                   className="text-center hover:bg-gray-50 cursor-pointer"

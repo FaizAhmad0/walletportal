@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
     res.status(200).json({
       token: token,
       name: user.name,
+      enrollment:user.enrollment,
       email: user.email,
       message: "Logged in successfully!",
       id: user._id,

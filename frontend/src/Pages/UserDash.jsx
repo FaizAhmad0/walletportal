@@ -8,7 +8,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const UserDash = () => {
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const [userData, setUserData] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState([]);

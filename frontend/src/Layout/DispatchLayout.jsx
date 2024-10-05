@@ -104,7 +104,7 @@ const DispatchLayout = ({ children }) => {
             {
               key: `/order-report/${enrollment}`,
               icon: <SignalCellularAltIcon />,
-              label: "Oreder Report",
+              label: "Bulk-Order",
             },
             {
               key: "/details-reporting",

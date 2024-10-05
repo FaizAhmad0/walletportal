@@ -53,7 +53,6 @@ app.use("/orders", Order);
 app.use("/wallet", Wallet);
 app.use("/wallet-action", WalletAction);
 
-
 // const express = require("express");
 // const dotenv = require("dotenv");
 // const cors = require("cors");
@@ -126,4 +125,3 @@ app.use("/wallet-action", WalletAction);
 //   console.error(err.stack);
 //   res.status(500).send({ message: "Something went wrong!" });
 // });
-

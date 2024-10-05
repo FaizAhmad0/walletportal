@@ -120,6 +120,11 @@ const AdminLayout = ({ children }) => {
               icon: <SignalCellularAltIcon />,
               label: "Report",
             },
+            {
+              key: "/bulkOrders",
+              icon: <SignalCellularAltIcon />,
+              label: "Bulk Order",
+            },
 
             {
               key: "/",

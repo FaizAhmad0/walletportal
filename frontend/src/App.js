@@ -31,6 +31,7 @@ import AdminReport from "./Pages/AdminReport";
 import BulkOrder from "./Pages/BulkOrder";
 import ArchivedOrders from "./Pages/ArchivedOrders";
 import ShippingOrder from "./Pages/ShippingOrder";
+import BulkOrders from "./Pages/BulkOrders";
 function App() {
   return (
     <>
@@ -57,6 +58,7 @@ function App() {
           />
           <Route path="/archive-orders" exact element={<ArchivedOrders />} />
           <Route path="/shipped-orders" exact element={<ShippingOrder />} />
+          <Route path="/bulkOrders" exact element={<BulkOrders />} />
           <Route
             path="/details-reporting"
             exact

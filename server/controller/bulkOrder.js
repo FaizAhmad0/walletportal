@@ -2,6 +2,7 @@ const BulkOrder = require("../models/BulkOrder");
 
 module.exports = async (req, res) => {
   try {
+
     const newOrder = new BulkOrder(req.body);
     await newOrder.save();
     res

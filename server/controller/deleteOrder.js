@@ -3,7 +3,7 @@ const User = require("../models/User");
 module.exports = async (req, res) => {
   try {
     const { orderId } = req.params;
-    console.log(orderId);
+    // console.log(orderId);
     const user = await User.findOneAndUpdate(
       { "orders._id": orderId },
       { $pull: { orders: { _id: orderId } } },

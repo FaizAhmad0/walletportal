@@ -1,227 +1,452 @@
-import React, { useState } from "react";
-import { Table, Input, Button, Select, message } from "antd";
-import { SaveOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Table, Input, Button, Select, message, Popconfirm, Modal } from "antd";
+import { SaveOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import DispatchLayout from "../Layout/DispatchLayout";
 import "antd/dist/reset.css";
+
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Option } = Select;
 
-
 const OrderReport = () => {
-  // Form data as an object
+  const [orders, setOrders] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [paymentStages, setPaymentStages] = useState([]);
+  const [editingKey, setEditingKey] = useState(""); // Track the currently editing row
   const [formData, setFormData] = useState({
     name: "",
     enrollment: "",
-    amazonOrderId: "",
-    manager: "",
+    managerName: "",
     deliveryPartner: "",
     trackingId: "",
     sku: "",
     remarks: "",
     paymentStatus: "",
     address: "",
+    brandName: "", // New field
+    partyName: "", // New field
+    shippingAddress: "", // New field
+    managerName: "", // New field
+    size: "", // New field
+    quantity: "", // New field
+    price: "", // New field
+    totalPrice: "", // New field
+    dueDate: "", // New field
   });
+
+  // Fetch orders
+  const getOrders = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/orders/getallbulk`, {
+        headers: { Authorization: localStorage.getItem("token") },
+      });
+      setOrders(response.data.orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    getOrders();
+  }, []);
 
   const handleChange = (name, value) => {
     setFormData({
       ...formData,
-      [name]: value, // Update formData for each input field
+      [name]: value,
     });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log("Form Data:", formData);
+  const handleSubmitEdit = async (record) => {
+    const id = record._id;
+    const updatedData = { ...formData };
 
     try {
-      const response = await axios.post("/api/save-user-data", formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      await axios.put(`${backendUrl}/orders/bulkupdate/${id}`, updatedData, {
+        headers: { Authorization: localStorage.getItem("token") },
       });
-      console.log("Success:", response.data);
-      message.success("Data saved successfully!");
+      message.success("Order updated successfully!");
+      setEditingKey(""); // Exit edit mode
+      getOrders(); // Refresh orders
     } catch (error) {
-      console.error("Error:", error);
-      message.error("Failed to save data.");
+      console.error("Error updating order:", error);
+      message.error("Failed to update order.");
     }
+  };
+
+  const handleDelete = async (record) => {
+    const id = record._id;
+    try {
+      await axios.delete(`${backendUrl}/orders/bulkdelete/${id}`, {
+        headers: { Authorization: localStorage.getItem("token") },
+      });
+      message.success("Order deleted successfully!");
+      getOrders(); // Refresh orders
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      message.error("Failed to delete order.");
+    }
+  };
+  const handleShowStages = (paymentStage) => {
+    setPaymentStages(paymentStage); // Set payment stages for the selected order
+    setIsModalVisible(true); // Show modal
+  };
+  const getTotalPaidAmount = (paymentStage) => {
+    return paymentStage
+      ? paymentStage.reduce((acc, stage) => acc + stage.amount, 0)
+      : 0;
+  };
+
+  const getRemainingAmount = (order) => {
+    const totalPaid = getTotalPaidAmount(order.paymentStage);
+    return order.totalPrice - totalPaid;
   };
 
   const columns = [
     {
-      title: "SN.",
-      dataIndex: "sn",
-      key: "sn",
-      render: (_, __, index) => index + 1,
+      title: "Order Id",
+      dataIndex: "orderId",
+      key: "orderId",
+      width: "100px",
+      className: "text-xs", // Apply text-xs class
     },
     {
       title: "Brand Name",
-      dataIndex: "name",
-      key: "name",
-      render: (_, __) => (
-        <Input
-          style={{ width: "100px" }}
-          value={formData.name}
-          onChange={(e) => handleChange("name", e.target.value)}
-        />
-      ),
+      dataIndex: "brandName",
+      key: "brandName",
+      width: "140px",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.brandName}
+            onChange={(e) => handleChange("brandName", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
       title: "Enrollment",
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (_, __) => (
-        <Input
-          value={formData.enrollment}
-          onChange={(e) => handleChange("enrollment", e.target.value)}
-        />
-      ),
-    },
-    {
-      title: "Amazon Order ID",
-      dataIndex: "amazonOrderId",
-      key: "amazonOrderId",
-      render: (_, __) => (
-        <Input
-          style={{ width: "120px" }}
-          value={formData.amazonOrderId || ""} // Ensure value is defined
-          onChange={(e) => handleChange("amazonOrderId", e.target.value)} // Handle changes smoothly
-          placeholder="Enter Amazon Order ID"
-        />
-      ),
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.enrollment}
+            onChange={(e) => handleChange("enrollment", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
       title: "Manager",
-      dataIndex: "manager",
-      key: "manager",
-      render: (_, __) => (
-        <Select
-          value={formData.manager}
-          onChange={(value) => handleChange("manager", value)}
-        >
-          <Option value="">Select Manager</Option>
-          <Option value="TL-13">TL-13</Option>
-          <Option value="TL-2">TL-2</Option>
-          <Option value="TL-6">TL-6</Option>
-          <Option value="TL-8">TL-8</Option>
-        </Select>
-      ),
+      dataIndex: "managerName",
+      key: "managerName",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.managerName}
+            onChange={(e) => handleChange("managerName", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
-      title: "Delivery Partner",
-      dataIndex: "deliveryPartner",
-      key: "deliveryPartner",
-      render: (_, __) => (
-        <Select
-          value={formData.deliveryPartner}
-          onChange={(value) => handleChange("deliveryPartner", value)}
-        >
-          <Option value="">Select Delivery Partner</Option>
-          <Option value="Tirupati">Tirupati</Option>
-          <Option value="DTDC">DTDC</Option>
-        </Select>
-      ),
+      title: "Party Name",
+      dataIndex: "partyName",
+      key: "partyName",
+      width: "140px",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.partyName}
+            onChange={(e) => handleChange("partyName", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
-      title: "Tracking ID",
-      dataIndex: "trackingId",
-      key: "trackingId",
-      render: (_, __) => (
-        <Input
-          style={{ width: "110px" }}
-          value={formData.trackingId}
-          onChange={(e) => handleChange("trackingId", e.target.value)}
-        />
-      ),
+      title: "Shipping Address",
+      dataIndex: "shippingAddress",
+      key: "shippingAddress",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.shippingAddress}
+            onChange={(e) => handleChange("shippingAddress", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
       title: "SKU",
       dataIndex: "sku",
       key: "sku",
-      render: (_, __) => (
-        <Input
-          style={{ width: "100px" }}
-          value={formData.sku}
-          onChange={(e) => handleChange("sku", e.target.value)}
-        />
-      ),
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.sku}
+            onChange={(e) => handleChange("sku", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
-      title: "Remarks",
-      dataIndex: "remarks",
-      key: "remarks",
-      render: (_, __) => (
-        <Input
-          style={{ width: "80px" }}
-          value={formData.remarks}
-          onChange={(e) => handleChange("remarks", e.target.value)}
-        />
-      ),
+      title: "Size",
+      dataIndex: "size",
+      key: "size",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.size}
+            onChange={(e) => handleChange("size", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
-      title: "Payment Status",
-      dataIndex: "paymentStatus",
-      key: "paymentStatus",
-      render: (_, __) => (
-        <Select
-          value={formData.paymentStatus}
-          onChange={(value) => handleChange("paymentStatus", value)}
-        >
-          <Option value="">Select Payment Stage</Option>
-          <Option value="1st Stage">1st Stage</Option>
-          <Option value="2nd Stage">2nd Stage</Option>
-          <Option value="3rd Stage">3rd Stage</Option>
-        </Select>
-      ),
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.quantity}
+            onChange={(e) => handleChange("quantity", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
     },
     {
-      title: "Full Address",
-      dataIndex: "address",
-      key: "address",
-      render: (_, __) => (
-        <Input
-          style={{ width: "200px" }}
-          value={formData.address}
-          onChange={(e) => handleChange("address", e.target.value)}
-        />
-      ),
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.price}
+            onChange={(e) => handleChange("price", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
+    },
+    {
+      title: "Total Price",
+      dataIndex: "totalPrice",
+      key: "totalPrice",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) =>
+        editingKey === record._id ? (
+          <Input
+            value={formData.totalPrice}
+            onChange={(e) => handleChange("totalPrice", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+        ),
+    },
+    {
+      title: "Total Paid Amount",
+      dataIndex: "paymentStage",
+      key: "totalPaidAmount",
+      className: "text-xs",
+      render: (paymentStage) => getTotalPaidAmount(paymentStage),
+    },
+    {
+      title: "Remaining Amount",
+      key: "remainingAmount",
+      className: "text-xs",
+      render: (record) => {
+        const remainingAmount = getRemainingAmount(record);
+        if (remainingAmount <= 0) {
+          return (
+            <span style={{ color: "green", fontWeight: "bold" }}>
+              Payment Completed
+            </span>
+          );
+        }
+
+        return <span>{remainingAmount}</span>;
+      },
+    },
+
+    {
+      title: "Shipping Date",
+      dataIndex: "dueDate",
+      key: "dueDate",
+      width: 150,
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) => {
+        const formattedDueDate = record.dueDate
+          ? new Date(record.dueDate).toISOString().split("T")[0]
+          : "";
+        return editingKey === record._id ? (
+          <Input
+            type="date"
+            value={formData.dueDate || formattedDueDate} // Use formatted date
+            onChange={(e) => handleChange("dueDate", e.target.value)}
+            className="text-xs" // Apply text-xs class to the input
+          />
+        ) : (
+          <span className="text-xs">{formattedDueDate}</span> // Apply text-xs class to the text
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      className: "text-xs", // Apply text-xs class
+
+      render: (text, record) => {
+        if (editingKey === record._id) {
+          return (
+            <div style={{ display: "flex", gap: "8px" }}>
+              {" "}
+              {/* Flexbox to align buttons */}
+              <Button
+                type="primary"
+                onClick={() => handleSubmitEdit(record)}
+                icon={<SaveOutlined />}
+                className="text-xs"
+              >
+                Save
+              </Button>
+            </div>
+          );
+        }
+        return (
+          <div style={{ display: "flex", gap: "8px" }}>
+            {" "}
+            {/* Flexbox to align buttons */}
+            <Button
+              type="primary"
+              onClick={() => {
+                setFormData({
+                  name: record.name,
+                  enrollment: record.enrollment,
+                  amazonOrderId: record.amazonOrderId,
+                  manager: record.manager,
+                  deliveryPartner: record.deliveryPartner,
+                  trackingId: record.trackingId,
+                  sku: record.sku,
+                  remarks: record.remarks,
+                  paymentStatus: record.paymentStatus,
+                  address: record.address,
+                  brandName: record.brandName,
+                  partyName: record.partyName,
+                  shippingAddress: record.shippingAddress,
+                  managerName: record.managerName,
+                  size: record.size,
+                  quantity: record.quantity,
+                  price: record.price,
+                  totalPrice: record.totalPrice,
+                  dueDate: record.dueDate,
+                });
+                setEditingKey(record._id);
+              }}
+              icon={<EditOutlined />}
+              className="text-xs"
+            >
+              Edit
+            </Button>
+            <Popconfirm
+              title="Are you sure to delete?"
+              onConfirm={() => handleDelete(record)}
+            >
+              <Button
+                style={{ background: "red", color: "white" }}
+                danger
+                icon={<DeleteOutlined />}
+                className="text-xs"
+              >
+                Delete
+              </Button>
+            </Popconfirm>
+            <Button
+              type="default"
+              onClick={() => handleShowStages(record.paymentStage)}
+              className="text-xs"
+            >
+              Show Stages
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
   return (
     <DispatchLayout>
       <div className="relative max-w-6xl mx-auto pb-20 z-10">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
-          Order Report
-        </h1>
-
-        <h2 className="text-xl font-semibold text-center text-gray-600 mb-6">
-          Detailed Information about the Order Report
-        </h2>
-
-        <div className="overflow-x-auto mb-16">
-          <form id="user-form" onSubmit={handleSubmit}>
-            <Table
-              dataSource={[formData]} // Wrapping formData in an array
-              columns={columns}
-              pagination={false}
-              rowKey={(record) => record.amazonOrderId || "default-key"} // Providing a key
-              className="min-w-full bg-white shadow-md rounded-lg overflow-hidden"
-              scroll={{ x: 1500 }}
-            />
-
-            <div className="flex justify-between mt-6">
-              <Button
-                type="primary"
-                icon={<SaveOutlined />}
-                htmlType="submit"
-                className="bg-green-500 hover:bg-green-600"
-              >
-                Save
-              </Button>
-            </div>
-          </form>
-        </div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">Bulk Order</h1>
+        <Table
+          bordered
+          dataSource={orders} // Display all orders
+          columns={columns}
+          rowKey={(record) => record._id}
+          pagination={false}
+          scroll={{ x: 1500 }}
+        />
+        <Modal
+          title="Payment Stages"
+          visible={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setIsModalVisible(false)}>
+              Close
+            </Button>,
+          ]}
+        >
+          {paymentStages.length > 0 ? (
+            <ul>
+              {paymentStages.map((stage, index) => (
+                <li key={index}>
+                  Stage: {stage.stage}, Amount: {stage.amount}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No payment stages available</p>
+          )}
+        </Modal>
       </div>
     </DispatchLayout>
   );

@@ -1,54 +1,55 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Modal, Input, Button, message } from "antd"; // Ant Design for modal and input
 import UserLayout from "../Layout/UserLayout";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const tableData = [
-  {
-    date: "2024-08-20",
-    orderNumber: "ORD12345",
-    totalInvoiceValue: "$1000",
-    paymentStatus: 1,
-    shippingAddress: "123 Main St, Springfield, IL",
-    shippedDate: "2024-08-21",
-    status: "Completed", // Add status here
-    paymentTimeline: [{ stage: "s1", amount: "$3000", date: "2024-08-19" }],
-  },
-  {
-    date: "2024-08-21",
-    orderNumber: "ORD54321",
-    totalInvoiceValue: "$1500",
-    paymentStatus: 2,
-    shippingAddress: "456 Oak St, Springfield, IL",
-    shippedDate: "2024-08-22",
-    status: "Pending", // Add status here
-    paymentTimeline: [
-      { stage: "s1", amount: "$3000", date: "2024-08-19" },
-      { stage: "s2", amount: "$6000", date: "2024-08-20" },
-    ],
-  },
-  {
-    date: "2024-08-21",
-    orderNumber: "ORD54321",
-    totalInvoiceValue: "$1500",
-    paymentStatus: 3,
-    shippingAddress: "456 Oak St, Springfield, IL",
-    shippedDate: "2024-08-22",
-    status: "Pending", // Add status here
-    paymentTimeline: [
-      { stage: "s1", amount: "$3000", date: "2024-08-19" },
-      { stage: "s2", amount: "$6000", date: "2024-08-20" },
-      { stage: "s3", amount: "$6000", date: "2024-08-20" },
-    ],
-  },
-  // Add more entries as needed
-];
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const BodFba = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [orders, setOrders] = useState([]);
   const [sortConfig, setSortConfig] = useState({
-    key: "date",
-    direction: "ascending",
+    key: "createdAt",
+    direction: "descending", // Default to descending
   });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [userData, setUserData] = useState("");
+  console.log(userData);
+  const [amount, setAmount] = useState("");
+
+  const getOrders = async () => {
+    const user = localStorage.getItem("enrollment");
+    try {
+      const response = await axios.get(
+        `${backendUrl}/orders/getuserbulk/${user}`,
+        {
+          headers: { Authorization: localStorage.getItem("token") },
+        }
+      );
+      setOrders(response.data.orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+  const getUser = async () => {
+    const id = localStorage.getItem("id");
+    try {
+      const response = await axios.get(`${backendUrl}/user/${id}`, {
+        headers: { Authorization: localStorage.getItem("token") },
+      });
+      setUserData(response.data.user);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    getOrders();
+    getUser();
+  }, []);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -60,7 +61,45 @@ const BodFba = () => {
     setSortConfig({ key, direction });
   };
 
-  const sortedData = [...tableData].sort((a, b) => {
+  const handlePayNowClick = (orderId) => {
+    setSelectedOrderId(orderId);
+    setIsModalVisible(true);
+  };
+
+  const handleModalOk = async () => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/orders/bulkorder/pay`,
+        {
+          orderId: selectedOrderId,
+          amount,
+          enrollment: localStorage.getItem("enrollment"),
+        },
+        {
+          headers: { Authorization: localStorage.getItem("token") },
+        }
+      );
+      setIsModalVisible(false);
+
+      message.success("Payment successfully completed!");
+      setAmount("");
+      getOrders(); // Refresh orders after payment
+    } catch (error) {
+      console.error("Payment failed:", error);
+    }
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setAmount("");
+  };
+
+  // Function to calculate the total paid amount from the paymentStage array
+  const getTotalPaidAmount = (paymentStage) => {
+    return paymentStage.reduce((acc, stage) => acc + stage.amount, 0);
+  };
+
+  const sortedData = [...orders].sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === "ascending" ? -1 : 1;
     }
@@ -78,7 +117,7 @@ const BodFba = () => {
 
   return (
     <UserLayout>
-      <div className="max-w-6xl mx-auto p-4 bg-white shadow-md rounded-md">
+      <div className="max-w-6xl mx-auto bg-white shadow-md rounded-md">
         <h2 className="text-2xl text-center font-bold mb-4">
           B.O.D - Order Details
         </h2>
@@ -94,16 +133,16 @@ const BodFba = () => {
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table className="min-w-full bg-white">
-              <thead className="bg-gray-50">
+              <thead className="bg-blue-50">
                 <tr>
                   {[
-                    "Date",
-                    "Order Number",
-                    "Total Invoice Value",
-                    "Payment Status",
+                    "Order Id",
                     "Shipping Address",
-                    "Shipped Date",
-                    "Status",
+                    "Total Price",
+                    "Remaining Amount",
+                    "Date of Order",
+                    "Date of Shipping",
+                    "Status", // Column for Pay Now or Payment Completed
                   ].map((header) => (
                     <th
                       key={header}
@@ -118,45 +157,77 @@ const BodFba = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((item, index) => (
-                  <tr key={index} className="hover:bg-gray-100">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.date}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.orderNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.totalInvoiceValue}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
-                      <Link to={`/order-payment-stage/`}>
-                        <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
-                          View Payment Stages
-                        </button>
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
-                      <Link to={`/order-shipping-address`}>
-                        <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
-                          View Shipping Adress
-                        </button>
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.shippedDate}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.status}
-                    </td>{" "}
-                    {/* New Status Column */}
-                  </tr>
-                ))}
+                {filteredData.map((item, index) => {
+                  const totalPaidAmount = getTotalPaidAmount(item.paymentStage);
+                  const remainingAmount = item.totalPrice - totalPaidAmount;
+
+                  return (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                        {item.orderId}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                        {item.shippingAddress}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                        {item.totalPrice}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                        {remainingAmount}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                        {new Date(item.dueDate).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                        {totalPaidAmount >= item.totalPrice ? (
+                          <span className="text-green-500 font-bold">
+                            Payment Completed
+                          </span>
+                        ) : remainingAmount <= userData.amount ? (
+                          <Button
+                            type="primary"
+                            onClick={() => handlePayNowClick(item.orderId)}
+                          >
+                            Pay Now
+                          </Button>
+                        ) : (
+                          <Button
+                            type="primary"
+                            onClick={() => {
+                              navigate("/wallet");
+                            }}
+                          >
+                            Recharge Now
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      <Modal
+        title="Pay Now"
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+      >
+        <Input
+          type="number"
+          placeholder="Enter amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+      </Modal>
     </UserLayout>
   );
 };
