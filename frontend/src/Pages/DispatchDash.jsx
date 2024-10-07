@@ -2,11 +2,15 @@ import React, { useEffect, useState } from "react";
 import DispatchLayout from "../Layout/DispatchLayout";
 import { Link } from "react-router-dom";
 import { Modal, Button, Table, message, Select, Radio, Input } from "antd";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import ArchiveIcon from "@mui/icons-material/Archive";
 import axios from "axios";
 import moment from "moment"; // Make sure to install moment.js via npm or yarn
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Option } = Select;
+const { confirm } = Modal;
 
 const DispatchDash = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -20,7 +24,7 @@ const DispatchDash = () => {
   const [timeFilter, setTimeFilter] = useState(""); // Initialize with empty string for no filter
   const [editingItem, setEditingItem] = useState(null); // Track the editing item
   const [editValues, setEditValues] = useState({}); // Store edit values for the item
-
+  const role = localStorage.getItem("role");
   // Fetch orders from backend
   const getOrders = async () => {
     try {
@@ -75,8 +79,11 @@ const DispatchDash = () => {
     }
   };
   const handleDeleteclick = async (orderItems, finalAmount, orderId) => {
-    console.log("kyu click kiya");
-    console.log(orderId, finalAmount);
+    // Log order details for debugging or auditing purposes
+    console.log("Delete initiated by user");
+    console.log("Order ID:", orderId);
+    console.log("Final Amount:", finalAmount);
+    console.log("Order Items:", orderItems);
 
     try {
       const response = await axios.delete(
@@ -88,11 +95,28 @@ const DispatchDash = () => {
         }
       );
       message.success("Order deleted successfully!");
-      getOrders();
+      getOrders(); // Refresh the list of orders after deletion
     } catch (error) {
       console.error("Error deleting order:", error);
-      message.error("Could not delete order, Please try again");
+      message.error("Could not delete order. Please try again.");
     }
+  };
+
+  const showDeleteConfirm = (orderId, recordId, orderItems, finalAmount) => {
+    confirm({
+      title: "Are you sure you want to delete this order?",
+      icon: <DeleteOutlineIcon />,
+      content: `This action will permanently remove the order with ID: ${recordId}.`,
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        handleDeleteclick(orderItems, finalAmount, orderId); // Pass necessary parameters
+      },
+      onCancel() {
+        console.log("Deletion canceled");
+      },
+    });
   };
 
   useEffect(() => {
@@ -140,17 +164,28 @@ const DispatchDash = () => {
 
     setFilteredOrders(filtered);
   };
+  const getRowClassName = (record) => {
+    const allUnavailable = record.items.some(
+      (item) => item.productAction !== "Available"
+    );
+    const isPaymentPending = !record.paymentStatus;
+
+    if (allUnavailable && isPaymentPending) {
+      return "bg-red-100"; // Light red
+    } else if (allUnavailable) {
+      return "bg-yellow-100"; // Light yellow
+    } else if (isPaymentPending) {
+      return "bg-pink-100"; // Light pink
+    } else {
+      return ""; // Default row color
+    }
+  };
+
   const columns = [
     {
       title: <span className="text-xs">Order Id</span>,
       dataIndex: "orderId",
       key: "orderId",
-      render: (text) => <span className="text-xs">{text}</span>,
-    },
-    {
-      title: <span className="text-xs">Name</span>,
-      dataIndex: "name",
-      key: "name",
       render: (text) => <span className="text-xs">{text}</span>,
     },
     {
@@ -220,16 +255,15 @@ const DispatchDash = () => {
       title: <span className="text-xs">Action</span>,
       key: "action",
       render: (_, record) => (
-        <div className="text-xs flex gap-2">
+        <div className="text-xs flex gap-1">
           <Button
             type="primary"
             className="text-xs"
             onClick={() =>
               handleRowClick(record.items, record.finalAmount, record._id)
             }
-            style={{ marginRight: "10px" }}
           >
-            View & Edit
+            <DriveFileRenameOutlineIcon style={{ fontSize: "16px" }} />
           </Button>
           {!record.paymentStatus ? (
             <Button
@@ -243,53 +277,67 @@ const DispatchDash = () => {
                 )
               }
             >
-              Pay Now
+              Pay
             </Button>
           ) : (
-            <Button
-              type="primary"
-              className="text-xs"
-              disabled={true}
-              style={{
-                background: "rgb(40,167,69)",
-                paddingLeft: "24px",
-                paddingRight: "24px",
-                color: "white",
-              }}
-            >
-              Done
-            </Button>
+            <></>
           )}
 
           <Button
             type="primary"
             className="text-xs"
-            onClick={() =>
-              handleDeleteclick(record.items, record.finalAmount, record._id)
-            }
-            style={{ marginRight: "10px", background: "red" }}
-          >
-            Delete
-          </Button>
-          <Button
-            type="primary"
-            className="text-xs"
-            style={{ marginRight: "10px", background: "green" }}
+            style={{ background: "green" }}
             onClick={() =>
               handleArchiveClick(record.items, record.finalAmount, record._id)
             }
           >
-            Archive
+            <ArchiveIcon style={{ fontSize: "16px" }} />
           </Button>
+          {role === "shippingmanager" ? (
+            <Button
+              type="primary"
+              className="text-xs"
+              style={{
+                marginRight: "5px",
+                background: "green",
+                color: "white",
+              }}
+              onClick={() =>
+                handleShippedClick(record.items, record.finalAmount, record._id)
+              }
+            >
+              Shipped
+            </Button>
+          ) : (
+            <Button
+              disabled={true}
+              type="primary"
+              className="text-xs"
+              style={{
+                marginRight: "5px",
+                background: "green",
+                color: "white",
+              }}
+              onClick={() =>
+                handleShippedClick(record.items, record.finalAmount, record._id)
+              }
+            >
+              Shipped
+            </Button>
+          )}
           <Button
             type="primary"
-            className="text-xs"
-            style={{ marginRight: "10px", background: "green" }}
             onClick={() =>
-              handleShippedClick(record.items, record.finalAmount, record._id)
+              showDeleteConfirm(
+                record._id,
+                record.orderId,
+                record.orderItems,
+                record.finalAmount
+              )
             }
+            style={{ background: "red" }}
           >
-            Shipped
+            <DeleteOutlineIcon style={{ fontSize: "16px" }} />
           </Button>
         </div>
       ),
@@ -335,20 +383,20 @@ const DispatchDash = () => {
     setTimeFilter(e.target.value);
   };
 
-  const handleDeleteClick = async (orderItems, finalAmount, orderId) => {
-    try {
-      await axios.delete(`${backendUrl}/orders/delete/${orderId}`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      });
-      message.success("Order deleted successfully!");
-      getOrders();
-    } catch (error) {
-      console.error("Error deleting order:", error);
-      message.error("Could not delete order, Please try again");
-    }
-  };
+  // const handleDeleteClick = async (orderItems, finalAmount, orderId) => {
+  //   try {
+  //     await axios.delete(`${backendUrl}/orders/delete/${orderId}`, {
+  //       headers: {
+  //         Authorization: localStorage.getItem("token"),
+  //       },
+  //     });
+  //     message.success("Order deleted successfully!");
+  //     getOrders();
+  //   } catch (error) {
+  //     console.error("Error deleting order:", error);
+  //     message.error("Could not delete order, Please try again");
+  //   }
+  // };
 
   // Handlers for modal and actions
   const handleRowClick = (orderItems, finalAmount, orderId) => {
@@ -451,7 +499,7 @@ const DispatchDash = () => {
 
   return (
     <DispatchLayout>
-      <div className="relative max-w-6xl mx-auto pb-20">
+      <div className="relative max-w-full mx-auto pb-20">
         <h1 className="text-xl font-semibold text-black-600 mb-4">
           Dispatch Dashboard
         </h1>
@@ -502,6 +550,7 @@ const DispatchDash = () => {
             bordered
             columns={columns}
             dataSource={dataSource}
+            rowClassName={getRowClassName}
             pagination={{ pageSize: 10 }}
             rowKey={(record) => record._id}
             scroll={{ x: "max-content" }}

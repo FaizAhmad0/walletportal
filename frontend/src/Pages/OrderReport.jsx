@@ -415,7 +415,7 @@ const OrderReport = () => {
 
   return (
     <DispatchLayout>
-      <div className="relative max-w-6xl mx-auto pb-20 z-10">
+      <div className="relative max-w-full mx-auto pb-20 z-10">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Bulk Order</h1>
         <Table
           bordered

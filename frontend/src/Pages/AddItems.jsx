@@ -218,7 +218,7 @@ const AddItems = () => {
 
   return (
     <DispatchLayout>
-      <main className="max-w-6xl mx-auto bg-white shadow-md rounded-md text-black">
+      <main className="max-w-full mx-auto bg-white shadow-md rounded-md text-black">
         <h1 className="text-lg font-bold mb-6 text-center underline">
           Add Items for Order: {enrollment}
         </h1>

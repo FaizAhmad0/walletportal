@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Table, Radio } from "antd";
+import { Table, Radio, Input } from "antd";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
-import moment from "moment"; // Import moment.js
+import moment from "moment";
 
+const { Search } = Input; // Destructure Search from Input
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ShippingOrder = () => {
   const [orders, setOrders] = useState([]);
-  const [filter, setFilter] = useState("all"); // Set default to "all"
-  console.log(orders);
+  const [filter, setFilter] = useState("all");
+  const [searchText, setSearchText] = useState(""); // Add searchText state
 
   const getOrders = async () => {
     try {
@@ -31,7 +32,6 @@ const ShippingOrder = () => {
     getOrders();
   }, []);
 
-  // Function to filter the orders based on the createdAt date
   const filterOrdersByDate = (order) => {
     const orderDate = moment(order.createdAt);
     const today = moment();
@@ -45,17 +45,16 @@ const ShippingOrder = () => {
         return orderDate.isSame(today, "month");
       case "year":
         return orderDate.isSame(today, "year");
-      case "all": // Return all orders when the filter is "all"
+      case "all":
       default:
         return true;
     }
   };
 
-  // Data processing to match DispatchDash style
-  const dataSource = orders
+  const filteredOrders = orders
     .flatMap((user) =>
       user.orders
-        .filter((order) => order.shipped === true && filterOrdersByDate(order)) // Only include shipped orders and apply the filter
+        .filter((order) => order.shipped === true && filterOrdersByDate(order))
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -75,69 +74,81 @@ const ShippingOrder = () => {
           createdAt: order.createdAt,
         }))
     )
+    .filter((order) => {
+      // Convert all values to strings before applying search filtering
+      const searchString = searchText.toLowerCase();
+      return (
+        String(order.name).toLowerCase().includes(searchString) ||
+        String(order.orderId).toLowerCase().includes(searchString) ||
+        String(order.amazonOrderId).toLowerCase().includes(searchString) ||
+        String(order.manager).toLowerCase().includes(searchString) ||
+        String(order.shippingPartner).toLowerCase().includes(searchString) ||
+        String(order.sku).toLowerCase().includes(searchString) ||
+        String(order.pincode).toLowerCase().includes(searchString)
+      );
+    })
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  // Column definitions for the Ant Design Table
   const columns = [
     {
       title: <span className="text-xs">Order ID</span>,
       dataIndex: "orderId",
       key: "orderId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Enrollment No.</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Amazon Order Id</span>,
       dataIndex: "amazonOrderId",
       key: "amazonOrderId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Tracking Id</span>,
       dataIndex: "trackingId",
       key: "trackingId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">SKU</span>,
       dataIndex: "sku",
       key: "sku",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Pincode</span>,
       dataIndex: "pincode",
       key: "pincode",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Amount</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (text) => <span className="text-xs">₹ {text}</span>,
+      render: (text) => <span className="text-xs">₹ {text}</span>, // Apply text-xs
     },
     {
       title: <span className="text-xs">Product Status</span>,
@@ -158,15 +169,24 @@ const ShippingOrder = () => {
 
   return (
     <DispatchLayout>
-      <div className="relative max-w-6xl mx-auto pb-20">
+      <div className="relative max-w-full mx-auto pb-20">
         <h1 className="text-xl font-semibold text-black-600 mb-4">
           Shipped Orders
         </h1>
-        <div className="text-xs">
+        <div className="flex justify-between items-center mb-4">
+          {/* Search Input */}
+          <Search
+            placeholder="Search orders..."
+            allowClear
+            onSearch={(value) => setSearchText(value)}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 200 }}
+          />
+          {/* Radio Filter */}
           <Radio.Group
             buttonStyle="solid"
-            value={filter} // Bind the selected filter to the state
-            onChange={(e) => setFilter(e.target.value)} // Update the filter state when the user selects an option
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
           >
             <Radio.Button value="all">All</Radio.Button>
             <Radio.Button value="today">Today</Radio.Button>
@@ -178,7 +198,7 @@ const ShippingOrder = () => {
         <Table
           bordered
           columns={columns}
-          dataSource={dataSource}
+          dataSource={filteredOrders}
           pagination={{ pageSize: 10 }}
         />
       </div>

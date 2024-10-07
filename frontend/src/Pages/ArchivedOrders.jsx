@@ -164,7 +164,7 @@ const ArchivedOrders = () => {
       {loading ? (
         <Skeleton active />
       ) : (
-        <div className="relative max-w-6xl mx-auto pb-20">
+        <div className="relative max-w-full mx-auto pb-20">
           <h1 className="text-xl font-semibold text-black-600 mb-4">
             Archived Orders
           </h1>

@@ -149,6 +149,21 @@ const OrderHistory = () => {
       width: 150,
     },
     {
+      title: <span className="text-xs">Product Availability</span>, // New column for product availability
+      key: "availability",
+      render: (text, record) => {
+        const isAnyProductNotAvailable = record.items.some(
+          (item) => item.productAction !== "Available"
+        );
+        return (
+          <span className="text-xs">
+            {isAnyProductNotAvailable ? "Not Available" : "Available"}
+          </span>
+        );
+      },
+      width: 150,
+    },
+    {
       title: <span className="text-xs">Action</span>,
       key: "action",
       render: (text, record) => (
@@ -211,6 +226,24 @@ const OrderHistory = () => {
     },
   ];
 
+  // Define row class based on conditions
+  const rowClassName = (record) => {
+    const isProductNotAvailable = record.items.some(
+      (item) => item.productAction !== "Available"
+    );
+    const isPaymentIncomplete = !record.paymentStatus;
+
+    if (isProductNotAvailable && isPaymentIncomplete) {
+      return "bg-red-100"; // Light red
+    } else if (isProductNotAvailable) {
+      return "bg-yellow-100"; // Light yellow
+    } else if (isPaymentIncomplete) {
+      return "bg-pink-100"; // Light pink
+    } else {
+      return ""; // No specific style
+    }
+  };
+
   return (
     <ManagerLayout>
       <div className="container mx-auto sm:p-6 lg:p-6">
@@ -248,6 +281,7 @@ const OrderHistory = () => {
               pagination={false}
               bordered
               className="custom-table"
+              rowClassName={rowClassName} // Apply row class
             />
           </div>
         ) : (

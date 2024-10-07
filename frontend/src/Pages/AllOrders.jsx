@@ -224,6 +224,23 @@ const AllOrders = () => {
     },
   ];
 
+  const getRowClassName = (record) => {
+    const allUnavailable = record.items.some(
+      (item) => item.productAction !== "Available"
+    );
+    const isPaymentPending = !record.paymentStatus;
+
+    if (allUnavailable && isPaymentPending) {
+      return "bg-red-100"; // Light red
+    } else if (allUnavailable) {
+      return "bg-yellow-100"; // Light yellow
+    } else if (isPaymentPending) {
+      return "bg-pink-100"; // Light pink
+    } else {
+      return ""; // Default row color
+    }
+  };
+
   const dataSource = orders.flatMap((user) =>
     user.orders.map((order) => ({
       key: order._id, // Ensure order._id is set properly
@@ -244,8 +261,8 @@ const AllOrders = () => {
 
   return (
     <AdminLayout>
-      <div className="relative max-w-6xl mx-auto pb-20">
-        <h1 className="text-2xl font-bold text-center mb-6 text-xl">
+      <div className="relative max-w-full mx-auto pb-20">
+        <h1 className="text-2xl font-bold mb-6 text-xl">
           A detailed list of orders and their information
         </h1>
 
@@ -270,6 +287,7 @@ const AllOrders = () => {
             style={{ cursor: "pointer" }}
             columns={columns}
             dataSource={dataSource}
+            rowClassName={getRowClassName}
             pagination={{ pageSize: 10 }}
             scroll={{ x: "max-content" }}
           />

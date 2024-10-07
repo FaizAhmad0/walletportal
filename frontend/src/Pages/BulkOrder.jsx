@@ -571,7 +571,7 @@ const BulkOrder = () => {
           className="min-w-full bg-white shadow-md rounded-lg overflow-hidden"
           scroll={{ x: 1500 }}
         />
-        <div className="flex justify-between mt-6 mb-6">
+        <div className="max-w-full flex justify-between mt-6 mb-6">
           <Button
             type="primary"
             icon={<SaveOutlined />}

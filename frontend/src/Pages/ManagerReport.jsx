@@ -322,39 +322,6 @@ const ManagerReport = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center underline">
-            GMS and Hold Analytics
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Gross Merchandise Sales (GMS)
-              </h3>
-              <Line
-                data={gmsData}
-                options={{
-                  responsive: true,
-                  plugins: { legend: { position: "top" } },
-                }}
-              />
-            </div>
-            {/* Holds Chart */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Hold Analytics
-              </h3>
-              <Bar
-                data={holdData}
-                options={{
-                  responsive: true,
-                  plugins: { legend: { position: "top" } },
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
         {isModalVisible && (
           <div
             ref={modalRef}

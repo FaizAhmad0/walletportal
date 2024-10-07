@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../Layout/AdminLayout";
-import { Modal, Button, Table } from "antd";
+import { Modal, Button, Table, Input, Typography } from "antd";
+
+const { Title } = Typography;
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AdminReport = () => {
@@ -58,78 +60,80 @@ const AdminReport = () => {
     setSelectedManagerClients([]);
   };
 
+  const columns = [
+    {
+      title: "Manager Name",
+      dataIndex: "name",
+      key: "name",
+      className: "text-xs",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      className: "text-xs",
+    },
+    {
+      title: "Enrollment",
+      dataIndex: "enrollment",
+      key: "enrollment",
+      className: "text-xs",
+    },
+    {
+      title: "Phone",
+      dataIndex: "mobile",
+      key: "mobile",
+      className: "text-xs",
+    },
+    {
+      title: "Balance",
+      dataIndex: "amount",
+      key: "amount",
+      className: "text-xs",
+    },
+    {
+      title: "GMS",
+      dataIndex: "gms",
+      key: "gms",
+      className: "text-xs",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          className="text-xs italic"
+          onClick={() => handleViewClientsClick(record.name)}
+          loading={loading}
+        >
+          View Clients
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <AdminLayout>
-      <div className="container mx-auto ">
-        <div>
-          <h1 className="text-2xl font-bold text-center mb-6">
-            Here is all the Managers
-          </h1>
-          <input
-            type="text"
-            style={{ width: "30%" }}
-            placeholder="Search by enrollment"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="mb-4 p-2 border rounded w-full"
+      <div className="container mx-auto p-6">
+        <Title level={2} className="text-center mb-4">
+          Here are all the Managers
+        </Title>
+        <Input
+          placeholder="Search by enrollment"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: "30%", marginBottom: "16px" }}
+        />
+        {filteredClients.length > 0 ? (
+          <Table
+            dataSource={filteredClients}
+            columns={columns}
+            pagination={false}
+            rowKey="enrollment"
+            bordered
+            className="text-xs"
           />
-        </div>
-
-        {filteredClients?.length > 0 ? (
-          <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg text-xs">
-            <thead className="bg-gray-200">
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 border border-gray-300">
-                  Manager Name
-                </th>
-                <th className="px-4 py-2 border border-gray-300">Email</th>
-                <th className="px-4 py-2 border border-gray-300">Enrollment</th>
-                <th className="px-4 py-2 border border-gray-300">Phone</th>
-                <th className="px-4 py-2 border border-gray-300">Balance</th>
-                <th className="px-4 py-2 border border-gray-300">GMS</th>
-                <th className="px-4 py-2 border border-gray-300">
-                  Action
-                </th>{" "}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredClients.map((client, index) => (
-                <tr
-                  key={index}
-                  className="text-center hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.name}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.email}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.enrollment}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.mobile}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.amount}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.gms}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    <Button
-                      type="primary"
-                      className="text-xs italic"
-                      onClick={() => handleViewClientsClick(client.name)}
-                      loading={loading}
-                    >
-                      View Clients
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         ) : (
           <p className="text-center text-gray-600">No manager found.</p>
         )}
@@ -145,7 +149,7 @@ const AdminReport = () => {
           </Button>,
         ]}
       >
-        {selectedManagerClients?.length > 0 ? (
+        {selectedManagerClients.length > 0 ? (
           <Table
             dataSource={selectedManagerClients}
             columns={[
@@ -153,25 +157,29 @@ const AdminReport = () => {
                 title: "Name",
                 dataIndex: "name",
                 key: "name",
+                className: "text-xs",
               },
               {
                 title: "Enrollment",
                 dataIndex: "enrollment",
                 key: "enrollment",
+                className: "text-xs",
               },
               {
                 title: "Email",
                 dataIndex: "email",
                 key: "email",
+                className: "text-xs",
               },
               {
                 title: "GMS",
                 dataIndex: "gms",
                 key: "gms",
+                className: "text-xs",
               },
             ]}
             pagination={false}
-            rowKey={(record) => record.enrollment}
+            rowKey="enrollment"
           />
         ) : (
           <p>No clients found for this manager.</p>

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../Layout/AdminLayout";
+import { Table, Input, Typography } from "antd";
+
+const { Search } = Input;
+const { Title } = Typography;
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AllManagers = () => {
@@ -29,68 +33,72 @@ const AllManagers = () => {
     client.enrollment.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const columns = [
+    {
+      title: "Manager Name",
+      dataIndex: "name",
+      key: "name",
+      className: "text-xs",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      className: "text-xs",
+    },
+    {
+      title: "Enrollment",
+      dataIndex: "enrollment",
+      key: "enrollment",
+      className: "text-xs",
+    },
+    {
+      title: "Phone",
+      dataIndex: "mobile",
+      key: "mobile",
+      className: "text-xs",
+    },
+    {
+      title: "Balance",
+      dataIndex: "amount",
+      key: "amount",
+      className: "text-xs",
+    },
+    {
+      title: "GMS",
+      dataIndex: "gms",
+      key: "gms",
+      className: "text-xs",
+    },
+  ];
+
   return (
     <AdminLayout>
-      <div className="container mx-auto pr-6 pb-6 pl-6">
-        <div>
-          <h1 className="text-2xl font-bold text-center mb-6 text-xl">
-            Here is all the Manager
-          </h1>
-          <input
-            type="text"
-            style={{ width: "30%" }}
-            placeholder="Search by enrollment"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="mb-4 p-2 border rounded w-full"
-          />
-          <h2 className="text-sm">Total managers : {clients.length}</h2>
-        </div>
+      <div className="container mx-auto p-6">
+        <Title level={2} className="text-center mb-6">
+          Here are all the Managers
+        </Title>
 
-        {filteredClients?.length > 0 ? (
-          <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg text-xs">
-            <thead className="bg-gray-200">
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 border border-gray-300">
-                  Manager Name
-                </th>
-                <th className="px-4 py-2 border border-gray-300">Email</th>
-                <th className="px-4 py-2 border border-gray-300">Enrollment</th>
-                <th className="px-4 py-2 border border-gray-300">Phone</th>
-                <th className="px-4 py-2 border border-gray-300">Balance</th>
-                <th className="px-4 py-2 border border-gray-300">GMS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredClients.map((client, index) => (
-                <tr
-                  key={index}
-                  className="text-center hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.name}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.email}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.enrollment}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.mobile}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.amount}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.gms}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-center text-gray-600">No manager found.</p>
+        <Search
+          placeholder="Search by enrollment"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: "40%", marginBottom: "16px" }}
+        />
+
+        <Title level={5}>Total Managers: {clients.length}</Title>
+
+        <Table
+          columns={columns}
+          dataSource={filteredClients}
+          rowKey={(record) => record._id}
+          pagination={{ pageSize: 5 }}
+          bordered
+          className="managers-table"
+        />
+
+        {filteredClients.length === 0 && (
+          <p className="text-center text-gray-600">No managers found.</p>
         )}
       </div>
     </AdminLayout>

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../Layout/AdminLayout";
-import { Modal, Input, message } from "antd";
+import { Modal, Input, message, Table, Button, Typography, Space } from "antd";
+
 const { Search } = Input;
+const { Title } = Typography;
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const WalletAction = () => {
@@ -37,7 +39,6 @@ const WalletAction = () => {
     setIsModalVisible(true);
   };
 
-  // Submit the amount and reason to the backend
   const handleSubmit = async () => {
     if (!amount || !reason) {
       message.error("Please fill in all fields");
@@ -63,7 +64,6 @@ const WalletAction = () => {
       );
       message.success(response.data.message);
 
-      // Reset fields and close modal
       setIsModalVisible(false);
       setAmount("");
       setReason("");
@@ -74,7 +74,6 @@ const WalletAction = () => {
     }
   };
 
-  // Filter clients based on the search term
   const filteredClients = clients.filter(
     (client) =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,98 +81,95 @@ const WalletAction = () => {
       client.enrollment.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const columns = [
+    {
+      title: "Client Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Enrollment",
+      dataIndex: "enrollment",
+      key: "enrollment",
+    },
+    {
+      title: "Phone",
+      dataIndex: "mobile",
+      key: "mobile",
+    },
+    {
+      title: "Balance",
+      dataIndex: "amount",
+      key: "amount",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, client) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            onClick={() => handleActionClick(client, "add")}
+          >
+            Add Money
+          </Button>
+          <Button
+            style={{ background: "red", color: "white" }}
+            onClick={() => handleActionClick(client, "deduct")}
+          >
+            Deduct Money
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <AdminLayout>
       <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">
+        <Title level={2} className="text-center mb-6">
           Manage Client Wallet
-        </h1>
+        </Title>
 
-        {/* Search box */}
-        <div className="mb-4">
-          <Search
-            style={{ width: "40%" }}
-            placeholder="Search clients by name, email, or enrollment"
-            onChange={(e) => setSearchTerm(e.target.value)}
-            enterButton
-            className="w-full"
-          />
-        </div>
+        <Search
+          style={{ width: "40%", marginBottom: "16px" }}
+          placeholder="Search clients by name, email, or enrollment"
+          onChange={(e) => setSearchTerm(e.target.value)}
+          enterButton
+        />
 
-        {filteredClients.length > 0 ? (
-          <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg text-xs">
-            <thead className="bg-gray-200">
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 border border-gray-300">
-                  Client Name
-                </th>
-                <th className="px-4 py-2 border border-gray-300">Email</th>
-                <th className="px-4 py-2 border border-gray-300">Enrollment</th>
-                <th className="px-4 py-2 border border-gray-300">Phone</th>
-                <th className="px-4 py-2 border border-gray-300">Balance</th>
-                <th className="px-4 py-2 border border-gray-300">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredClients.map((client, index) => (
-                <tr
-                  key={index}
-                  className="text-center hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.name}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.email}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.enrollment}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.mobile}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {client.amount}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    <button
-                      className="bg-green-500 text-white px-3 py-1 rounded-md mr-2 italic"
-                      onClick={() => handleActionClick(client, "add")}
-                    >
-                      Add Money
-                    </button>
-                    <button
-                      className="bg-red-500 text-white px-3 py-1 rounded-md italic"
-                      onClick={() => handleActionClick(client, "deduct")}
-                    >
-                      Deduct Money
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-center text-gray-600">No clients found.</p>
-        )}
+        <Table
+          columns={columns}
+          dataSource={filteredClients}
+          rowKey={(record) => record._id}
+          pagination={{ pageSize: 5 }}
+          bordered
+          className="wallet-table"
+        />
 
-        {/* Ant Design Modal */}
         <Modal
           title={actionType === "add" ? "Add Money" : "Deduct Money"}
           visible={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           onOk={handleSubmit}
+          okText="Submit"
         >
-          <div className="mb-4 text-xs">
+          <div className="mb-4">
             <label>Amount:</label>
             <Input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount"
+              style={{ marginBottom: "8px" }}
             />
           </div>
-          <div className="text-xs">
+          <div>
             <label>Reason:</label>
             <Input
               type="text"

@@ -210,44 +210,6 @@ const DetailsReporting = () => {
     },
   };
 
-  const gmsData = {
-    labels: ["Today", "Yesterday", "This Week", "This Month", "Custom"],
-    datasets: [
-      {
-        label: "Gross Merchandise Sales (GMS)",
-        data: [
-          managerData.gms.today,
-          managerData.gms.yesterday,
-          managerData.gms.thisWeek,
-          managerData.gms.thisMonth,
-          managerData.gms.custom,
-        ],
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const holdData = {
-    labels: ["Today", "Yesterday", "This Week", "This Month", "Custom"],
-    datasets: [
-      {
-        label: "Holds",
-        data: [
-          managerData.hold.today,
-          managerData.hold.yesterday,
-          managerData.hold.thisWeek,
-          managerData.hold.thisMonth,
-          managerData.hold.custom,
-        ],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
   return (
     <DispatchLayout>
       <div className="relative max-w-7xl mx-auto pb-20 min-h-screen">
@@ -306,45 +268,6 @@ const DetailsReporting = () => {
           </div>
         </div>
 
-        {/* GMS and Hold Analytics Charts */}
-        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center underline">
-            GMS and Hold Analytics
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Gross Merchandise Sales (GMS)
-              </h3>
-              <Line
-                data={gmsData}
-                options={{
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                }}
-              />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Holds Overview
-              </h3>
-              <Bar
-                data={holdData}
-                options={{
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
         {/* Modal for displaying filtered orders */}
         {isModalVisible && (
           <div
@@ -361,6 +284,7 @@ const DetailsReporting = () => {
                     <tr className="bg-gray-100">
                       <th className="px-4 py-2">Order ID</th>
                       <th className="px-4 py-2">Payment Status</th>
+                      <th className="px-4 py-2">Total Price</th>
                       <th className="px-4 py-2">Product Name</th>
                       <th className="px-4 py-2">Product Availability</th>
                     </tr>
@@ -381,6 +305,9 @@ const DetailsReporting = () => {
                           >
                             {order.paymentStatus ? "Paid" : "Not Paid"}
                           </span>
+                        </td>
+                        <td className="px-4 py-2 font-semibold">
+                          {order.finalAmount}
                         </td>
                         <td className="px-4 py-2">
                           <ul>

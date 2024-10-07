@@ -117,7 +117,7 @@ const BodFba = () => {
 
   return (
     <UserLayout>
-      <div className="max-w-6xl mx-auto bg-white shadow-md rounded-md">
+      <div className="max-w-full mx-auto bg-white shadow-md rounded-md">
         <h2 className="text-2xl text-center font-bold mb-4">
           B.O.D - Order Details
         </h2>
