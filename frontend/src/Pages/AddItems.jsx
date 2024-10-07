@@ -21,8 +21,9 @@ const AddItems = () => {
       pincode: "",
       trackingId: "",
       shippingPartner: "",
+      shippingPrice: "", // New field for shipping price
       totalPrice: "",
-      productAction: "Available", // Default value set to "Available"
+      productAction: "Available",
     },
   ]);
 
@@ -123,24 +124,36 @@ const AddItems = () => {
   };
 
   const calculateFinalAmount = () => {
+    // Calculate the subtotal (without shipping price)
     const subtotal = items.reduce(
       (total, item) => total + parseFloat(item.totalPrice || 0),
       0
     );
 
+    // Calculate total shipping cost
+    const totalShipping = items.reduce(
+      (total, item) => total + parseFloat(item.shippingPrice || 0),
+      0
+    );
+
     let gst = 0;
     let scst = 0;
+    let igst = 0;
 
     // Check if the user is from the same state (Rajasthan in this case)
     if (userData.state === "Rajsthan") {
-      gst = (subtotal * 9) / 100; // 9% GST
-      scst = (subtotal * 9) / 100; // 9% SCST
+      // Split GST as 9% CGST and 9% SGST for the same state
+      gst = (subtotal * 9) / 100; // 9% CGST
+      scst = (subtotal * 9) / 100; // 9% SGST
     } else {
-      gst = (subtotal * 18) / 100; // 18% GST for other states
+      // 18% IGST for other states
+      igst = (subtotal * 18) / 100;
     }
 
-    const totalAmount = subtotal + gst + scst;
-    return totalAmount.toFixed(2); // Return total amount including taxes
+    // Calculate the total amount
+    const totalAmount = subtotal + gst + scst + igst + totalShipping;
+
+    return totalAmount.toFixed(2); // Return total amount including taxes and shipping
   };
 
   const handleAddRow = () => {
@@ -155,9 +168,9 @@ const AddItems = () => {
         pincode: "",
         trackingId: "",
         shippingPartner: "",
-        customPartner: "",
+        shippingPrice: "", // Include this field in the new row
         totalPrice: "",
-        productAction: "Available", // Default value set to "Available"
+        productAction: "Available",
       },
     ]);
   };
@@ -251,6 +264,9 @@ const AddItems = () => {
                   </th>
                   <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Shipping Partner
+                  </th>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Shipping Price
                   </th>
                   <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Tracking ID
@@ -357,6 +373,15 @@ const AddItems = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <input
                         type="text"
+                        name="shippingPrice"
+                        value={item.shippingPrice || ""}
+                        onChange={(e) => handleChange(index, e)}
+                        className="w-20 py-1 px-3 border rounded-md focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <input
+                        type="text"
                         name="trackingId"
                         value={item.trackingId}
                         onChange={(e) => handleChange(index, e)}
@@ -445,39 +470,41 @@ const AddItems = () => {
           <div className="mt-4">
             {userData.state === "Rajsthan" ? (
               <div>
-                GST: ₹
+                {/* Display CGST and SGST for same-state */}
+                CGST: ₹
                 {(
-                  (calculateFinalAmount() -
-                    items.reduce(
-                      (total, item) => total + parseFloat(item.totalPrice || 0),
-                      0
-                    )) /
-                  2
+                  (items.reduce(
+                    (total, item) => total + parseFloat(item.totalPrice || 0),
+                    0
+                  ) *
+                    9) /
+                  100
                 ).toFixed(2)}{" "}
                 (9%) <br />
-                IGST: ₹
+                SGST: ₹
                 {(
-                  (calculateFinalAmount() -
-                    items.reduce(
-                      (total, item) => total + parseFloat(item.totalPrice || 0),
-                      0
-                    )) /
-                  2
+                  (items.reduce(
+                    (total, item) => total + parseFloat(item.totalPrice || 0),
+                    0
+                  ) *
+                    9) /
+                  100
                 ).toFixed(2)}{" "}
-                (9%)
+                (9%) <br />
               </div>
             ) : (
               <div>
-                GST: ₹
+                {/* Display IGST for different-state */}
+                IGST: ₹
                 {(
-                  (calculateFinalAmount() -
-                    items.reduce(
-                      (total, item) => total + parseFloat(item.totalPrice || 0),
-                      0
-                    )) *
-                  0.18
+                  (items.reduce(
+                    (total, item) => total + parseFloat(item.totalPrice || 0),
+                    0
+                  ) *
+                    18) /
+                  100
                 ).toFixed(2)}{" "}
-                (18%)
+                (18%) <br />
               </div>
             )}
             <h2 className="text-xl font-bold">
