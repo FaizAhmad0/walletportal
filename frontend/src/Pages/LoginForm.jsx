@@ -32,6 +32,7 @@ const LoginForm = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("role", response.data.role);
         localStorage.setItem("enrollment", response.data.enrollment);
+        localStorage.removeItem("theme");
 
         if (response.data.role === "user") {
           navigate("/user-order", {

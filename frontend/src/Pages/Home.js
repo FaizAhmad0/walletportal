@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Card, Row, Col, Button, Form, Input, Modal,message } from "antd";
+import { Card, Row, Col, Button, Form, Input, Modal, message } from "antd";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../components/Navbar";
@@ -17,6 +17,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const { Meta } = Card;
 const Home = () => {
+  const role = localStorage.getItem("role");
   const carouselRef = useRef(null);
   const scrollLeft = () => {
     if (carouselRef.current) {
@@ -133,17 +134,32 @@ const Home = () => {
     navigate("/login");
   };
 
-    const location = useLocation();
-    const { message: successMessage } = location.state || {}; // Destructure the message from location.state
+  const location = useLocation();
+  const { message: successMessage } = location.state || {}; // Destructure the message from location.state
 
-    useEffect(() => {
-      if (successMessage) {
-        message.success(successMessage); // Display the message using Ant Design's message component
+  useEffect(() => {
+    if (successMessage) {
+      message.success(successMessage); // Display the message using Ant Design's message component
 
-        // Clear the state after displaying the message
-        navigate(location.pathname, { replace: true, state: {} });
-      }
-    }, [successMessage, location, navigate]);
+      // Clear the state after displaying the message
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    if (role === "user") {
+      navigate("/user-order");
+    }
+    if (role === "manager") {
+      navigate("/manager-dash");
+    }
+    if (role === "dispatch") {
+      navigate("/dispatch-dash");
+    }
+    if (role === "admin") {
+      navigate("/admin-dash");
+    }
+    if (role === "shippingmanager") {
+      navigate("/shippingmanager-dash");
+    }
+  }, [successMessage, location, navigate]);
 
   return (
     <>

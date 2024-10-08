@@ -31,6 +31,7 @@ const DispatchLayout = ({ children }) => {
       localStorage.removeItem("id");
       localStorage.removeItem("token");
       localStorage.removeItem("role");
+      localStorage.removeItem("enrollment");
       navigate(key, {
         state: { message: "Logged out successfully!" },
       });
