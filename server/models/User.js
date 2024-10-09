@@ -119,7 +119,7 @@ const userSchema = new Schema(
     },
     gst: {
       type: String,
-      required: true,
+      default: null,
     },
     mobile: {
       type: Number,

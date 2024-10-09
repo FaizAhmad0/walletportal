@@ -54,6 +54,10 @@ const LoginForm = () => {
           navigate("/supervisor-dash", {
             state: { message: response.data.message },
           });
+        } else if (response.data.role === "shippingmanager") {
+          navigate("/shippingmanager-dash", {
+            state: { message: response.data.message },
+          });
         }
       })
       .catch((error) => {

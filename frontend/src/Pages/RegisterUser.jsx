@@ -126,7 +126,7 @@ const RegisterUser = () => {
             />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="gst"
             rules={[
               { required: true, message: "Please enter your GST number" },
@@ -136,7 +136,7 @@ const RegisterUser = () => {
               prefix={<FileTextOutlined />}
               placeholder="Enter your GST number"
             />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             name="mobile"

@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { FaTimesCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { Table, Input, Button, Space } from "antd";
+import {
+  Table,
+  Input,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Form,
+  message,
+} from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
@@ -10,6 +19,9 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const CreateOrder = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [gstValue, setGstValue] = useState("");
 
   const getUsers = async () => {
     try {
@@ -42,6 +54,39 @@ const CreateOrder = () => {
 
   const handleClearSearch = () => {
     setSearchTerm("");
+  };
+
+  const showGstModal = (user) => {
+    setSelectedUser(user);
+    setIsModalVisible(true);
+  };
+
+  const handleGstSubmit = async () => {
+    try {
+      console.log(gstValue);
+      const response = await axios.post(
+        `${backendUrl}/user/add-gst/${selectedUser.enrollment}`,
+        { gst: gstValue },
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      console.log("GST saved successfully", response.data);
+      message.success("Gst updated successfully!");
+      setIsModalVisible(false);
+      getUsers(); // Refresh user data after saving GST
+    } catch (error) {
+      message.error("Could not update the gst!");
+
+      console.error("Error saving GST:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setGstValue("");
   };
 
   const filteredUsers = users.filter((user) =>
@@ -89,15 +134,29 @@ const CreateOrder = () => {
       render: (text, user) => (
         <div className="text-xs">
           <Link to={`/add-items/${user.enrollment}`}>
-            <Button className="mr-5 text-xs" type="primary">
-              Add Items
-            </Button>
+            {user.gst ? (
+              <Button className="mr-5 text-xs" type="primary">
+                Add Items
+              </Button>
+            ) : (
+              <Tooltip title={!user.gst ? "Add GST to click" : ""}>
+                <Button
+                  disabled={!user.gst}
+                  className="mr-5 text-xs"
+                  type="primary"
+                >
+                  Add Items
+                </Button>
+              </Tooltip>
+            )}
           </Link>
-          <Link to={`/order-report/${user.enrollment}`}>
-            <Button className="text-xs" type="primary">
-              Order Report
-            </Button>
-          </Link>
+          <Button
+            className="text-xs"
+            type="primary"
+            onClick={() => showGstModal(user)}
+          >
+            Add GST
+          </Button>
         </div>
       ),
     },
@@ -131,9 +190,28 @@ const CreateOrder = () => {
         dataSource={filteredUsers}
         rowKey={(record) => record.enrollment}
         bordered
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 7 }}
         className="shadow-sm text-xs"
       />
+
+      <Modal
+        title="Add GST"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        onOk={handleGstSubmit}
+        okText="Save GST"
+      >
+        <Form layout="vertical">
+          <Form.Item label="GST Number">
+            <Input
+              type="text"
+              value={gstValue}
+              onChange={(e) => setGstValue(e.target.value)}
+              placeholder="Enter GST Number"
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </DispatchLayout>
   );
 };
