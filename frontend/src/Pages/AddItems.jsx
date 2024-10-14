@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Modal from "./Modal";
 import { message } from "antd";
 import axios from "axios";
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AddItems = () => {
@@ -17,11 +18,12 @@ const AddItems = () => {
       name: "",
       price: "",
       quantity: "",
+      gstRate: 0, // New field for gstRate
       amazonOrderId: "",
       pincode: "",
       trackingId: "",
       shippingPartner: "",
-      shippingPrice: "", // New field for shipping price
+      shippingPrice: "",
       totalPrice: "",
       productAction: "Available",
     },
@@ -102,20 +104,20 @@ const AddItems = () => {
       if (product) {
         updatedItems[index].name = product.name;
         updatedItems[index].price = product.price;
+        updatedItems[index].gstRate = product.gstRate || 18; // Set dynamic gstRate based on product, default to 18%
       } else {
         updatedItems[index].name = "";
         updatedItems[index].price = "";
+        updatedItems[index].gstRate = 18; // Default GST rate
       }
     }
 
-    // Calculate total price for the item
     if (name === "quantity" || name === "price") {
       const quantity = parseFloat(updatedItems[index].quantity) || 0;
       const price = parseFloat(updatedItems[index].price) || 0;
       updatedItems[index].totalPrice = (quantity * price).toFixed(2);
     }
 
-    // Handle custom partner logic
     if (name === "shippingPartner" && value !== "Custom") {
       updatedItems[index].customPartner = "";
     }
@@ -124,13 +126,11 @@ const AddItems = () => {
   };
 
   const calculateFinalAmount = () => {
-    // Calculate the subtotal (without shipping price)
     const subtotal = items.reduce(
       (total, item) => total + parseFloat(item.totalPrice || 0),
       0
     );
 
-    // Calculate total shipping cost
     const totalShipping = items.reduce(
       (total, item) => total + parseFloat(item.shippingPrice || 0),
       0
@@ -139,21 +139,29 @@ const AddItems = () => {
     let gst = 0;
     let scst = 0;
     let igst = 0;
+    let shippingGst = 0;
 
-    // Check if the user is from the same state (Rajasthan in this case)
+    // Calculate GST for shipping
+    shippingGst = (totalShipping * 18) / 100; // 18% GST on shipping
+
     if (userData.state === "Rajsthan") {
-      // Split GST as 9% CGST and 9% SGST for the same state
-      gst = (subtotal * 9) / 100; // 9% CGST
-      scst = (subtotal * 9) / 100; // 9% SGST
+      gst = items.reduce(
+        (total, item) =>
+          total + (parseFloat(item.totalPrice || 0) * item.gstRate) / 200,
+        0
+      ); // 9% CGST + 9% SGST
+      scst = gst; // SGST same as CGST
     } else {
-      // 18% IGST for other states
-      igst = (subtotal * 18) / 100;
+      igst = items.reduce(
+        (total, item) =>
+          total + (parseFloat(item.totalPrice || 0) * item.gstRate) / 100,
+        0
+      ); // 18% IGST
     }
 
-    // Calculate the total amount
-    const totalAmount = subtotal + gst + scst + igst + totalShipping;
-
-    return totalAmount.toFixed(2); // Return total amount including taxes and shipping
+    const totalAmount =
+      subtotal + gst + scst + igst + totalShipping + shippingGst;
+    return totalAmount.toFixed(2);
   };
 
   const handleAddRow = () => {
@@ -164,11 +172,12 @@ const AddItems = () => {
         name: "",
         price: "",
         quantity: "",
+        gstRate: 0, // New gstRate field
         amazonOrderId: "",
         pincode: "",
         trackingId: "",
         shippingPartner: "",
-        shippingPrice: "", // Include this field in the new row
+        shippingPrice: "",
         totalPrice: "",
         productAction: "Available",
       },
@@ -190,9 +199,7 @@ const AddItems = () => {
     };
 
     console.log(dataToSubmit);
-
     try {
-      console.log(dataToSubmit);
       const response = await axios.post(
         `${backendUrl}/orders/${enrollment}`,
         dataToSubmit,
@@ -470,43 +477,48 @@ const AddItems = () => {
           <div className="mt-4">
             {userData.state === "Rajsthan" ? (
               <div>
-                {/* Display CGST and SGST for same-state */}
-                CGST: ₹
-                {(
-                  (items.reduce(
-                    (total, item) => total + parseFloat(item.totalPrice || 0),
-                    0
-                  ) *
-                    9) /
-                  100
-                ).toFixed(2)}{" "}
-                (9%) <br />
-                SGST: ₹
-                {(
-                  (items.reduce(
-                    (total, item) => total + parseFloat(item.totalPrice || 0),
-                    0
-                  ) *
-                    9) /
-                  100
-                ).toFixed(2)}{" "}
-                (9%) <br />
+                {items.map((item, index) => {
+                  const totalPrice = parseFloat(item.totalPrice || 0);
+                  const gstAmount = (totalPrice * item.gstRate) / 100; // Total GST amount for this item
+                  const cgstAmount = gstAmount / 2; // 50% of GST is CGST
+                  const sgstAmount = gstAmount / 2; // 50% of GST is SGST
+
+                  return (
+                    <div key={index}>
+                      <strong>Item {index + 1}:</strong>
+                      <br />
+                      Total Price: ₹{totalPrice.toFixed(2)} <br />
+                      GST Rate: {item.gstRate}% <br />
+                      CGST ({(item.gstRate / 2).toFixed(2)}% of GST): ₹
+                      {cgstAmount.toFixed(2)} <br />
+                      SGST ({(item.gstRate / 2).toFixed(2)}% of GST): ₹
+                      {sgstAmount.toFixed(2)} <br />
+                      <br />
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div>
                 {/* Display IGST for different-state */}
-                IGST: ₹
-                {(
-                  (items.reduce(
-                    (total, item) => total + parseFloat(item.totalPrice || 0),
-                    0
-                  ) *
-                    18) /
-                  100
-                ).toFixed(2)}{" "}
-                (18%) <br />
+                {items.map((item, index) => {
+                  const totalPrice = parseFloat(item.totalPrice || 0);
+                  const gstAmount = (totalPrice * item.gstRate) / 100; // Total GST amount for this item
+
+                  return (
+                    <div key={index}>
+                      <strong>Item {index + 1}:</strong>
+                      <br />
+                      Total Price: ₹{totalPrice.toFixed(2)} <br />
+                      GST Rate: {item.gstRate}% <br />
+                      IGST ({item.gstRate}): ₹{gstAmount.toFixed(2)} <br />
+                      <br />
+                    </div>
+                  );
+                })}
               </div>
             )}
+
             <h2 className="text-xl font-bold">
               Payable amount: ₹{calculateFinalAmount()}
             </h2>

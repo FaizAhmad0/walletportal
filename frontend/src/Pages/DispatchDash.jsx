@@ -11,6 +11,7 @@ import moment from "moment"; // Make sure to install moment.js via npm or yarn
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Option } = Select;
 const { confirm } = Modal;
+const { Search } = Input;
 
 const DispatchDash = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -25,6 +26,8 @@ const DispatchDash = () => {
   const [editingItem, setEditingItem] = useState(null); // Track the editing item
   const [editValues, setEditValues] = useState({}); // Store edit values for the item
   const role = localStorage.getItem("role");
+  const [searchQuery, setSearchQuery] = useState(""); // Add state for search
+
   // Fetch orders from backend
   const getOrders = async () => {
     try {
@@ -160,6 +163,27 @@ const DispatchDash = () => {
           }),
         }))
         .filter((user) => user.orders.length > 0);
+    }
+
+    // Apply Search Filter
+    if (searchQuery.trim() !== "") {
+      filtered = filtered
+        .map((user) => ({
+          ...user,
+          orders: user.orders.filter((order) => {
+            const orderId = order.orderId?.toString().toLowerCase() || "";
+            const enrollment = user.enrollment?.toString().toLowerCase() || "";
+            const amazonOrderId =
+              order.items[0]?.amazonOrderId?.toString().toLowerCase() || "N/A";
+
+            return (
+              orderId.includes(searchQuery.toLowerCase()) ||
+              enrollment.includes(searchQuery.toLowerCase()) ||
+              amazonOrderId.includes(searchQuery.toLowerCase())
+            );
+          }),
+        }))
+        .filter((user) => user.orders.length > 0); // Ensure to filter out users with no orders left after filtering
     }
 
     setFilteredOrders(filtered);
@@ -372,7 +396,10 @@ const DispatchDash = () => {
   useEffect(() => {
     filterOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentStatusFilter, timeFilter, orders]);
+  }, [paymentStatusFilter, timeFilter, searchQuery, orders]);
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   // Handlers for filters
   const handlePaymentStatusFilter = (value) => {
@@ -540,6 +567,16 @@ const DispatchDash = () => {
                 <Radio.Button value="month">This Month</Radio.Button>
                 <Radio.Button value="year">This Year</Radio.Button>
               </Radio.Group>
+            </div>
+            <div>
+              <Search
+                placeholder="Search by Order ID, Enrollment No., Amazon Order ID"
+                value={searchQuery}
+                onChange={handleSearchChange} // This will still handle input change
+                style={{ width: 300 }}
+                className="text-xs"
+                enterButton // Adds a search icon/button next to the input
+              />
             </div>
           </div>
         </div>

@@ -41,21 +41,17 @@ const InvoicePage = () => {
     );
   };
 
-  const calculateTaxes = (totalAmount) => {
-    if (customer.state === "Rajasthan") {
-      // Apply CGST and SGST
-      const CGST = (totalAmount * 9) / 100;
-      const SGST = (totalAmount * 9) / 100;
-      return { CGST, SGST, IGST: 0 };
-    } else {
-      // Apply IGST
-      const IGST = (totalAmount * 18) / 100;
-      return { CGST: 0, SGST: 0, IGST };
-    }
+  const calculateTotalShipping = () => {
+    return (
+      orderDetails.items?.reduce(
+        (total, item) => total + (parseFloat(item.shippingPrice) || 0),
+        0
+      ) || 0
+    );
   };
 
   const totalAmount = calculateTotal();
-  const { CGST, SGST, IGST } = calculateTaxes(totalAmount);
+  const totalShipping = calculateTotalShipping(); // Calculate total shipping from all items
 
   const columns = [
     {
@@ -185,43 +181,20 @@ const InvoicePage = () => {
                   <Text strong>₹{totalAmount.toFixed(2)}</Text>
                 </Table.Summary.Cell>
               </Table.Summary.Row>
-              {customer.state === "Rajasthan" ? (
-                <>
-                  <Table.Summary.Row>
-                    <Table.Summary.Cell colSpan={5} align="right">
-                      <Text>CGST (9%):</Text>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell>
-                      <Text>₹{CGST.toFixed(2)}</Text>
-                    </Table.Summary.Cell>
-                  </Table.Summary.Row>
-                  <Table.Summary.Row>
-                    <Table.Summary.Cell colSpan={5} align="right">
-                      <Text>SGST (9%):</Text>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell>
-                      <Text>₹{SGST.toFixed(2)}</Text>
-                    </Table.Summary.Cell>
-                  </Table.Summary.Row>
-                </>
-              ) : (
-                <Table.Summary.Row>
-                  <Table.Summary.Cell colSpan={5} align="right">
-                    <Text>IGST (18%):</Text>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell>
-                    <Text>₹{IGST.toFixed(2)}</Text>
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-              )}
               <Table.Summary.Row>
                 <Table.Summary.Cell colSpan={5} align="right">
-                  <Text strong>Payable Amount:</Text>
+                  <Text strong>Shipping: </Text>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell>
-                  <Text strong>
-                    ₹{(totalAmount + CGST + SGST + IGST).toFixed(2)}
-                  </Text>
+                  <Text strong>₹{totalShipping.toFixed(2)}</Text>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+              <Table.Summary.Row>
+                <Table.Summary.Cell colSpan={5} align="right">
+                  <Text strong>Payable Amount including GST:</Text>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell>
+                  <Text strong>₹{orderDetails?.finalAmount}</Text>
                 </Table.Summary.Cell>
               </Table.Summary.Row>
             </>

@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
 import ShippingLayout from "../Layout/ShippingLayout";
 import { Link } from "react-router-dom";
-import { Modal, Button, Table, message, Select, Radio, Input } from "antd";
+import {
+  Modal,
+  Button,
+  Table,
+  message,
+  Select,
+  Radio,
+  Input,
+  Tooltip,
+} from "antd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import ArchiveIcon from "@mui/icons-material/Archive";
 import axios from "axios";
 import moment from "moment"; // Make sure to install moment.js via npm or yarn
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Option } = Select;
 const { confirm } = Modal;
+const { Search } = Input;
 
 const ShippingDash = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -24,7 +33,9 @@ const ShippingDash = () => {
   const [timeFilter, setTimeFilter] = useState(""); // Initialize with empty string for no filter
   const [editingItem, setEditingItem] = useState(null); // Track the editing item
   const [editValues, setEditValues] = useState({}); // Store edit values for the item
+  const [searchQuery, setSearchQuery] = useState(""); // Add state for search
   const role = localStorage.getItem("role");
+
   // Fetch orders from backend
   const getOrders = async () => {
     try {
@@ -39,84 +50,6 @@ const ShippingDash = () => {
       console.error("Error fetching orders:", error);
       message.error("Failed to fetch orders. Please try again.");
     }
-  };
-  const handleShippedClick = async (orderItems, finalAmount, orderId) => {
-    console.log(orderId, finalAmount);
-
-    try {
-      const response = await axios.put(
-        `${backendUrl}/orders/shipped/${orderId}`,
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-      message.success("Order shipped successfully!");
-      getOrders();
-    } catch (error) {
-      console.error("Error in order shipping:", error);
-      message.error("Could not ship the order, Please try again");
-    }
-  };
-  const handleArchiveClick = async (orderItems, finalAmount, orderId) => {
-    console.log(orderId, finalAmount);
-
-    try {
-      const response = await axios.put(
-        `${backendUrl}/orders/archive/${orderId}`,
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-      message.success("Order status changes successfully!");
-      getOrders();
-    } catch (error) {
-      console.error("Error in order status:", error);
-      message.error("Could not change order status, Please try again");
-    }
-  };
-  const handleDeleteclick = async (orderItems, finalAmount, orderId) => {
-    // Log order details for debugging or auditing purposes
-    console.log("Delete initiated by user");
-    console.log("Order ID:", orderId);
-    console.log("Final Amount:", finalAmount);
-    console.log("Order Items:", orderItems);
-
-    try {
-      const response = await axios.delete(
-        `${backendUrl}/orders/delete/${orderId}`,
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-      message.success("Order deleted successfully!");
-      getOrders(); // Refresh the list of orders after deletion
-    } catch (error) {
-      console.error("Error deleting order:", error);
-      message.error("Could not delete order. Please try again.");
-    }
-  };
-
-  const showDeleteConfirm = (orderId, recordId, orderItems, finalAmount) => {
-    confirm({
-      title: "Are you sure you want to delete this order?",
-      icon: <DeleteOutlineIcon />,
-      content: `This action will permanently remove the order with ID: ${recordId}.`,
-      okText: "Yes",
-      okType: "danger",
-      cancelText: "No",
-      onOk() {
-        handleDeleteclick(orderItems, finalAmount, orderId); // Pass necessary parameters
-      },
-      onCancel() {
-        console.log("Deletion canceled");
-      },
-    });
   };
 
   useEffect(() => {
@@ -162,25 +95,47 @@ const ShippingDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
+    // Apply Search Filter
+    if (searchQuery.trim() !== "") {
+      filtered = filtered
+        .map((user) => ({
+          ...user,
+          orders: user.orders.filter((order) => {
+            const orderId = order.orderId?.toString().toLowerCase() || "";
+            const enrollment = user.enrollment?.toString().toLowerCase() || "";
+            const amazonOrderId =
+              order.items[0]?.amazonOrderId?.toString().toLowerCase() || "N/A";
+
+            return (
+              orderId.includes(searchQuery.toLowerCase()) ||
+              enrollment.includes(searchQuery.toLowerCase()) ||
+              amazonOrderId.includes(searchQuery.toLowerCase())
+            );
+          }),
+        }))
+        .filter((user) => user.orders.length > 0); // Ensure to filter out users with no orders left after filtering
+    }
+
     setFilteredOrders(filtered);
   };
-  const getRowClassName = (record) => {
-    const allUnavailable = record.items.some(
-      (item) => item.productAction !== "Available"
-    );
-    const isPaymentPending = !record.paymentStatus;
 
-    if (allUnavailable && isPaymentPending) {
-      return "bg-red-100"; // Light red
-    } else if (allUnavailable) {
-      return "bg-yellow-100"; // Light yellow
-    } else if (isPaymentPending) {
-      return "bg-pink-100"; // Light pink
-    } else {
-      return ""; // Default row color
-    }
+  // Trigger filtering whenever filters or orders change
+  useEffect(() => {
+    filterOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paymentStatusFilter, timeFilter, searchQuery, orders]);
+
+  const handlePaymentStatusFilter = (value) => {
+    setPaymentStatusFilter(value);
   };
 
+  const handleTimeFilter = (e) => {
+    setTimeFilter(e.target.value);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
   const columns = [
     {
       title: <span className="text-xs">Order Id</span>,
@@ -312,21 +267,27 @@ const ShippingDash = () => {
               Shipped
             </Button>
           ) : (
-            <Button
-              disabled={true}
-              type="primary"
-              className="text-xs"
-              style={{
-                marginRight: "5px",
-                background: "green",
-                color: "white",
-              }}
-              onClick={() =>
-                handleShippedClick(record.items, record.finalAmount, record._id)
-              }
-            >
-              Shipped
-            </Button>
+            <Tooltip title="Payment is not completed yet">
+              <Button
+                disabled={true}
+                type="primary"
+                className="text-xs"
+                style={{
+                  marginRight: "5px",
+                  background: "green",
+                  color: "white",
+                }}
+                onClick={() =>
+                  handleShippedClick(
+                    record.items,
+                    record.finalAmount,
+                    record._id
+                  )
+                }
+              >
+                Shipped
+              </Button>
+            </Tooltip>
           )}
           <Button
             type="primary"
@@ -346,6 +307,38 @@ const ShippingDash = () => {
       ),
     },
   ];
+  const showDeleteConfirm = (orderId, recordId, orderItems, finalAmount) => {
+    confirm({
+      title: "Are you sure you want to delete this order?",
+      icon: <DeleteOutlineIcon />,
+      content: `This action will permanently remove the order with ID: ${recordId}.`,
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        handleDeleteclick(orderItems, finalAmount, orderId); // Pass necessary parameters
+      },
+      onCancel() {
+        console.log("Deletion canceled");
+      },
+    });
+  };
+  const getRowClassName = (record) => {
+    const allUnavailable = record.items.some(
+      (item) => item.productAction !== "Available"
+    );
+    const isPaymentPending = !record.paymentStatus;
+
+    if (allUnavailable && isPaymentPending) {
+      return "bg-red-100"; // Light red
+    } else if (allUnavailable) {
+      return "bg-yellow-100"; // Light yellow
+    } else if (isPaymentPending) {
+      return "bg-pink-100"; // Light pink
+    } else {
+      return ""; // Default row color
+    }
+  };
   const dataSource = filteredOrders
     .flatMap((user) =>
       user.orders
@@ -371,52 +364,6 @@ const ShippingDash = () => {
     )
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  // Trigger filtering whenever filters or orders change
-  useEffect(() => {
-    filterOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentStatusFilter, timeFilter, orders]);
-
-  // Handlers for filters
-  const handlePaymentStatusFilter = (value) => {
-    setPaymentStatusFilter(value);
-  };
-
-  const handleTimeFilter = (e) => {
-    setTimeFilter(e.target.value);
-  };
-
-  // const handleDeleteClick = async (orderItems, finalAmount, orderId) => {
-  //   try {
-  //     await axios.delete(`${backendUrl}/orders/delete/${orderId}`, {
-  //       headers: {
-  //         Authorization: localStorage.getItem("token"),
-  //       },
-  //     });
-  //     message.success("Order deleted successfully!");
-  //     getOrders();
-  //   } catch (error) {
-  //     console.error("Error deleting order:", error);
-  //     message.error("Could not delete order, Please try again");
-  //   }
-  // };
-
-  // Handlers for modal and actions
-  const handleRowClick = (orderItems, finalAmount, orderId) => {
-    setSelectedOrderItems(orderItems);
-    setSelectedOrderAmount(finalAmount);
-    setSelectedOrderId(orderId);
-    setIsModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-    setSelectedOrderItems([]);
-    setSelectedOrderAmount(0);
-    setSelectedOrderId("");
-    setEditingItem(null); // Reset editing item
-  };
-
   const handlePaymentClick = async (amount, id, enrollment) => {
     try {
       await axios.post(
@@ -435,69 +382,53 @@ const ShippingDash = () => {
       message.error("Insufficient user amount. Please try again.");
     }
   };
+  const handleRowClick = (orderItems, finalAmount, orderId) => {
+    setSelectedOrderItems(orderItems);
+    setSelectedOrderAmount(finalAmount);
+    setSelectedOrderId(orderId);
+    setIsModalVisible(true);
+  };
+  const handleShippedClick = async (orderItems, finalAmount, orderId) => {
+    console.log(orderId, finalAmount);
 
-  const handleMarkAvailableClick = async (id) => {
     try {
-      await axios.put(
-        `${backendUrl}/orders/markavailable/${id}`,
-        {},
+      const response = await axios.put(
+        `${backendUrl}/orders/shipped/${orderId}`,
         {
           headers: {
             Authorization: localStorage.getItem("token"),
           },
         }
       );
-      message.success("Item marked as available successfully!");
+      message.success("Order shipped successfully!");
       getOrders();
     } catch (error) {
-      console.error("Error marking item as available:", error);
-      message.error("Failed to mark item as available. Please try again.");
+      console.error("Error in order shipping:", error);
+      message.error("Could not ship the order, Please try again");
     }
   };
+  const handleDeleteclick = async (orderItems, finalAmount, orderId) => {
+    // Log order details for debugging or auditing purposes
+    console.log("Delete initiated by user");
+    console.log("Order ID:", orderId);
+    console.log("Final Amount:", finalAmount);
+    console.log("Order Items:", orderItems);
 
-  const handleEditClick = (item) => {
-    setEditingItem(item._id);
-    // Populate the form with the item details
-    setEditValues({
-      amazonOrderId: item.amazonOrderId,
-      trackingId: item.trackingId,
-      sku: item.sku,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-      pincode: item.pincode,
-      shippingPartner: item.shippingPartner,
-      totalPrice: item.totalPrice,
-    });
-  };
-
-  // Save changes to the edited item
-  const handleSaveClick = async () => {
     try {
-      console.log(editValues);
-      await axios.put(
-        `${backendUrl}/orders/update/${editingItem}`,
-        editValues,
+      const response = await axios.delete(
+        `${backendUrl}/orders/delete/${orderId}`,
         {
           headers: {
             Authorization: localStorage.getItem("token"),
           },
         }
       );
-      message.success("Order updated successfully!");
-      getOrders();
-      setEditingItem(null); // Exit editing mode
+      message.success("Order deleted successfully!");
+      getOrders(); // Refresh the list of orders after deletion
     } catch (error) {
-      console.error("Error updating order:", error);
-      message.error("Failed to update order. Please try again.");
+      console.error("Error deleting order:", error);
+      message.error("Could not delete order. Please try again.");
     }
-  };
-
-  const handleChange = (e) => {
-    setEditValues({
-      ...editValues,
-      [e.target.name]: e.target.value,
-    });
   };
 
   return (
@@ -506,43 +437,54 @@ const ShippingDash = () => {
         <h1 className="text-xl font-semibold text-black-600 mb-4">
           Shipping Dashboard
         </h1>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center justify-between space-x-4">
-            {" "}
-            <div className="text-sm">
-              <label htmlFor="paymentStatus">Payment Status: </label>
-              <Select
-                id="paymentStatus"
-                value={paymentStatusFilter}
-                style={{ width: 200 }}
-                onChange={handlePaymentStatusFilter}
-                className="text-xs"
-                placeholder="Select Status"
-                allowClear
-              >
-                <Option value="true" className="text-xs">
-                  Paid
-                </Option>
-                <Option value="false" className="text-xs">
-                  Unpaid
-                </Option>
-              </Select>
-            </div>
-            <div>
-              {/* <Link to="/create-order">
-                <Button type="primary" className="text-xs ">
-                  Create Order
-                </Button>
-              </Link> */}
-            </div>
-            {/* Time Filter */}
-            <div className="text-xs items-end">
-              <Radio.Group buttonStyle="solid">
-                <Radio.Button value="today">Today</Radio.Button>
-                <Radio.Button value="week">This Week</Radio.Button>
-                <Radio.Button value="month">This Month</Radio.Button>
-                <Radio.Button value="year">This Year</Radio.Button>
-              </Radio.Group>
+
+        {/* Search Input */}
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center justify-between space-x-4">
+              {" "}
+              <div className="text-sm">
+                <label htmlFor="paymentStatus">Payment Status: </label>
+                <Select
+                  id="paymentStatus"
+                  value={paymentStatusFilter}
+                  style={{ width: 200 }}
+                  onChange={handlePaymentStatusFilter}
+                  className="text-xs"
+                  placeholder="Select Status"
+                  allowClear
+                >
+                  <Option value="true" className="text-xs">
+                    Paid
+                  </Option>
+                  <Option value="false" className="text-xs">
+                    Unpaid
+                  </Option>
+                </Select>
+              </div>
+              {/* Time Filter */}
+              <div className="text-xs items-end">
+                <Radio.Group
+                  buttonStyle="solid"
+                  onChange={handleTimeFilter}
+                  value={timeFilter}
+                >
+                  <Radio.Button value="today">Today</Radio.Button>
+                  <Radio.Button value="week">This Week</Radio.Button>
+                  <Radio.Button value="month">This Month</Radio.Button>
+                  <Radio.Button value="year">This Year</Radio.Button>
+                </Radio.Group>
+              </div>
+              <div>
+                <Search
+                  placeholder="Search by Order ID, Enrollment No., Amazon Order ID"
+                  value={searchQuery}
+                  onChange={handleSearchChange} // This will still handle input change
+                  style={{ width: 300 }}
+                  className="text-xs"
+                  enterButton // Adds a search icon/button next to the input
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -560,164 +502,6 @@ const ShippingDash = () => {
           />
         </div>
       </div>
-
-      {/* Order Details Modal */}
-      <Modal
-        title="Order Details"
-        visible={isModalVisible}
-        onCancel={handleModalClose}
-        footer={[
-          <Button key="close" onClick={handleModalClose}>
-            Close
-          </Button>,
-          editingItem && (
-            <Button key="save" type="primary" onClick={handleSaveClick}>
-              Save
-            </Button>
-          ),
-        ]}
-      >
-        <ul>
-          {selectedOrderItems.map((item, index) => (
-            <li key={index} className="text-sm pb-6">
-              {editingItem === item._id ? (
-                <>
-                  <label>
-                    <strong>Amazon Order ID:</strong>
-                    <Input
-                      name="amazonOrderId"
-                      value={editValues.amazonOrderId || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Tracking ID:</strong>
-                    <Input
-                      name="trackingId"
-                      value={editValues.trackingId || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>SKU:</strong>
-                    <Input name="sku" value={editValues.sku || ""} />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Name:</strong>
-                    <Input name="name" value={editValues.name || ""} />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Price:</strong>
-                    <Input
-                      name="price"
-                      value={editValues.price || ""}
-                      type="number"
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Quantity:</strong>
-                    <Input
-                      name="quantity"
-                      value={editValues.quantity || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Pincode:</strong>
-                    <Input
-                      name="pincode"
-                      value={editValues.pincode || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Shipping Partner:</strong>
-                    <Input
-                      name="shippingPartner"
-                      value={editValues.shippingPartner || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Total Price:</strong>
-                    <Input
-                      name="totalPrice"
-                      value={editValues.totalPrice || ""}
-                      type="number"
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Product Availability:</strong>
-                    <Select
-                      name="productAction"
-                      placeholder="Select product status"
-                      value={editValues.productAction || "Available"} // Set default to "Available"
-                      onChange={(value) =>
-                        setEditValues({ ...editValues, productAction: value })
-                      }
-                    >
-                      <Option value="Available">Available</Option>
-                      <Option value="Product not available">
-                        Product not available
-                      </Option>
-                    </Select>
-                  </label>
-                </>
-              ) : (
-                <>
-                  <strong>Amazon Order ID:</strong> {item.amazonOrderId}
-                  <br />
-                  <strong>Tracking ID:</strong> {item.trackingId}
-                  <br />
-                  <strong>SKU:</strong> {item.sku}
-                  <br />
-                  <strong>Name:</strong> {item.name}
-                  <br />
-                  <strong>Price:</strong> {item.price}
-                  <br />
-                  <strong>Quantity:</strong> {item.quantity}
-                  <br />
-                  <strong>Pincode:</strong> {item.pincode}
-                  <br />
-                  <strong>Delivery Partner:</strong> {item.shippingPartner}
-                  <br />
-                  <strong>Total Price:</strong> {item.totalPrice}
-                  <br />
-                  <strong>Product Availability:</strong> {item.productAction}
-                  <br />
-                  <Button
-                    type="primary"
-                    onClick={() => handleEditClick(item)}
-                    style={{ marginTop: "10px" }}
-                  >
-                    Edit
-                  </Button>
-                  {item.productAction !== "Available" && (
-                    <Button
-                      type="primary"
-                      className="text-xs mt-2 ml-5"
-                      onClick={() => handleMarkAvailableClick(item._id)}
-                    >
-                      Mark Available
-                    </Button>
-                  )}
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      </Modal>
     </ShippingLayout>
   );
 };

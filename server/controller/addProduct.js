@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
     }
 
     const { items, finalAmount } = req.body;
+    console.log(items);
     const flattenedItems = items.flat();
 
     const newOrder = {

@@ -29,6 +29,14 @@ const itemSchema = new Schema({
     type: String,
     required: true,
   },
+  gstRate: {
+    type: Number,
+    required: true,
+  },
+  shippingPrice: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
@@ -78,6 +86,7 @@ const orderSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
     orderId: {
       type: Number,
     },

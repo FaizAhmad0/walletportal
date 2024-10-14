@@ -1,33 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Bar, Line } from "react-chartjs-2";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  LineElement,
-  PointElement,
-} from "chart.js";
-import DispatchLayout from "../Layout/DispatchLayout";
 import { DatePicker } from "antd"; // Import Ant Design DatePicker
 import dayjs from "dayjs"; // For date formatting
+import DispatchLayout from "../Layout/DispatchLayout";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  LineElement,
-  PointElement
-);
 
 const DetailsReporting = () => {
   const [userData, setUserData] = useState([]);
@@ -36,9 +12,7 @@ const DetailsReporting = () => {
   const [productNotAvailableCount, setProductNotAvailableCount] = useState(0);
   const [totalOrdersHold, setTotalOrdersHold] = useState(0);
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null); // State for selected date
-  const modalRef = useRef(null);
 
   // Fetch user data and orders from the backend
   const getUserData = async () => {
@@ -55,6 +29,7 @@ const DetailsReporting = () => {
       let holdMoneyIssue = 0;
       let productNotAvailable = 0;
       let totalHoldOrders = 0;
+      let allOrders = [];
 
       users.forEach((user) => {
         const orders = user.orders || [];
@@ -62,6 +37,7 @@ const DetailsReporting = () => {
 
         orders.forEach((order) => {
           let orderHasHold = false;
+          allOrders.push(order); // Add all orders
 
           if (order.paymentStatus === false) {
             holdMoneyIssue += 1;
@@ -88,6 +64,7 @@ const DetailsReporting = () => {
       setHoldMoneyIssueCount(holdMoneyIssue);
       setProductNotAvailableCount(productNotAvailable);
       setTotalOrdersHold(totalHoldOrders);
+      setFilteredOrders(allOrders); // Display all orders initially
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -104,14 +81,6 @@ const DetailsReporting = () => {
       const orders = user.orders || [];
 
       orders.forEach((order) => {
-        // Filter by selected date if any
-        if (selectedDate) {
-          const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
-          if (orderDate !== selectedDate) {
-            return; // Skip this order if the date doesn't match
-          }
-        }
-
         // Filter by paymentStatus or productNotAvailable
         if (type === "paymentStatus") {
           if (order.paymentStatus === false) {
@@ -126,25 +95,12 @@ const DetailsReporting = () => {
     });
 
     setFilteredOrders(filtered); // Update the filtered orders state
-    setIsModalVisible(true); // Show the modal with filtered orders
-
-    // Scroll to the modal
-    setTimeout(() => {
-      if (modalRef.current) {
-        modalRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date ? date.format("YYYY-MM-DD") : null);
 
     let filtered = [];
-    let moneyIssueCount = 0;
-    let productNotAvailableCount = 0;
-    let totalHoldOrders = 0;
-    let totalOrders = 0;
-
     userData.forEach((user) => {
       const orders = user.orders || [];
 
@@ -157,57 +113,11 @@ const DetailsReporting = () => {
           }
         }
 
-        totalOrders += 1; // Count total orders for the selected date
-        let orderHasHold = false;
-
-        if (order.paymentStatus === false) {
-          moneyIssueCount += 1; // Count hold money issues
-          orderHasHold = true;
-        }
-
-        const productHold = order.items.some(
-          (item) => item.productAction !== "Available"
-        );
-        if (productHold) {
-          productNotAvailableCount += 1; // Count product not available holds
-          orderHasHold = true;
-        }
-
-        if (orderHasHold) {
-          totalHoldOrders += 1; // Count total holds
-        }
-
-        filtered.push(order); // Add filtered orders for the modal
+        filtered.push(order); // Add filtered orders for the table
       });
     });
 
-    setFilteredOrders(filtered);
-    setTotalOrdersCount(totalOrders); // Update total orders count dynamically
-    setHoldMoneyIssueCount(moneyIssueCount); // Update money issue count dynamically
-    setProductNotAvailableCount(productNotAvailableCount); // Update product not available count dynamically
-    setTotalOrdersHold(totalHoldOrders); // Update total holds dynamically
-  };
-
-  const managerData = {
-    name: "Manish",
-    totalOrders: totalOrdersCount,
-    totalOrdersHold: totalOrdersHold,
-    holdMoneyIssue: holdMoneyIssueCount,
-    holdProductNotAvailable: productNotAvailableCount,
-    gms: {
-      today: 5000,
-      yesterday: 4500,
-      thisWeek: 30000,
-      thisMonth: 120000,
-      custom: 15000,
-    },
-    hold: {
-      today: 2,
-      yesterday: 3,
-      thisWeek: 10,
-      thisMonth: 40,
-      custom: 5,
-    },
+    setFilteredOrders(filtered); // Display filtered orders based on date
   };
 
   return (
@@ -237,7 +147,7 @@ const DetailsReporting = () => {
               onClick={() => filterOrders("paymentStatus")}
             >
               <p className="text-lg font-medium text-yellow-800">
-                Hold: Money Issue - {managerData.holdMoneyIssue}
+                Hold: Money Issue - {holdMoneyIssueCount}
               </p>
             </button>
 
@@ -246,8 +156,7 @@ const DetailsReporting = () => {
               onClick={() => filterOrders("productNotAvailable")}
             >
               <p className="text-lg font-medium text-green-800">
-                Hold: Product Not Available -{" "}
-                {managerData.holdProductNotAvailable}
+                Hold: Product Not Available - {productNotAvailableCount}
               </p>
             </button>
           </div>
@@ -256,98 +165,87 @@ const DetailsReporting = () => {
           <div className="grid grid-cols-2 gap-4">
             <button className="w-full p-4 bg-blue-100 rounded-lg hover:bg-blue-200 active:bg-blue-300 transition duration-150 ease-in-out">
               <p className="text-lg font-medium text-blue-800">
-                Total Orders - {managerData.totalOrders}
+                Total Orders - {totalOrdersCount}
               </p>
             </button>
 
             <button className="w-full p-4 bg-red-100 rounded-lg hover:bg-red-200 active:bg-red-300 transition duration-150 ease-in-out">
               <p className="text-lg font-medium text-red-800">
-                Total Orders Hold - {managerData.totalOrdersHold}
+                Total Orders Hold - {totalOrdersHold}
               </p>
             </button>
           </div>
         </div>
 
-        {/* Modal for displaying filtered orders */}
-        {isModalVisible && (
-          <div
-            ref={modalRef}
-            className="bg-white shadow-md rounded-lg p-6 mb-8"
-          >
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center underline">
-              Filtered Orders
-            </h2>
-            {filteredOrders.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="table-auto w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-4 py-2">Order ID</th>
-                      <th className="px-4 py-2">Payment Status</th>
-                      <th className="px-4 py-2">Total Price</th>
-                      <th className="px-4 py-2">Product Name</th>
-                      <th className="px-4 py-2">Product Availability</th>
+        {/* Display Filtered Orders */}
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center underline">
+            Orders
+          </h2>
+          {filteredOrders.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="table-auto w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-4 py-2">Order ID</th>
+                    <th className="px-4 py-2">Payment Status</th>
+                    <th className="px-4 py-2">Total Price</th>
+                    <th className="px-4 py-2">Product Name</th>
+                    <th className="px-4 py-2">Product Availability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredOrders.map((order, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="px-4 py-2 font-semibold">
+                        {order.orderId}
+                      </td>
+                      <td className="px-4 py-2">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            order.paymentStatus
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {order.paymentStatus ? "Paid" : "Not Paid"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 font-semibold">
+                        {order.finalAmount}
+                      </td>
+                      <td className="px-4 py-2">
+                        <ul>
+                          {order.items.map((item, i) => (
+                            <li key={i}>{item.name}</li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td className="px-4 py-2">
+                        <ul>
+                          {order.items.map((item, i) => (
+                            <li
+                              key={i}
+                              className={`${
+                                item.productAction === "Available"
+                                  ? "text-green-500"
+                                  : "text-red-500"
+                              }`}
+                            >
+                              {item.productAction}
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOrders.map((order, index) => (
-                      <tr key={index} className="border-t">
-                        <td className="px-4 py-2 font-semibold">
-                          {order.orderId}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              order.paymentStatus
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {order.paymentStatus ? "Paid" : "Not Paid"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2 font-semibold">
-                          {order.finalAmount}
-                        </td>
-                        <td className="px-4 py-2">
-                          <ul>
-                            {order.items.map((item, i) => (
-                              <li key={i}>{item.name}</li>
-                            ))}
-                          </ul>
-                        </td>
-                        <td className="px-4 py-2">
-                          <ul>
-                            {order.items.map((item, i) => (
-                              <li
-                                key={i}
-                                className={`px-2 py-1 text-xs rounded-full ${
-                                  item.productAction === "Available"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
-                                }`}
-                              >
-                                {item.productAction}
-                              </li>
-                            ))}
-                          </ul>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>No orders found</p>
-            )}
-            <button
-              className="mt-4 p-2 bg-red-500 text-white rounded"
-              onClick={() => setIsModalVisible(false)}
-            >
-              Close
-            </button>
-          </div>
-        )}
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>No orders found</p>
+          )}
+        </div>
       </div>
     </DispatchLayout>
   );
