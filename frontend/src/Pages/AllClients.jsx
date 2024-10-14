@@ -138,7 +138,7 @@ const AllClients = () => {
     <AdminLayout>
       <div className="container mx-auto pr-6 pb-6 pl-6">
         <div>
-          <Title level={2} className="text-center mb-4 text-sm">
+          <Title level={2} className=" font-bold mb-4 text-sm">
             All Clients
           </Title>
           {/* Search input */}

@@ -96,6 +96,7 @@ const ShippingDash = () => {
     }
 
     // Apply Search Filter
+    // Apply Search Filter
     if (searchQuery.trim() !== "") {
       filtered = filtered
         .map((user) => ({
@@ -105,11 +106,14 @@ const ShippingDash = () => {
             const enrollment = user.enrollment?.toString().toLowerCase() || "";
             const amazonOrderId =
               order.items[0]?.amazonOrderId?.toString().toLowerCase() || "N/A";
+            const trackingId =
+              order.items[0]?.trackingId?.toString().toLowerCase() || "N/A";
 
             return (
               orderId.includes(searchQuery.toLowerCase()) ||
               enrollment.includes(searchQuery.toLowerCase()) ||
-              amazonOrderId.includes(searchQuery.toLowerCase())
+              amazonOrderId.includes(searchQuery.toLowerCase()) ||
+              trackingId.includes(searchQuery.toLowerCase()) // Add trackingId to search logic
             );
           }),
         }))

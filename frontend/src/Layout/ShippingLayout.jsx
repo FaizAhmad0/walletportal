@@ -13,6 +13,7 @@ import logoExpanded from "../assets/logo2.png";
 import logoCollapsed from "../assets/Logoratan.png";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 
 const { Header, Sider, Content } = Layout;
 
@@ -132,6 +133,11 @@ const ShippingLayout = ({ children }) => {
               key: "/shippingmanager-dash",
               icon: <ShoppingCartIcon />,
               label: "Orders",
+            },
+            {
+              key: "/shipped",
+              icon: <LocalShippingIcon />,
+              label: "Shipped",
             },
 
             { key: "/", icon: <LockIcon />, label: "Logout" },

@@ -33,6 +33,7 @@ import ArchivedOrders from "./Pages/ArchivedOrders";
 import ShippingOrder from "./Pages/ShippingOrder";
 import BulkOrders from "./Pages/BulkOrders";
 import ShippingDash from "./Pages/ShippingDash";
+import ShippedOrders from "./Pages/ShippedOrders";
 function App() {
   return (
     <>
@@ -78,6 +79,7 @@ function App() {
           <Route path="/create-manager" element={<RegisterManager />} />
           <Route path="/admin-report" element={<AdminReport />} />
           <Route path="/shippingmanager-dash" element={<ShippingDash />} />
+          <Route path="/shipped" element={<ShippedOrders />} />
         </Routes>
       </Router>
     </>

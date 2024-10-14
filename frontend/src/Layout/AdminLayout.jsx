@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Layout, Menu, theme } from "antd";
+import React, { useState, useEffect } from "react";
+import { Layout, Menu, Button, theme } from "antd";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import "./UserLayout.css";
 import LayoutNav from "../components/LayoutNav";
@@ -9,19 +9,62 @@ import logoCollapsed from "../assets/Logoratan.png";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GridViewIcon from "@mui/icons-material/GridView";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
-
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 
 const { Header, Sider, Content } = Layout;
 
 const AdminLayout = ({ children }) => {
   const { enrollment } = useParams();
   const [collapsed, setCollapsed] = useState(true); // Initially collapsed
+  const [isMobile, setIsMobile] = useState(false); // For mobile responsiveness
   const navigate = useNavigate();
   const location = useLocation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Function to expand sidebar on hover when not on mobile
+    const handleMouseEnter = () => {
+      if (!isMobile) setCollapsed(false);
+    };
+
+    // Function to collapse sidebar on mouse leave when not on mobile
+    const handleMouseLeave = () => {
+      if (!isMobile) setCollapsed(true);
+    };
+
+    // Attach hover events when the screen is wider than 768px
+    if (!isMobile) {
+      document
+        .querySelector(".ant-layout-sider")
+        ?.addEventListener("mouseenter", handleMouseEnter);
+      document
+        .querySelector(".ant-layout-sider")
+        ?.addEventListener("mouseleave", handleMouseLeave);
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (!isMobile) {
+        document
+          .querySelector(".ant-layout-sider")
+          ?.removeEventListener("mouseenter", handleMouseEnter);
+        document
+          .querySelector(".ant-layout-sider")
+          ?.removeEventListener("mouseleave", handleMouseLeave);
+      }
+    };
+  }, [isMobile]);
 
   const handleMenuClick = ({ key }) => {
     if (key === "/") {
@@ -40,14 +83,16 @@ const AdminLayout = ({ children }) => {
     }
   };
 
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {/* Sidebar */}
       <Sider
         collapsible
         collapsed={collapsed}
-        onMouseEnter={() => setCollapsed(false)}
-        onMouseLeave={() => setCollapsed(true)}
         trigger={null}
         breakpoint="md"
         collapsedWidth={80}
@@ -60,6 +105,7 @@ const AdminLayout = ({ children }) => {
           background: "#1F222E",
           zIndex: 1000,
           borderRight: "4px solid #EF4444",
+          display: isMobile && collapsed ? "none" : "block", // Hide on mobile
         }}
       >
         <div style={{ textAlign: "center", padding: "16px 0" }}>
@@ -104,7 +150,6 @@ const AdminLayout = ({ children }) => {
               icon: <GridViewIcon />,
               label: "View Managers",
             },
-
             {
               key: "/view-all-orders",
               icon: <GridViewIcon />,
@@ -125,7 +170,6 @@ const AdminLayout = ({ children }) => {
               icon: <SignalCellularAltIcon />,
               label: "Bulk Order",
             },
-
             {
               key: "/",
               icon: <LockIcon />,
@@ -136,18 +180,33 @@ const AdminLayout = ({ children }) => {
       </Sider>
 
       {/* Main Layout */}
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
+      <Layout
+        style={{ marginLeft: isMobile && collapsed ? 0 : collapsed ? 80 : 200 }}
+      >
         {/* Header with Navbar */}
         <Header
           style={{
             padding: 0,
             background: colorBgContainer,
             position: "fixed",
-            width: `calc(100% - ${collapsed ? 80 : 200}px)`,
+            width: `calc(100% - ${
+              isMobile && collapsed ? 0 : collapsed ? 80 : 200
+            }px)`,
             zIndex: 1,
           }}
         >
-          <LayoutNav />
+          <Button
+            onClick={toggleSidebar}
+            style={{
+              margin: "0 16px",
+              display: isMobile ? "block" : "none", // Show button only on mobile
+              position: "relative",
+              top: "20px",
+            }}
+          >
+            {collapsed ? <MenuIcon /> : <CloseIcon />}
+          </Button>
+          {!isMobile && <LayoutNav />}
         </Header>
 
         {/* Main Content Area */}

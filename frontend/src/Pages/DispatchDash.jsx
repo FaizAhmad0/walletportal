@@ -561,7 +561,11 @@ const DispatchDash = () => {
             </div>
             {/* Time Filter */}
             <div className="text-xs items-end">
-              <Radio.Group buttonStyle="solid">
+              <Radio.Group
+                buttonStyle="solid"
+                onChange={handleTimeFilter}
+                value={timeFilter}
+              >
                 <Radio.Button value="today">Today</Radio.Button>
                 <Radio.Button value="week">This Week</Radio.Button>
                 <Radio.Button value="month">This Month</Radio.Button>

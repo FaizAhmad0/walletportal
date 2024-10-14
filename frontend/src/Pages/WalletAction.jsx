@@ -131,8 +131,8 @@ const WalletAction = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6">
-        <Title level={2} className="text-center mb-6">
+      <div className="container mx-auto p-6 pt-0">
+        <Title level={2} className="font-bold mb-6">
           Manage Client Wallet
         </Title>
 

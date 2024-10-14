@@ -19,9 +19,13 @@ const LayoutNav = () => {
         <Menu.Item key="/" className="px-4">
           <Link to="/">Home</Link>
         </Menu.Item>
-        <Menu.Item key="/user-order" className="px-4">
-          <Link to="/user-order">Order</Link>
-        </Menu.Item>
+        {localStorage.getItem("role") === "user" ? (
+          <Menu.Item key="/user-order" className="px-4">
+            <Link to="/user-order">Order</Link>
+          </Menu.Item>
+        ) : (
+          ""
+        )}
         <Menu.Item key="/aboutus" className="px-4">
           <Link to="/aboutus">About Us</Link>
         </Menu.Item>
