@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../Layout/AdminLayout";
-import { Table, Input, Typography } from "antd";
+import { Table, Input, Typography, Button } from "antd";
 
 const { Search } = Input;
 const { Title } = Typography;
@@ -33,6 +33,31 @@ const AllManagers = () => {
     client.enrollment.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Function to download CSV
+  const downloadCSV = () => {
+    const headers = ["Manager Name", "Email", "Enrollment", "Phone", "GMS"]; // Define CSV headers without GMS
+
+    const rows = clients.map((client) => [
+      client.name,
+      client.email,
+      client.enrollment,
+      client.mobile,
+      client.gms,
+    ]); // Convert client data to rows without GMS
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "managers_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const columns = [
     {
       title: "Manager Name",
@@ -58,12 +83,7 @@ const AllManagers = () => {
       key: "mobile",
       className: "text-xs",
     },
-    {
-      title: "Balance",
-      dataIndex: "amount",
-      key: "amount",
-      className: "text-xs",
-    },
+
     {
       title: "GMS",
       dataIndex: "gms",
@@ -75,16 +95,26 @@ const AllManagers = () => {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6 pt-0">
-        <Title level={2} className=" font-bold mb-6">
+        <Title level={2} className="font-bold mb-6">
           Here are all the Managers
         </Title>
 
+        {/* Search input */}
         <Search
           placeholder="Search by enrollment"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ width: "40%", marginBottom: "16px" }}
         />
+
+        {/* CSV Download Button */}
+        <Button
+          type="primary"
+          onClick={downloadCSV}
+          style={{ marginBottom: "16px", marginLeft: "10px" }}
+        >
+          Download CSV
+        </Button>
 
         <Title level={5}>Total Managers: {clients.length}</Title>
 

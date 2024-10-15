@@ -12,7 +12,7 @@ import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-
+import InfoIcon from "@mui/icons-material/Info";
 const { Header, Sider, Content } = Layout;
 
 const AdminLayout = ({ children }) => {
@@ -164,6 +164,11 @@ const AdminLayout = ({ children }) => {
               key: "/admin-report",
               icon: <SignalCellularAltIcon />,
               label: "Report",
+            },
+            {
+              key: "/audit-report",
+              icon: <InfoIcon />,
+              label: "Audit Report",
             },
             {
               key: "/bulkOrders",

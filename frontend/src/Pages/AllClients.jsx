@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Button, Select, message, Table, Typography, Input } from "antd";
 import AdminLayout from "../Layout/AdminLayout";
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Title } = Typography;
 
 const AllClients = () => {
@@ -69,6 +69,41 @@ const AllClients = () => {
       message.error("Error assigning manager.");
       console.error("Error assigning manager:", error);
     }
+  };
+
+  // Function to download CSV
+  const downloadCSV = () => {
+    const headers = [
+      "Client Name",
+      "Email",
+      "Manager",
+      "Enrollment",
+      "Phone",
+      "Balance",
+      "GMS",
+    ]; // Define CSV headers
+
+    const rows = clients.map((client) => [
+      client.name,
+      client.email,
+      client.manager,
+      client.enrollment,
+      client.mobile,
+      client.amount,
+      client.gms,
+    ]); // Convert client data to rows
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "clients_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const columns = [
@@ -149,7 +184,15 @@ const AllClients = () => {
             onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
             style={{ marginBottom: "20px", width: "30%" }}
           />
-          <h2 className="text-sm">Total clients : {clients.length}</h2>
+          <h2 className="text-sm">Total clients: {clients.length}</h2>
+          {/* Download CSV Button */}
+          <Button
+            type="primary"
+            onClick={downloadCSV}
+            style={{ marginBottom: "20px" }}
+          >
+            Download Users
+          </Button>
         </div>
 
         <Table
