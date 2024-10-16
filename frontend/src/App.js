@@ -35,6 +35,7 @@ import BulkOrders from "./Pages/BulkOrders";
 import ShippingDash from "./Pages/ShippingDash";
 import ShippedOrders from "./Pages/ShippedOrders";
 import AuditReport from "./Pages/AuditReport";
+import AddManagerClient from "./Pages/AddManagerClient";
 function App() {
   return (
     <>
@@ -77,6 +78,7 @@ function App() {
           <Route path="/view-all-orders" exact element={<AllOrders />} />
           <Route path="/wallet-action" exact element={<WalletAction />} />
           <Route path="/invoice" element={<InvoicePage />} />
+          <Route path="/add-user" element={<AddManagerClient />} />
           <Route path="/create-manager" element={<RegisterManager />} />
           <Route path="/admin-report" element={<AdminReport />} />
           <Route path="/shippingmanager-dash" element={<ShippingDash />} />

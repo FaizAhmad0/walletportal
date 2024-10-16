@@ -94,7 +94,7 @@ const ManagerLayout = ({ children }) => {
               label: "Clients",
             },
             {
-              key: "/register-user",
+              key: "/add-user",
               icon: <GroupAddIcon />,
               label: "Add Client",
             },

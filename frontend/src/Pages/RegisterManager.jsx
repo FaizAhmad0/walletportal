@@ -131,18 +131,6 @@ const RegisterManager = () => {
           </Form.Item>
 
           <Form.Item
-            name="gst"
-            rules={[
-              { required: true, message: "Please enter your GST number" },
-            ]}
-          >
-            <Input
-              prefix={<FileTextOutlined />}
-              placeholder="Enter your GST number"
-            />
-          </Form.Item>
-
-          <Form.Item
             name="mobile"
             rules={[
               {
