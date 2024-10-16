@@ -67,7 +67,18 @@ const LoginForm = () => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        backgroundImage:
+          'url("https://img.freepik.com/free-vector/paper-style-white-monochrome-background_52683-66443.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <div className="login-container" data-aos="fade-up">
         {contextHolder}
         <Form
@@ -115,7 +126,7 @@ const LoginForm = () => {
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

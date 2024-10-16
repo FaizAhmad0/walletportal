@@ -134,7 +134,7 @@ const OrderHistory = () => {
       title: <span className="text-xs">Total Price</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (finalAmount) => <span className="text-xs">${finalAmount}</span>,
+      render: (finalAmount) => <span className="text-xs">₹ {finalAmount}</span>,
       width: 150,
     },
     {
@@ -202,14 +202,14 @@ const OrderHistory = () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      render: (price) => `$${price}`,
+      render: (price) => `₹${price}`,
       width: 150,
     },
     {
       title: "Total Price",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      render: (totalPrice) => `$${totalPrice}`,
+      render: (totalPrice) => `₹${totalPrice}`,
       width: 150,
     },
     {

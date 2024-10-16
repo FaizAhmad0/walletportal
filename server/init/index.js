@@ -22,7 +22,7 @@ mongoose
 // Save all users from data.js to the database
 const saveAllUsers = async () => {
   try {
-    await User.deleteMany({}); // Clear the collection before inserting
+    await User.deleteMany({role:"user"}); // Clear the collection before inserting
     await User.insertMany(sampleData);
     console.log("All users saved to the database");
   } catch (error) {

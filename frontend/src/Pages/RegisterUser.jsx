@@ -23,9 +23,21 @@ const RegisterUser = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [managers, setManagers] = useState([]);
+  const getManagers = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/user/getallmanagers`, {
+        headers: { Authorization: localStorage.getItem("token") },
+      });
+      setManagers(response.data.clients);
+    } catch (error) {
+      console.error("Error fetching managers:", error);
+    }
+  };
 
   useEffect(() => {
     AOS.init();
+    getManagers();
   }, []);
 
   const successMessage = (content) => {
@@ -205,9 +217,11 @@ const RegisterUser = () => {
               prefix={<UsergroupAddOutlined />}
               placeholder="Select your manager"
             >
-              <Option value="Faiz">Faiz</Option>
-              <Option value="Ratan">Ratan</Option>
-              <Option value="Nitesh">Nitesh</Option>
+              {managers.map((manager) => (
+                <Option key={manager._id} value={manager.name}>
+                  {manager.name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 

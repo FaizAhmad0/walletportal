@@ -296,19 +296,25 @@ const AddItems = () => {
                     className="hover:bg-gray-100 transition duration-300 ease-in-out"
                   >
                     <td className="px-3 py-1 whitespace-nowrap text-sm text-gray-900">
-                      <select
+                      <input
+                        type="text"
                         name="sku"
                         value={item.sku}
                         onChange={(e) => handleChange(index, e)}
                         className="w-30 py-1 px-3 border rounded-md focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-                      >
-                        <option value="">Select SKU</option>
-                        {products.map((product) => (
-                          <option key={product.sku} value={product.sku}>
-                            {product.sku}
-                          </option>
-                        ))}
-                      </select>
+                        placeholder="Enter SKU"
+                        list={`sku-suggestions-${index}`}
+                      />
+                      {/* Create a datalist for SKU suggestions */}
+                      <datalist id={`sku-suggestions-${index}`}>
+                        {products
+                          .filter((product) => product.sku.includes(item.sku))
+                          .map((product) => (
+                            <option key={product.sku} value={product.sku}>
+                              {product.sku}
+                            </option>
+                          ))}
+                      </datalist>
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -539,5 +545,4 @@ const AddItems = () => {
     </DispatchLayout>
   );
 };
-
 export default AddItems;
