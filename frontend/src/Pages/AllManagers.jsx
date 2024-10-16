@@ -89,6 +89,7 @@ const AllManagers = () => {
       dataIndex: "gms",
       key: "gms",
       className: "text-xs",
+      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
     },
   ];
 

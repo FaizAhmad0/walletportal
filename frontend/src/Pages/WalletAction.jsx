@@ -175,7 +175,7 @@ const WalletAction = () => {
           columns={columns}
           dataSource={filteredClients}
           rowKey={(record) => record._id}
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 6 }}
           bordered
           className="wallet-table"
         />

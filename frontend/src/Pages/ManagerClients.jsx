@@ -110,13 +110,13 @@ const ManagerClients = () => {
       title: <span className="text-xs">Balance</span>,
       dataIndex: "amount",
       key: "amount",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
     },
     {
       title: <span className="text-xs">GMS</span>,
       dataIndex: "gms",
       key: "gms",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
     },
     {
       title: <span className="text-xs">Action</span>,

@@ -90,12 +90,14 @@ const AdminReport = () => {
       dataIndex: "amount",
       key: "amount",
       className: "text-xs",
+      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
     },
     {
       title: "GMS",
       dataIndex: "gms",
       key: "gms",
       className: "text-xs",
+      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
     },
     {
       title: "Action",
@@ -176,6 +178,9 @@ const AdminReport = () => {
                 dataIndex: "gms",
                 key: "gms",
                 className: "text-xs",
+                render: (text) => (
+                  <span className="text-xs">{text.toFixed(3)}</span>
+                ),
               },
             ]}
             pagination={false}
