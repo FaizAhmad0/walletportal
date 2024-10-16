@@ -219,6 +219,12 @@ const DispatchDash = () => {
       render: (text) => <span className="text-xs">{text}</span>,
     },
     {
+      title: <span className="text-xs">User Amount.</span>,
+      dataIndex: "amount",
+      key: "amount",
+      render: (text) => <span className="text-xs">₹ {text}</span>,
+    },
+    {
       title: <span className="text-xs">Amazon Order Id</span>,
       dataIndex: "amazonOrderId",
       key: "amazonOrderId",
@@ -374,6 +380,7 @@ const DispatchDash = () => {
         .map((order) => ({
           key: order._id,
           name: user.name,
+          amount: user.amount,
           orderId: order.orderId,
           enrollment: user.enrollment,
           amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
