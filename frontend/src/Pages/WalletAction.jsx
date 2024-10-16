@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../Layout/AdminLayout";
-import { Modal, Input, message, Table, Button, Typography, Space } from "antd";
+import {
+  Modal,
+  Input,
+  message,
+  Table,
+  Button,
+  Typography,
+  Space,
+  List,
+} from "antd";
+import moment from "moment"; // For formatting timestamps
 
 const { Search } = Input;
 const { Title } = Typography;
@@ -15,6 +25,9 @@ const WalletAction = () => {
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState("");
   const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const [isTransactionModalVisible, setIsTransactionModalVisible] =
+    useState(false); // For showing transactions
+  const [totalSpend, setTotalSpend] = useState(0); // State for total spend calculation
 
   const getClients = async () => {
     try {
@@ -37,6 +50,17 @@ const WalletAction = () => {
     setSelectedClient(client);
     setActionType(type);
     setIsModalVisible(true);
+  };
+
+  const handleShowTransactions = (client) => {
+    setSelectedClient(client);
+    setIsTransactionModalVisible(true);
+
+    // Calculate total spend (sum of all debit transactions)
+    const spend = client.transactions
+      .filter((transaction) => transaction.debit) // Filter only debit transactions
+      .reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0); // Sum all debit amounts
+    setTotalSpend(spend);
   };
 
   const handleSubmit = async () => {
@@ -106,6 +130,7 @@ const WalletAction = () => {
       title: "Balance",
       dataIndex: "amount",
       key: "amount",
+      render: (amount) => parseFloat(amount).toFixed(3),
     },
     {
       title: "Action",
@@ -116,13 +141,16 @@ const WalletAction = () => {
             type="primary"
             onClick={() => handleActionClick(client, "add")}
           >
-            Add Money
+            Add
           </Button>
           <Button
             style={{ background: "red", color: "white" }}
             onClick={() => handleActionClick(client, "deduct")}
           >
-            Deduct Money
+            Deduct
+          </Button>
+          <Button onClick={() => handleShowTransactions(client)}>
+            Show Transactions
           </Button>
         </Space>
       ),
@@ -152,6 +180,7 @@ const WalletAction = () => {
           className="wallet-table"
         />
 
+        {/* Add/Deduct Money Modal */}
         <Modal
           title={actionType === "add" ? "Add Money" : "Deduct Money"}
           visible={isModalVisible}
@@ -177,6 +206,46 @@ const WalletAction = () => {
               onChange={(e) => setReason(e.target.value)}
               placeholder="Enter reason"
             />
+          </div>
+        </Modal>
+
+        {/* Transaction Modal */}
+        <Modal
+          title="Client Transactions"
+          visible={isTransactionModalVisible}
+          onCancel={() => setIsTransactionModalVisible(false)}
+          footer={null} // No default buttons
+        >
+          <List
+            itemLayout="horizontal"
+            dataSource={selectedClient?.transactions || []}
+            renderItem={(transaction) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={
+                    <span
+                      style={{
+                        color: transaction.credit ? "green" : "red",
+                      }}
+                    >
+                      {transaction.amount} - {transaction.description}
+                    </span>
+                  }
+                  description={
+                    !transaction.credit
+                      ? `Debited on ${moment(transaction.createdAt).format(
+                          "MMMM Do YYYY, h:mm:ss a"
+                        )}`
+                      : `Credited on ${moment(transaction.createdAt).format(
+                          "MMMM Do YYYY, h:mm:ss a"
+                        )}`
+                  }
+                />
+              </List.Item>
+            )}
+          />
+          <div style={{ marginTop: "16px", fontWeight: "bold" }}>
+            Total Spend: <span>{totalSpend.toFixed(3)}</span>
           </div>
         </Modal>
       </div>

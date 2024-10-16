@@ -3,9 +3,9 @@ import ManagerLayout from "../Layout/ManagerLayout";
 import axios from "axios";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-
 const ManagerDash = () => {
   const [userData, setUserData] = useState("");
+  console.log(userData);
   const getUserData = async () => {
     const id = localStorage.getItem("id");
     try {
