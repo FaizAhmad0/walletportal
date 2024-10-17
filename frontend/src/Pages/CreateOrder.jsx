@@ -135,14 +135,14 @@ const CreateOrder = () => {
         <div className="text-xs">
           <Link to={`/add-items/${user.enrollment}`}>
             {user.gst ? (
-              <Button className="mr-5 text-xs" type="primary">
+              <Button className="mr-5 text-xs mb-2" type="primary">
                 Add Items
               </Button>
             ) : (
               <Tooltip title={!user.gst ? "Add GST to click" : ""}>
                 <Button
                   disabled={!user.gst}
-                  className="mr-5 text-xs"
+                  className="mr-5 text-xs mb-2"
                   type="primary"
                 >
                   Add Items
@@ -151,7 +151,7 @@ const CreateOrder = () => {
             )}
           </Link>
           <Button
-            className="text-xs"
+            className="text-xs px-5"
             type="primary"
             onClick={() => showGstModal(user)}
           >

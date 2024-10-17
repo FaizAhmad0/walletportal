@@ -36,6 +36,7 @@ import ShippingDash from "./Pages/ShippingDash";
 import ShippedOrders from "./Pages/ShippedOrders";
 import AuditReport from "./Pages/AuditReport";
 import AddManagerClient from "./Pages/AddManagerClient";
+import AccountantDash from "./Pages/AccountantDash";
 function App() {
   return (
     <>
@@ -84,6 +85,7 @@ function App() {
           <Route path="/shippingmanager-dash" element={<ShippingDash />} />
           <Route path="/shipped" element={<ShippedOrders />} />
           <Route path="/audit-report" element={<AuditReport />} />
+          <Route path="/accountant-dash" element={<AccountantDash />} />
         </Routes>
       </Router>
     </>

@@ -58,6 +58,10 @@ const LoginForm = () => {
           navigate("/shippingmanager-dash", {
             state: { message: response.data.message },
           });
+        } else if (response.data.role === "accountant") {
+          navigate("/accountant-dash", {
+            state: { message: response.data.message },
+          });
         }
       })
       .catch((error) => {

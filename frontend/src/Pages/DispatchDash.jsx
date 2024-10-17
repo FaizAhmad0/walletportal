@@ -222,7 +222,10 @@ const DispatchDash = () => {
       title: <span className="text-xs">User Amount.</span>,
       dataIndex: "amount",
       key: "amount",
-      render: (text) => <span className="text-xs">₹ {text}</span>,
+      render: (text) => {
+        const formattedAmount = Number(text).toFixed(2); // Convert to number and format with 2 decimal places
+        return <span className="text-xs">₹ {formattedAmount}</span>;
+      },
     },
     {
       title: <span className="text-xs">Amazon Order Id</span>,

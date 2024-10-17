@@ -139,7 +139,7 @@ const userSchema = new Schema(
     },
     gms: {
       type: Number,
-      default: 5,
+      default: 0,
     },
     country: {
       type: String,
@@ -147,7 +147,7 @@ const userSchema = new Schema(
     },
     amount: {
       type: Number,
-      default: 50,
+      default: 0,
     },
     pincode: {
       type: String,
@@ -159,7 +159,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["user", "manager", "dispatch", "shippingmanager", "admin"],
+      enum: ["user", "manager", "dispatch", "shippingmanager", "admin","accountant"],
       required: true,
       default: "user",
     },
