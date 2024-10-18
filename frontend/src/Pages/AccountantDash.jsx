@@ -98,7 +98,30 @@ const AccountantDash = () => {
   };
   const handleDownload = () => {
     // Create a new data source excluding the items field
-    const dataToDownload = dataSource.map(({ items, amount, ...rest }) => rest); // Destructure to remove items field
+    const dataToDownload = dataSource.map(
+      ({
+        shippingPartner,
+        trackingId,
+        amazonOrderId,
+        _id,
+        key,
+        amount,
+        items,
+        ...rest
+      }) => {
+        const itemsWithGST = items.map(({ IGST, CGST, SGST, ...itemRest }) => ({
+          ...itemRest,
+          IGST,
+          CGST,
+          SGST,
+        }));
+
+        return {
+          ...rest,
+          items: itemsWithGST, // Include updated items with separate GST fields
+        };
+      }
+    );
 
     const jsonData = JSON.stringify(dataToDownload, null, 2); // Convert the dataToDownload to JSON format
 
@@ -111,6 +134,7 @@ const AccountantDash = () => {
     link.click();
     document.body.removeChild(link);
   };
+
   const getRowClassName = (record) => {
     const allUnavailable = record.items.some(
       (item) => item.productAction !== "Available"
@@ -156,7 +180,7 @@ const AccountantDash = () => {
       render: (text) => <span className="text-xs">{text}</span>,
     },
     {
-      title: <span className="text-xs">Party Name.</span>,
+      title: <span className="text-xs">Party Name</span>,
       dataIndex: "name",
       key: "name",
       render: (text) => <span className="text-xs">{text}</span>,
@@ -171,7 +195,7 @@ const AccountantDash = () => {
       },
     },
     {
-      title: <span className="text-xs">Item name</span>,
+      title: <span className="text-xs">Item Name</span>,
       dataIndex: "itemName",
       key: "itemName",
       render: (text) => <span className="text-xs">{text}</span>,
@@ -183,7 +207,7 @@ const AccountantDash = () => {
       render: (text) => <span className="text-xs">{text}</span>,
     },
     {
-      title: <span className="text-xs">Item rate</span>,
+      title: <span className="text-xs">Item Rate</span>,
       dataIndex: "price",
       key: "price",
       render: (text) => <span className="text-xs">₹ {text}</span>,
@@ -254,11 +278,27 @@ const AccountantDash = () => {
       key: "state",
       render: (text) => <span className="text-xs">{text}</span>,
     },
+    // Add new column for GST rate (CGST, SGST or IGST)
+    {
+      title: <span className="text-xs">GST Rate</span>,
+      dataIndex: "items", // Accessing items array
+      key: "gstRateDisplay",
+      render: (_, record) => (
+        <div>
+          {record.items.map((item, index) => (
+            <div key={index} className="text-xs">
+              {item.gstRateDisplay}
+            </div>
+          ))}
+        </div>
+      ),
+    },
   ];
+
   const dataSource = filteredOrders
     .flatMap((user) =>
       user.orders
-        .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
+        .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived and non-shipped orders
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -282,7 +322,37 @@ const AccountantDash = () => {
           gst: user.gst,
           invoiceVal: order.finalAmount,
           paymentStatus: order.paymentStatus,
-          items: order.items,
+          items: order.items.map((item) => {
+            const gstRate = parseFloat(item.gstRate || 0); // Get gstRate from item or default to 0
+            const totalPrice = parseFloat(item.totalPrice || 0);
+            const shippingPrice = parseFloat(item.shippingPrice || 0);
+
+            // Calculate GST for item price and shipping price
+            const itemGST = (totalPrice * gstRate) / 100;
+            const shippingGST = (shippingPrice * 18) / 100; // 18% GST on shipping price
+            const totalGST = itemGST + shippingGST; // Sum of item and shipping GST
+
+            let gstData = {};
+            if (user.state === "Rajasthan") {
+              const halfGstRate = (totalGST / 2).toFixed(2);
+              gstData = {
+                CGST: parseFloat(halfGstRate),
+                SGST: parseFloat(halfGstRate),
+                IGST: 0,
+              };
+            } else {
+              gstData = {
+                CGST: 0,
+                SGST: 0,
+                IGST: parseFloat(totalGST.toFixed(2)),
+              };
+            }
+
+            return {
+              ...item, // Keep all the existing item data
+              gstData, // Add the calculated GST rate display
+            };
+          }),
           gstRegistration: "Regular",
           voucherType: "Sales",
           _id: order._id,
@@ -308,7 +378,7 @@ const AccountantDash = () => {
     <AccountantLayout>
       <div className="relative max-w-full mx-auto pb-20">
         <h1 className="text-xl font-semibold text-black-600 mb-4">
-          Dispatch Dashboard
+          Accountant Dashboard
         </h1>
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center justify-between space-x-4">
