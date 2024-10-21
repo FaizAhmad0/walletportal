@@ -139,17 +139,21 @@ const WalletAction = () => {
         <Space size="middle">
           <Button
             type="primary"
+            className="italic text-xs" // Decreased font size
             onClick={() => handleActionClick(client, "add")}
           >
             Add
           </Button>
           <Button
-            style={{ background: "red", color: "white" }}
+            style={{ background: "red", color: "white", fontStyle: "italic", fontSize: "0.875rem" }} // Decreased font size
             onClick={() => handleActionClick(client, "deduct")}
           >
             Deduct
           </Button>
-          <Button onClick={() => handleShowTransactions(client)}>
+          <Button
+            className="italic text-xs" // Decreased font size
+            onClick={() => handleShowTransactions(client)}
+          >
             Show Transactions
           </Button>
         </Space>
@@ -159,25 +163,31 @@ const WalletAction = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 pt-0">
-        <Title level={2} className="font-bold mb-6">
-          Manage Client Wallet
-        </Title>
+      <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
+        {/* Page Title */}
+        <h1 className="text-2xl font-bold mb-6 italic text-gray-700"> {/* Decreased font size */}
+          Manage Client's Wallet
+        </h1>
 
-        <Search
-          style={{ width: "40%", marginBottom: "16px" }}
-          placeholder="Search clients by name, email, or enrollment"
-          onChange={(e) => setSearchTerm(e.target.value)}
-          enterButton
-        />
+        {/* Search Input */}
+        <div className="mb-4 flex justify-between items-center">
+          <Search
+            style={{ width: "40%" }}
+            placeholder="Search clients by name, email, or enrollment"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            enterButton
+            className="shadow-md rounded-md"
+          />
+        </div>
 
+        {/* Clients Table */}
         <Table
           columns={columns}
           dataSource={filteredClients}
           rowKey={(record) => record._id}
           pagination={{ pageSize: 6 }}
           bordered
-          className="wallet-table"
+          className="wallet-table shadow-sm rounded-lg"
         />
 
         {/* Add/Deduct Money Modal */}
@@ -187,25 +197,33 @@ const WalletAction = () => {
           onCancel={() => setIsModalVisible(false)}
           onOk={handleSubmit}
           okText="Submit"
+          className="rounded-lg"
         >
-          <div className="mb-4">
-            <label>Amount:</label>
-            <Input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Enter amount"
-              style={{ marginBottom: "8px" }}
-            />
-          </div>
-          <div>
-            <label>Reason:</label>
-            <Input
-              type="text"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Enter reason"
-            />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-md font-medium text-gray-700">
+                Amount:
+              </label>
+              <Input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-200"
+              />
+            </div>
+            <div>
+              <label className="block text-md font-medium text-gray-700">
+                Reason:
+              </label>
+              <Input
+                type="text"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Enter reason"
+                className="mt-1 rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-200"
+              />
+            </div>
           </div>
         </Modal>
 
@@ -214,7 +232,8 @@ const WalletAction = () => {
           title="Client Transactions"
           visible={isTransactionModalVisible}
           onCancel={() => setIsTransactionModalVisible(false)}
-          footer={null} // No default buttons
+          footer={null}
+          className="rounded-lg"
         >
           <List
             itemLayout="horizontal"
@@ -224,28 +243,30 @@ const WalletAction = () => {
                 <List.Item.Meta
                   title={
                     <span
-                      style={{
-                        color: transaction.credit ? "green" : "red",
-                      }}
+                      className={`font-semibold ${
+                        transaction.credit ? "text-green-600" : "text-red-600"
+                      }`}
                     >
-                      {transaction.amount} - {transaction.description}
+                      ₹{transaction.amount} - {transaction.description}
                     </span>
                   }
                   description={
-                    !transaction.credit
-                      ? `Debited on ${moment(transaction.createdAt).format(
+                    transaction.credit
+                      ? `Credited on ${moment(transaction.createdAt).format(
                           "MMMM Do YYYY, h:mm:ss a"
                         )}`
-                      : `Credited on ${moment(transaction.createdAt).format(
+                      : `Debited on ${moment(transaction.createdAt).format(
                           "MMMM Do YYYY, h:mm:ss a"
                         )}`
                   }
                 />
               </List.Item>
             )}
+            className="bg-gray-50 rounded-lg shadow-sm p-4"
           />
-          <div style={{ marginTop: "16px", fontWeight: "bold" }}>
-            Total Spend: <span>{totalSpend.toFixed(3)}</span>
+
+          <div className="mt-6 text-right font-bold text-lg">
+            Total Spend: ₹<span>{totalSpend.toFixed(2)}</span>
           </div>
         </Modal>
       </div>

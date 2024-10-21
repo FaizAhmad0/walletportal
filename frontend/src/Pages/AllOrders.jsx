@@ -261,17 +261,19 @@ const AllOrders = () => {
 
   return (
     <AdminLayout>
-      <div className="relative max-w-full mx-auto pb-20">
-        <h1 className="text-2xl font-bold mb-6 text-xl">
-          A detailed list of orders and their information
+      <div className="relative max-w-full mx-auto pb-10 px-2 bg-white shadow-lg rounded-lg">
+        {/* Page Title */}
+        <h1 className="text-3xl font-bold mb-6 italic">
+          A Detailed List of Orders
         </h1>
 
-        {/* Radio Group for filtering */}
-        <div className=" mb-4">
+        {/* Radio Group for Filtering */}
+        <div className="mb-6 flex justify-between items-center">
           <Radio.Group
             onChange={handleFilterChange}
             buttonStyle="solid"
             value={filter}
+            className="bg-gray-100 p-2 rounded-md shadow-sm"
           >
             <Radio.Button value="all">All</Radio.Button>
             <Radio.Button value="today">Today</Radio.Button>
@@ -281,7 +283,8 @@ const AllOrders = () => {
           </Radio.Group>
         </div>
 
-        <div className="overflow-x-auto mb-16">
+        {/* Orders Table */}
+        <div className="overflow-x-auto bg-gray-50 rounded-md shadow-sm">
           <Table
             bordered
             style={{ cursor: "pointer" }}
@@ -290,12 +293,14 @@ const AllOrders = () => {
             rowClassName={getRowClassName}
             pagination={{ pageSize: 10 }}
             scroll={{ x: "max-content" }}
+            className="rounded-md"
           />
         </div>
       </div>
 
+      {/* Modal for Order Items */}
       <Modal
-        title="Order Items"
+        title="Order Details"
         visible={isModalVisible}
         onCancel={handleModalClose}
         footer={[
@@ -304,40 +309,44 @@ const AllOrders = () => {
           </Button>,
         ]}
       >
-        <ul>
+        {/* List of Ordered Items */}
+        <ul className="space-y-4">
           {selectedOrderItems.map((item, index) => (
-            <li key={index} className="pb-5">
-              <p>
+            <li key={index} className="border-b pb-4">
+              <p className="text-lg">
                 <strong>Product:</strong> {item.name}
               </p>
-              <p>
-                <strong>Quantity:</strong> {item.quantity}
-              </p>
-              <p>
+              <p className="text-md">
                 <strong>Price:</strong> ₹ {item.price}
               </p>
-              <p>
-                <strong>Product Status:</strong> {item.productAction} &nbsp;{" "}
-                {item.productAction === "Product not available" ? (
+              <p className="text-md">
+                <strong>Quantity:</strong> {item.quantity}
+              </p>
+              <p className="text-md">
+                <strong>GST Rate:</strong> {item.gstRate}%
+              </p>
+              <p className="text-md">
+                <strong>Product Status:</strong> {item.productAction}
+                {item.productAction === "Product not available" && (
                   <Button
                     type="primary"
+                    className="ml-2"
                     onClick={() => handleMarkAvailableClick(item._id)}
                   >
-                    Mark available
+                    Mark Available
                   </Button>
-                ) : (
-                  ""
                 )}
               </p>
-              <p>
-                <strong>Total:</strong> {item.quantity} * {item.price} ={" "}
+              <p className="text-md font-semibold">
+                <strong>Total:</strong> {item.quantity} * ₹{item.price} = ₹
                 {item.totalPrice}
               </p>
-              <hr />
             </li>
           ))}
         </ul>
-        <p style={{ textAlign: "right", fontWeight: "bold" }}>
+
+        {/* Final Amount */}
+        <p className="text-right font-bold text-xl mt-4">
           Final Amount: ₹ {selectedOrderAmount}
         </p>
       </Modal>

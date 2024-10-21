@@ -95,41 +95,57 @@ const AllManagers = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 pt-0">
-        <Title level={2} className="font-bold mb-6">
-          Here are all the Managers
-        </Title>
+      <div className="container mx-auto p-2 bg-white shadow-md rounded-lg">
+        {/* Title */}
+        <h1 className="text-3xl font-bold italic mb-4">All Managers</h1>
 
         {/* Search input */}
-        <Search
-          placeholder="Search by enrollment"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ width: "40%", marginBottom: "16px" }}
-        />
+        <div className="flex items-center mb-4">
+          <Search
+            placeholder="Search by enrollment"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: "50%", marginRight: "12px" }}
+            className="shadow-sm"
+            allowClear
+          />
+          {/* CSV Download Button */}
+          <Button
+            type="primary"
+            onClick={downloadCSV}
+            style={{
+              marginLeft: "10px",
+              fontSize: "small",
+              fontWeight: "bold",
+            }}
+          >
+            Download Managers
+          </Button>
+        </div>
 
-        {/* CSV Download Button */}
-        <Button
-          type="primary"
-          onClick={downloadCSV}
-          style={{ marginBottom: "16px", marginLeft: "10px" }}
-        >
-          Download CSV
-        </Button>
+        {/* Managers count */}
+        <Title level={5} className="text-gray-600 italic mb-4">
+          Total Managers: {clients.length}
+        </Title>
 
-        <Title level={5}>Total Managers: {clients.length}</Title>
-
+        {/* Managers Table */}
         <Table
           columns={columns}
           dataSource={filteredClients}
           rowKey={(record) => record._id}
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 7 }}
           bordered
-          className="managers-table"
+          className="managers-table shadow-sm"
+          style={{ borderRadius: "8px", overflow: "hidden" }}
         />
 
+        {/* No results message */}
         {filteredClients.length === 0 && (
-          <p className="text-center text-gray-600">No managers found.</p>
+          <div className="flex justify-center mt-6">
+            <p className="text-center text-gray-500 italic">
+              No managers found.
+            </p>
+          </div>
         )}
       </div>
     </AdminLayout>

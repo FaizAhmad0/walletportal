@@ -108,51 +108,51 @@ const AllClients = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Client Name</span>,
+      title: <span className="text-xs ">Client Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs ">{text}</span>,
     },
     {
-      title: <span className="text-xs">Email</span>,
+      title: <span className="text-xs ">Email</span>,
       dataIndex: "email",
       key: "email",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs ">{text}</span>,
     },
     {
-      title: <span className="text-xs">Manager</span>,
+      title: <span className="text-xs ">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs ">{text}</span>,
     },
     {
-      title: <span className="text-xs">Enrollment</span>,
+      title: <span className="text-xs ">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs ">{text}</span>,
     },
     {
-      title: <span className="text-xs">Phone</span>,
+      title: <span className="text-xs ">Phone</span>,
       dataIndex: "mobile",
       key: "mobile",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-xs ">{text}</span>,
     },
     {
-      title: <span className="text-xs">Balance</span>,
+      title: <span className="text-xs ">Balance</span>,
       dataIndex: "amount",
       key: "amount",
       render: (amount) => (
-        <span className="text-xs">₹ {amount.toFixed(3)}</span>
+        <span className="text-xs ">₹{amount.toFixed(2)}</span>
       ),
     },
     {
-      title: <span className="text-xs">GMS</span>,
+      title: <span className="text-xs ">GMS</span>,
       dataIndex: "gms",
       key: "gms",
-      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
+      render: (text) => <span className="text-xs ">{text.toFixed(3)}</span>,
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-xs ">Action</span>,
       key: "action",
       render: (text, client) => (
         <Button
@@ -173,39 +173,51 @@ const AllClients = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto pr-6 pb-6 pl-6">
-        <div>
-          <Title level={2} className=" font-bold mb-4 text-sm">
+      <div className="container mx-auto px-2 py-2 bg-white shadow-lg rounded-lg">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-3xl font-bold italic text-gray-800">
             All Clients
-          </Title>
-          {/* Search input */}
-          <Input
-            type="text"
-            placeholder="Search by enrollment"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
-            style={{ marginBottom: "20px", width: "30%" }}
-          />
-          <h2 className="text-sm">Total clients: {clients.length}</h2>
-          {/* Download CSV Button */}
+          </h1>
+          {/* Download Button */}
           <Button
             type="primary"
+            className="italic text-sm px-4"
             onClick={downloadCSV}
-            style={{ marginBottom: "20px" }}
           >
             Download Users
           </Button>
         </div>
 
+        {/* Search and Total Clients */}
+        <div className="flex items-center mb-4">
+          {/* Search Input */}
+          <Input
+            type="text"
+            placeholder="Search by enrollment"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: "30%" }}
+            className="shadow-sm text-sm"
+          />
+          {/* Total Clients */}
+          <span className="ml-6 text-gray-600 text-sm">
+            Total clients:{" "}
+            <span className="font-semibold">{clients.length}</span>
+          </span>
+        </div>
+
+        {/* Clients Table */}
         <Table
-          dataSource={filteredClients} // Use the filtered clients here
+          dataSource={filteredClients}
           columns={columns}
           rowKey={(record) => record._id}
           bordered
           pagination={{ pageSize: 10 }}
+          className="rounded-lg shadow-md"
         />
 
-        {/* Modal to assign manager */}
+        {/* Assign Manager Modal */}
         <Modal
           title="Assign Manager"
           visible={isModalVisible}
@@ -213,11 +225,13 @@ const AllClients = () => {
           onCancel={() => setIsModalVisible(false)}
           okText="Assign"
           cancelText="Cancel"
+          centered
+          className="rounded-lg"
         >
           <Select
-            style={{ width: "100%" }}
             placeholder="Select a manager"
             onChange={handleManagerSelect}
+            className="w-full"
             showSearch
           >
             {managers.map((manager) => (

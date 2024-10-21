@@ -164,50 +164,57 @@ const CreateOrder = () => {
 
   return (
     <DispatchLayout>
-      <div className="search-container text-xs">
-        <Space style={{ marginBottom: 16, width: "100%" }} align="center">
+      {/* Search Container */}
+      <div className="search-container mb-6">
+        <Space style={{ width: "100%" }} align="center">
           <Input
             placeholder="Search by Enrollment, Name, Mobile, or Address"
             value={searchTerm}
             onChange={handleSearch}
             allowClear
-            prefix={<SearchOutlined className="text-xs" />}
-            style={{ width: 400 }}
-            className="text-xs"
+            prefix={<SearchOutlined className="text-gray-500" />}
+            style={{ width: 400, borderRadius: "8px", padding: "6px 12px" }}
+            className="shadow-md"
           />
           {searchTerm && (
             <Button
               type="link"
               onClick={handleClearSearch}
-              icon={<FaTimesCircle className="text-xs" />}
+              icon={<FaTimesCircle className="text-gray-500" />}
+              className="hover:text-red-600"
             />
           )}
         </Space>
       </div>
 
+      {/* Table */}
       <Table
         columns={columns}
         dataSource={filteredUsers}
         rowKey={(record) => record.enrollment}
         bordered
         pagination={{ pageSize: 7 }}
-        className="shadow-sm text-xs"
+        className="shadow-lg rounded-lg text-sm"
+        style={{ borderRadius: "10px" }}
       />
 
+      {/* Modal for GST */}
       <Modal
-        title="Add GST"
+        title={<h2 className="text-lg font-semibold">Add GST</h2>}
         visible={isModalVisible}
         onCancel={handleCancel}
         onOk={handleGstSubmit}
         okText="Save GST"
+        className="rounded-lg"
       >
-        <Form layout="vertical">
-          <Form.Item label="GST Number">
+        <Form layout="vertical" className="text-sm">
+          <Form.Item label="GST Number" className="mb-4">
             <Input
               type="text"
               value={gstValue}
               onChange={(e) => setGstValue(e.target.value)}
               placeholder="Enter GST Number"
+              className="shadow-sm p-2"
             />
           </Form.Item>
         </Form>

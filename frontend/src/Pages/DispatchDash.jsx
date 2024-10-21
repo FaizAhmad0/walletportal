@@ -536,62 +536,75 @@ const DispatchDash = () => {
 
   return (
     <DispatchLayout>
-      <div className="relative max-w-full mx-auto pb-20">
-        <h1 className="text-xl font-semibold text-black-600 mb-4">
+      <div className="relative max-w-7xl mx-auto bg-white shadow-md rounded-lg">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Dispatch Dashboard
         </h1>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center justify-between space-x-4">
-            {" "}
-            <div className="text-sm">
-              <label htmlFor="paymentStatus">Payment Status: </label>
-              <Select
-                id="paymentStatus"
-                value={paymentStatusFilter}
-                style={{ width: 200 }}
-                onChange={handlePaymentStatusFilter}
-                className="text-xs"
-                placeholder="Select Status"
-                allowClear
+
+        {/* Filter Row */}
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-6">
+          {/* Payment Status */}
+          <div className="flex items-center space-x-3">
+            <label
+              htmlFor="paymentStatus"
+              className="text-sm font-medium text-gray-600"
+            >
+              Payment Status:
+            </label>
+            <Select
+              id="paymentStatus"
+              value={paymentStatusFilter}
+              style={{ width: 200 }}
+              onChange={handlePaymentStatusFilter}
+              className="text-xs"
+              placeholder="Select Status"
+              allowClear
+            >
+              <Option value="true" className="text-xs">
+                Paid
+              </Option>
+              <Option value="false" className="text-xs">
+                Unpaid
+              </Option>
+            </Select>
+          </div>
+
+          {/* Create Order Button */}
+          <div>
+            <Link to="/create-order">
+              <Button
+                type="primary"
+                className="text-xs md:text-sm font-semibold py-2 px-4"
               >
-                <Option value="true" className="text-xs">
-                  Paid
-                </Option>
-                <Option value="false" className="text-xs">
-                  Unpaid
-                </Option>
-              </Select>
-            </div>
-            <div>
-              <Link to="/create-order">
-                <Button type="primary" className="text-xs ">
-                  Create Order
-                </Button>
-              </Link>
-            </div>
-            {/* Time Filter */}
-            <div className="text-xs items-end">
-              <Radio.Group
-                buttonStyle="solid"
-                onChange={handleTimeFilter}
-                value={timeFilter}
-              >
-                <Radio.Button value="today">Today</Radio.Button>
-                <Radio.Button value="week">This Week</Radio.Button>
-                <Radio.Button value="month">This Month</Radio.Button>
-                <Radio.Button value="year">This Year</Radio.Button>
-              </Radio.Group>
-            </div>
-            <div>
-              <Search
-                placeholder="Search by Order ID, Enrollment No., Amazon Order ID"
-                value={searchQuery}
-                onChange={handleSearchChange} // This will still handle input change
-                style={{ width: 300 }}
-                className="text-xs"
-                enterButton // Adds a search icon/button next to the input
-              />
-            </div>
+                Create Order
+              </Button>
+            </Link>
+          </div>
+
+          {/* Time Filter */}
+          <div className="text-xs">
+            <Radio.Group
+              buttonStyle="solid"
+              onChange={handleTimeFilter}
+              value={timeFilter}
+            >
+              <Radio.Button value="today">Today</Radio.Button>
+              <Radio.Button value="week">This Week</Radio.Button>
+              <Radio.Button value="month">This Month</Radio.Button>
+              <Radio.Button value="year">This Year</Radio.Button>
+            </Radio.Group>
+          </div>
+
+          {/* Search Bar */}
+          <div className="w-full md:w-auto">
+            <Search
+              placeholder="Search by Order ID, Enrollment No., Amazon Order ID"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              style={{ width: 300 }}
+              className="text-xs md:text-sm"
+              enterButton
+            />
           </div>
         </div>
 
@@ -605,6 +618,7 @@ const DispatchDash = () => {
             pagination={{ pageSize: 10 }}
             rowKey={(record) => record._id}
             scroll={{ x: "max-content" }}
+            className="shadow-lg rounded-lg"
           />
         </div>
       </div>
@@ -624,137 +638,145 @@ const DispatchDash = () => {
             </Button>
           ),
         ]}
+        className="rounded-lg"
       >
-        <ul>
+        <ul className="space-y-6">
           {selectedOrderItems.map((item, index) => (
             <li key={index} className="text-sm pb-6">
               {editingItem === item._id ? (
                 <>
-                  <label>
-                    <strong>Amazon Order ID:</strong>
-                    <Input
-                      name="amazonOrderId"
-                      value={editValues.amazonOrderId || ""}
-                      onChange={handleChange}
-                    />
+                  <label className="block mb-2 font-semibold">
+                    Amazon Order ID:
                   </label>
-                  <br />
-                  <label>
-                    <strong>Tracking ID:</strong>
-                    <Input
-                      name="trackingId"
-                      value={editValues.trackingId || ""}
-                      onChange={handleChange}
-                    />
+                  <Input
+                    name="amazonOrderId"
+                    value={editValues.amazonOrderId || ""}
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">
+                    Tracking ID:
                   </label>
-                  <br />
-                  <label>
-                    <strong>SKU:</strong>
-                    <Input name="sku" value={editValues.sku || ""} />
+                  <Input
+                    name="trackingId"
+                    value={editValues.trackingId || ""}
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">SKU:</label>
+                  <Input
+                    name="sku"
+                    value={editValues.sku || ""}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">Name:</label>
+                  <Input
+                    name="name"
+                    value={editValues.name || ""}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">Price:</label>
+                  <Input
+                    name="price"
+                    value={editValues.price || ""}
+                    type="number"
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">Quantity:</label>
+                  <Input
+                    name="quantity"
+                    value={editValues.quantity || ""}
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">Pincode:</label>
+                  <Input
+                    name="pincode"
+                    value={editValues.pincode || ""}
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">
+                    Shipping Partner:
                   </label>
-                  <br />
-                  <label>
-                    <strong>Name:</strong>
-                    <Input name="name" value={editValues.name || ""} />
+                  <Input
+                    name="shippingPartner"
+                    value={editValues.shippingPartner || ""}
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">
+                    Total Price:
                   </label>
-                  <br />
-                  <label>
-                    <strong>Price:</strong>
-                    <Input
-                      name="price"
-                      value={editValues.price || ""}
-                      type="number"
-                      onChange={handleChange}
-                    />
+                  <Input
+                    name="totalPrice"
+                    value={editValues.totalPrice || ""}
+                    type="number"
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+                  <label className="block mb-2 font-semibold">
+                    Product Availability:
                   </label>
-                  <br />
-                  <label>
-                    <strong>Quantity:</strong>
-                    <Input
-                      name="quantity"
-                      value={editValues.quantity || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Pincode:</strong>
-                    <Input
-                      name="pincode"
-                      value={editValues.pincode || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Shipping Partner:</strong>
-                    <Input
-                      name="shippingPartner"
-                      value={editValues.shippingPartner || ""}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Total Price:</strong>
-                    <Input
-                      name="totalPrice"
-                      value={editValues.totalPrice || ""}
-                      type="number"
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    <strong>Product Availability:</strong>
-                    <Select
-                      name="productAction"
-                      placeholder="Select product status"
-                      value={editValues.productAction || "Available"} // Set default to "Available"
-                      onChange={(value) =>
-                        setEditValues({ ...editValues, productAction: value })
-                      }
-                    >
-                      <Option value="Available">Available</Option>
-                      <Option value="Product not available">
-                        Product not available
-                      </Option>
-                    </Select>
-                  </label>
+                  <Select
+                    name="productAction"
+                    placeholder="Select product status"
+                    value={editValues.productAction || "Available"}
+                    onChange={(value) =>
+                      setEditValues({ ...editValues, productAction: value })
+                    }
+                    className="mb-3"
+                  >
+                    <Option value="Available">Available</Option>
+                    <Option value="Product not available">
+                      Product not available
+                    </Option>
+                  </Select>
                 </>
               ) : (
                 <>
-                  <strong>Amazon Order ID:</strong> {item.amazonOrderId}
-                  <br />
-                  <strong>Tracking ID:</strong> {item.trackingId}
-                  <br />
-                  <strong>SKU:</strong> {item.sku}
-                  <br />
-                  <strong>Name:</strong> {item.name}
-                  <br />
-                  <strong>Price:</strong> {item.price}
-                  <br />
-                  <strong>Quantity:</strong> {item.quantity}
-                  <br />
-                  <strong>Pincode:</strong> {item.pincode}
-                  <br />
-                  <strong>Delivery Partner:</strong> {item.shippingPartner}
-                  <br />
-                  <strong>Total Price:</strong> {item.totalPrice}
-                  <br />
-                  <strong>Product Availability:</strong> {item.productAction}
-                  <br />
+                  <p>
+                    <strong>Amazon Order ID:</strong> {item.amazonOrderId}
+                  </p>
+                  <p>
+                    <strong>Tracking ID:</strong> {item.trackingId}
+                  </p>
+                  <p>
+                    <strong>SKU:</strong> {item.sku}
+                  </p>
+                  <p>
+                    <strong>Name:</strong> {item.name}
+                  </p>
+                  <p>
+                    <strong>Price:</strong> {item.price}
+                  </p>
+                  <p>
+                    <strong>Quantity:</strong> {item.quantity}
+                  </p>
+                  <p>
+                    <strong>Pincode:</strong> {item.pincode}
+                  </p>
+                  <p>
+                    <strong>Delivery Partner:</strong> {item.shippingPartner}
+                  </p>
+                  <p>
+                    <strong>Total Price:</strong> {item.totalPrice}
+                  </p>
+                  <p>
+                    <strong>Product Availability:</strong> {item.productAction}
+                  </p>
                   <Button
                     type="primary"
                     onClick={() => handleEditClick(item)}
-                    style={{ marginTop: "10px" }}
+                    className="mt-4"
                   >
                     Edit
                   </Button>
                   {item.productAction !== "Available" && (
                     <Button
                       type="primary"
-                      className="text-xs mt-2 ml-5"
+                      className="ml-4 mt-4"
                       onClick={() => handleMarkAvailableClick(item._id)}
                     >
                       Mark Available

@@ -117,16 +117,24 @@ const AdminReport = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 pt-0">
-        <Title level={2} className="font-bold mb-4">
-          Here are all the Managers
-        </Title>
-        <Input
-          placeholder="Search by enrollment"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ width: "30%", marginBottom: "16px" }}
-        />
+      <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
+        {/* Page Title */}
+        <h1 className="text-3xl font-bold mb-6 italic text-gray-700">
+          All Managers Overview
+        </h1>
+
+        {/* Search Input */}
+        <div className="mb-4 flex justify-between items-center">
+          <Input
+            placeholder="Search by enrollment"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: "30%", padding: "10px" }}
+            className="shadow-md rounded-md"
+          />
+        </div>
+
+        {/* Managers Table */}
         {filteredClients.length > 0 ? (
           <Table
             dataSource={filteredClients}
@@ -134,22 +142,25 @@ const AdminReport = () => {
             pagination={false}
             rowKey="enrollment"
             bordered
-            className="text-xs"
+            className="rounded-lg shadow-sm text-sm"
+            style={{ fontSize: "14px" }}
           />
         ) : (
-          <p className="text-center text-gray-600">No manager found.</p>
+          <p className="text-center text-gray-600 py-6">No managers found.</p>
         )}
       </div>
 
+      {/* Modal for Manager's Clients */}
       <Modal
         title="Manager's Clients"
         visible={isModalVisible}
         onCancel={handleModalClose}
         footer={[
-          <Button key="close" onClick={handleModalClose}>
+          <Button key="close" type="primary" onClick={handleModalClose}>
             Close
           </Button>,
         ]}
+        className="rounded-lg"
       >
         {selectedManagerClients.length > 0 ? (
           <Table
@@ -179,15 +190,18 @@ const AdminReport = () => {
                 key: "gms",
                 className: "text-xs",
                 render: (text) => (
-                  <span className="text-xs">{text.toFixed(3)}</span>
+                  <span className="text-xs">₹ {text.toFixed(3)}</span>
                 ),
               },
             ]}
             pagination={false}
             rowKey="enrollment"
+            className="rounded-lg shadow-sm text-xs"
           />
         ) : (
-          <p>No clients found for this manager.</p>
+          <p className="text-center text-gray-600 py-6">
+            No clients found for this manager.
+          </p>
         )}
       </Modal>
     </AdminLayout>

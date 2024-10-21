@@ -97,16 +97,7 @@ const AuditReport = () => {
   return (
     <AdminLayout>
       <div style={{ padding: "20px" }}>
-        <Title
-          level={3}
-          style={{
-            textAlign: "center",
-            marginBottom: "20px",
-            fontWeight: "bold",
-          }}
-        >
-          Audit Report
-        </Title>
+        <h1 className="text-2xl font-bold mb-2 italic text-xl">Audit report</h1>
         <Row gutter={[16, 16]} justify="center">
           <Col xs={24} sm={12} md={8}>
             <Card

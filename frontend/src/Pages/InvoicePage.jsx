@@ -133,21 +133,32 @@ const InvoicePage = () => {
         <Row gutter={[16, 16]}>
           <Col span={12}>
             <Title level={4}>Bill To:</Title>
-            <Text strong>{customer.name}</Text>
-            <br />
-            <Text>{customer.address}</Text>
-            <br />
-            <Text>{customer.email}</Text>
-            <br />
-            <Text>{customer.mobile}</Text>
+            <Text strong>Name: {customer.name}</Text>
             <br />
             <Text>
-              {customer.state} {customer.country}
+              <strong>Add:</strong> {customer.address}
             </Text>
             <br />
-            <Text>{customer.pincode}</Text>
+            <Text>
+              <strong>Email:</strong> {customer.email}
+            </Text>
             <br />
-            <Text>GST: {customer.gst}</Text>
+            <Text>
+              <strong>Phone:</strong> {customer.mobile}
+            </Text>
+            <br />
+            <Text>
+              <strong>State:</strong> {customer.state} <strong>Country:</strong>
+              {customer.country}
+            </Text>
+            <br />
+            <Text>
+              <strong>Pincode:</strong> {customer.pincode}
+            </Text>
+            <br />
+            <Text>
+              <strong>GST:</strong> {customer.gst}
+            </Text>
           </Col>
 
           <Col span={12}>

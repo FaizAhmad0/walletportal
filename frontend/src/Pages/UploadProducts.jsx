@@ -143,7 +143,7 @@ const UploadProducts = () => {
         SKU: "SKU001",
         "Product Name": "Sample Product",
         "Product Price": "100",
-        "GST Rate": "12%",
+        "GST Rate": "12",
         HSN: "123456",
       },
     ];
@@ -177,7 +177,11 @@ const UploadProducts = () => {
             onChange={handleFileUpload}
             className="border border-gray-300 rounded-md py-2 px-4"
           />
-          <Button type="primary" onClick={handleBulkUpload}>
+          <Button
+            className="pt-4 pb-4 ml-4"
+            type="primary"
+            onClick={handleBulkUpload}
+          >
             Upload
           </Button>
         </div>
