@@ -107,33 +107,39 @@ const WalletAction = () => {
 
   const columns = [
     {
-      title: "Client Name",
+      title: <span className="text-xs">Client Name</span>,
       dataIndex: "name",
       key: "name",
+      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
     },
     {
-      title: "Email",
+      title: <span className="text-xs">Email</span>,
       dataIndex: "email",
       key: "email",
+      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
     },
     {
-      title: "Enrollment",
+      title: <span className="text-xs">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
+      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
     },
     {
-      title: "Phone",
+      title: <span className="text-xs">Phone</span>,
       dataIndex: "mobile",
       key: "mobile",
+      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
     },
     {
-      title: "Balance",
+      title: <span className="text-xs">Balance</span>,
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => parseFloat(amount).toFixed(3),
+      render: (amount) => (
+        <span className="text-xs">{parseFloat(amount).toFixed(3)}</span> // Apply class to body
+      ),
     },
     {
-      title: "Action",
+      title: <span className="text-xs">Action</span>,
       key: "action",
       render: (text, client) => (
         <Space size="middle">
@@ -145,7 +151,12 @@ const WalletAction = () => {
             Add
           </Button>
           <Button
-            style={{ background: "red", color: "white", fontStyle: "italic", fontSize: "0.875rem" }} // Decreased font size
+            className="text-xs"
+            style={{
+              background: "red",
+              color: "white",
+              fontStyle: "italic",
+            }} // Decreased font size
             onClick={() => handleActionClick(client, "deduct")}
           >
             Deduct
@@ -165,7 +176,9 @@ const WalletAction = () => {
     <AdminLayout>
       <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
         {/* Page Title */}
-        <h1 className="text-2xl font-bold mb-6 italic text-gray-700"> {/* Decreased font size */}
+        <h1 className="text-2xl font-bold mb-6 italic text-gray-700">
+          {" "}
+          {/* Decreased font size */}
           Manage Client's Wallet
         </h1>
 

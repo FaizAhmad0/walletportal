@@ -15,6 +15,8 @@ const getManagerData = require("../controller/getManagerData");
 const updateUserGms = require("../controller/updateUserGms");
 const getClientOfManager = require("../controller/getClientOfManager");
 const updateGst = require("../controller/updateGst");
+const updateClient = require("../controller/updateClient");
+const deleteUser = require("../controller/deleteUser");
 router.get("/getallusers", getAllUser);
 router.post("/payorder", payOrder);
 router.get("/getallmanagers", getAllManager);
@@ -31,6 +33,8 @@ router.post("/registermanager", createManager);
 router.post("/assign-manager", assignManager);
 router.post("/getmanagerclients", getClientOfManager);
 router.post("/add-gst/:enrollment", updateGst);
-
+router.put("/update-client/:id", updateClient);
+router.put("/update/:id", updateClient);
+router.delete("/delete/:clientId",deleteUser);
 
 module.exports = router;

@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Modal, Button, Select, message, Table, Typography, Input } from "antd";
+import {
+  Modal,
+  Button,
+  Select,
+  message,
+  Table,
+  Typography,
+  Input,
+  Form,
+} from "antd";
 import AdminLayout from "../Layout/AdminLayout";
+import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Title } = Typography;
@@ -9,7 +19,8 @@ const { Title } = Typography;
 const AllClients = () => {
   const [clients, setClients] = useState([]);
   const [managers, setManagers] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAssignModalVisible, setIsAssignModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // New state for edit modal
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedManager, setSelectedManager] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); // New state for search query
@@ -43,7 +54,7 @@ const AllClients = () => {
 
   const showAssignModal = (client) => {
     setSelectedClient(client);
-    setIsModalVisible(true);
+    setIsAssignModalVisible(true);
   };
 
   const handleManagerSelect = (value) => {
@@ -63,11 +74,35 @@ const AllClients = () => {
         { headers: { Authorization: localStorage.getItem("token") } }
       );
       message.success("Manager assigned successfully!");
-      setIsModalVisible(false);
+      setIsAssignModalVisible(false);
       getClients();
     } catch (error) {
       message.error("Error assigning manager.");
       console.error("Error assigning manager:", error);
+    }
+  };
+
+  // New function to show edit modal
+  const showEditModal = (client) => {
+    setSelectedClient(client);
+    setIsEditModalVisible(true);
+  };
+
+  // Function to handle client details update
+  const handleEditClient = async (values) => {
+    console.log(values);
+    try {
+      await axios.put(
+        `${backendUrl}/user/update-client/${selectedClient._id}`,
+        values,
+        { headers: { Authorization: localStorage.getItem("token") } }
+      );
+      message.success("Client details updated successfully!");
+      setIsEditModalVisible(false);
+      getClients();
+    } catch (error) {
+      message.error("Error updating client details.");
+      console.error("Error updating client details:", error);
     }
   };
 
@@ -105,63 +140,99 @@ const AllClients = () => {
     link.click();
     document.body.removeChild(link);
   };
+  const handleDeleteClient = async (clientId) => {
+    try {
+      await axios.delete(`${backendUrl}/user/delete/${clientId}`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      message.success("Client deleted successfully!");
+      getClients(); // Refresh the client list
+    } catch (error) {
+      message.error("Error deleting client.");
+      console.error("Error deleting client:", error);
+    }
+  };
 
   const columns = [
     {
-      title: <span className="text-xs ">Client Name</span>,
+      title: <span className="text-xs">Client Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs ">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>,
     },
     {
-      title: <span className="text-xs ">Email</span>,
+      title: <span className="text-xs">Email</span>,
       dataIndex: "email",
       key: "email",
-      render: (text) => <span className="text-xs ">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>,
     },
     {
-      title: <span className="text-xs ">Manager</span>,
+      title: <span className="text-xs">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs ">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>,
     },
     {
-      title: <span className="text-xs ">Enrollment</span>,
+      title: <span className="text-xs">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs ">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>,
     },
     {
-      title: <span className="text-xs ">Phone</span>,
+      title: <span className="text-xs">Phone</span>,
       dataIndex: "mobile",
       key: "mobile",
-      render: (text) => <span className="text-xs ">{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>,
     },
     {
-      title: <span className="text-xs ">Balance</span>,
+      title: <span className="text-xs">Balance</span>,
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => (
-        <span className="text-xs ">₹{amount.toFixed(2)}</span>
-      ),
+      render: (amount) => <span className="text-xs">₹{amount.toFixed(2)}</span>,
     },
     {
-      title: <span className="text-xs ">GMS</span>,
+      title: <span className="text-xs">GMS</span>,
       dataIndex: "gms",
       key: "gms",
-      render: (text) => <span className="text-xs ">{text.toFixed(3)}</span>,
+      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
     },
     {
-      title: <span className="text-xs ">Action</span>,
+      title: <span className="text-xs">Action</span>,
       key: "action",
       render: (text, client) => (
-        <Button
-          className="text-xs italic"
-          type="primary"
-          onClick={() => showAssignModal(client)}
-        >
-          Assign Manager
-        </Button>
+        <>
+          <Button
+            className="text-xs italic"
+            type="primary"
+            onClick={() => showAssignModal(client)}
+          >
+            Assign Manager
+          </Button>
+          <Button
+            className="text-xs italic ml-2" // Add margin to separate buttons
+            onClick={() => showEditModal(client)}
+          >
+            Edit
+          </Button>
+          <Button
+            onClick={() => {
+              Modal.confirm({
+                title: "Are you sure you want to delete this client?",
+                onOk: () => handleDeleteClient(client._id),
+              });
+            }}
+            style={{
+              marginLeft: "8px",
+              background: "red",
+              color: "white",
+              fontStyle: "italic",
+            }}
+          >
+            Delete
+          </Button>
+        </>
       ),
     },
   ];
@@ -185,7 +256,7 @@ const AllClients = () => {
             className="italic text-sm px-4"
             onClick={downloadCSV}
           >
-            Download Users
+            <DownloadForOfflineIcon /> Download Users
           </Button>
         </div>
 
@@ -220,9 +291,9 @@ const AllClients = () => {
         {/* Assign Manager Modal */}
         <Modal
           title="Assign Manager"
-          visible={isModalVisible}
+          visible={isAssignModalVisible}
           onOk={handleAssignManager}
-          onCancel={() => setIsModalVisible(false)}
+          onCancel={() => setIsAssignModalVisible(false)}
           okText="Assign"
           cancelText="Cancel"
           centered
@@ -240,6 +311,86 @@ const AllClients = () => {
               </Select.Option>
             ))}
           </Select>
+        </Modal>
+
+        {/* Edit Client Modal */}
+        <Modal
+          title="Edit Client"
+          visible={isEditModalVisible}
+          onCancel={() => setIsEditModalVisible(false)}
+          footer={null}
+          centered
+        >
+          <Form
+            layout="vertical"
+            initialValues={{
+              name: selectedClient?.name,
+              email: selectedClient?.email,
+              mobile: selectedClient?.mobile,
+              amount: selectedClient?.amount,
+              gst: selectedClient?.gst,
+              enrollment: selectedClient?.enrollment,
+            }}
+            onFinish={handleEditClient}
+          >
+            <Form.Item
+              label="Client Name"
+              name="name"
+              rules={[
+                { required: true, message: "Please input the client name!" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Enrollment"
+              name="enrollment"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input the client enrollment!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                {
+                  required: true,
+                  type: "email",
+                  message: "Please input a valid email!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Phone"
+              name="mobile"
+              rules={[
+                { required: true, message: "Please input the phone number!" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="GST"
+              name="gst"
+              rules={[
+                { required: true, message: "Please input the gst number!" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                Save Changes
+              </Button>
+            </Form.Item>
+          </Form>
         </Modal>
       </div>
     </AdminLayout>
