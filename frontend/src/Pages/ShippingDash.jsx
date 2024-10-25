@@ -438,8 +438,9 @@ const ShippingDash = () => {
   return (
     <ShippingLayout>
       <div className="relative max-w-full mx-auto pb-20">
-        <h1 className="text-2xl font-bold text-black-800">All Orders</h1>
-
+        <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">All Order's</h1>
+        </div>{" "}
         {/* Search Input */}
         <div className="flex justify-between items-center">
           <div className="flex justify-between items-center">
@@ -498,7 +499,6 @@ const ShippingDash = () => {
             </div>
           </div>
         </div>
-
         {/* Orders Table */}
         <div className="overflow-x-auto mb-16 text-sm text-black">
           <Table

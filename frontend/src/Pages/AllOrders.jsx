@@ -269,9 +269,10 @@ const AllOrders = () => {
   return (
     <AdminLayout>
       <div className="relative max-w-full mx-auto pb-10 px-2 bg-white shadow-lg rounded-lg">
-        <h1 className="text-2xl font-bold">Order Details</h1>
+        <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">All Orders</h1>
+        </div>{" "}
         {/* Search Input */}
-
         {/* Radio Group for Filtering */}
         <div className="mb-6 flex justify-between items-center">
           <Radio.Group
@@ -312,7 +313,6 @@ const AllOrders = () => {
             </h2>
           </div>
         </div>
-
         {/* Orders Table */}
         <div className="overflow-x-auto bg-gray-50 rounded-md shadow-sm">
           <Table

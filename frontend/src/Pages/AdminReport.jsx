@@ -123,12 +123,14 @@ const AdminReport = () => {
     <AdminLayout>
       <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
         {/* Page Title */}
-        <h1 className="text-3xl font-bold  text-black-700">
-          All Managers Overview
-        </h1>
+        <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Manager's Overview
+          </h1>
+        </div>
 
         {/* Search Input */}
-        <div className="mb-4 flex justify-between items-center">
+        <div className="my-4 flex justify-between items-center">
           <Input
             placeholder="Search by enrollment"
             value={searchTerm}

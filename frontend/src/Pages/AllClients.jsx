@@ -246,12 +246,8 @@ const AllClients = () => {
     <AdminLayout>
       <div className="container max-w-7xl mx-auto px-4 bg-white shadow-lg rounded-lg ">
         {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-black-800">All Clients</h1>
-          {/* Download Button */}
-          <Button type="primary" className="text-sm px-4" onClick={downloadCSV}>
-            <DownloadForOfflineIcon /> Download Users
-          </Button>
+        <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">All Clients</h1>
         </div>
 
         {/* Search and Total Clients */}
@@ -266,9 +262,19 @@ const AllClients = () => {
             className="shadow-md sm:mb-0"
           />
           {/* Total Clients */}
-          <h2 className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md">
-            Total Users: {clients?.length}
-          </h2>
+          <div className="flex justify-end items-center space-x-4">
+            <Button
+              type="primary"
+              className="text-sm px-4 bg-gradient-to-r from-blue-500 to-red-300 text-white shadow-lg border-none"
+              onClick={downloadCSV}
+            >
+              <DownloadForOfflineIcon /> Download Users
+            </Button>
+
+            <h2 className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 mt-3 rounded-md">
+              Total Users: {clients?.length}
+            </h2>
+          </div>
         </div>
 
         {/* Clients Table */}

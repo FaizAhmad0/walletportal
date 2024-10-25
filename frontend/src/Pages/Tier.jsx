@@ -38,11 +38,12 @@ const Tier = () => {
   return (
     <UserLayout>
       <div className="max-w-4xl mx-auto my-8 p-6 bg-white shadow-md rounded-md">
-        <h2 className="text-3xl font-bold text-center text-black-800 mb-6 flex items-center justify-center">
-          Your Tier Status, {localStorage.getItem("name")}
-          <FaMedal className="ml-3 text-yellow-500" />
-        </h2>
-
+        <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Your tier status, {localStorage.getItem("name")}
+          </h1>
+          {/* <FaMedal className="ml-3 text-yellow-500" /> */}
+        </div>{" "}
         <div className="relative border-l border-gray-300 ml-6">
           {stages.map((stage, index) => (
             <div key={index} className="mb-10 ml-4">

@@ -561,7 +561,9 @@ const BulkOrder = () => {
 
   return (
     <ManagerLayout>
-      <h1 className="text-xl font-bold">Create New Order</h1>
+      <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+        <h1 className="text-2xl pt-4 font-bold text-white">Bulk Order's</h1>
+      </div>{" "}
       <form id="user-form" onSubmit={handleSubmit}>
         <Table
           dataSource={[formData]} // Show form fields in the table format

@@ -207,14 +207,13 @@ const ManagerClients = () => {
 
   return (
     <ManagerLayout>
-      <div className="container mx-auto px-4 py-6 bg-white shadow-md rounded-md">
-        <h1 className="text-2xl font-bold text-black mb-6">
-          {localStorage.getItem("name")}'s Clients
-        </h1>
+      <div className="container mx-auto px-4 py-2 bg-white shadow-md rounded-md">
+        <div className="w-full pb-2 px-4 mb-3 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">All Clients</h1>
+        </div>{" "}
         <h2 className="text-lg font-bold w-200 bg-blue-50 text-blue-800 px-4 py-1 rounded-md">
           Total Clients: {clients?.length}
         </h2>
-
         {/* Search Input */}
         <Input
           type="text"
@@ -224,7 +223,6 @@ const ManagerClients = () => {
           className="mb-6 text-black"
           style={{ width: "300px" }} // Maintain the width
         />
-
         {/* Ant Design Table */}
         <Table
           columns={columns}
@@ -236,7 +234,6 @@ const ManagerClients = () => {
           rowClassName="hover:bg-gray-100 transition ease-in-out duration-150" // Add hover effect to rows
           className="text-black" // Ensure text color is black
         />
-
         {/* Add GMS Modal */}
         <Modal
           title={`Add GMS for ${selectedClient?.name}`}
@@ -258,7 +255,6 @@ const ManagerClients = () => {
             className="text-black" // Ensure text color is black
           />
         </Modal>
-
         {/* Edit Client Modal */}
         <Modal
           title="Edit Client"

@@ -118,9 +118,9 @@ const BodFba = () => {
   return (
     <UserLayout>
       <div className="max-w-full mx-auto bg-white shadow-md rounded-md">
-        <h2 className="text-2xl text-center font-bold mb-4">
-          B.O.D - Order Details
-        </h2>
+        <div className="w-full mb-3 pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">Bulk Orders</h1>
+        </div>{" "}
         <div className="mb-4">
           <input
             type="text"

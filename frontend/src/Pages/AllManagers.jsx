@@ -171,7 +171,9 @@ const AllManagers = () => {
     <AdminLayout>
       <div className="container mx-auto px-4 bg-white shadow-md rounded-lg">
         {/* Title */}
-        <h1 className="text-2xl font-bold">All Managers</h1>
+        <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">All Managers</h1>
+        </div>
 
         {/* Search input and Actions */}
         <div className="flex justify-between items-center">

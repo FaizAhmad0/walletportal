@@ -252,10 +252,13 @@ const OrderHistory = () => {
 
   return (
     <ManagerLayout>
-      <div className="container mx-auto sm:p-6 lg:p-6">
+      <div className="container mx-auto sm:pb-6 lg:pb-6">
         <div>
-          <h1 className="text-2xl font-bold">Order Details</h1>
-
+          <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+            <h1 className="text-2xl pt-4 font-bold text-white">
+              Order Details
+            </h1>
+          </div>{" "}
           <div className="flex justify-between items-center mb-6">
             <DatePicker
               style={{ width: "30%", padding: "6px" }}
@@ -275,7 +278,7 @@ const OrderHistory = () => {
               <Radio.Button value="year">This Year</Radio.Button>
             </Radio.Group>
             <h2
-              className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md "
+              className="text-lg mt-2 font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md "
               style={{
                 display: "inline-block",
               }}

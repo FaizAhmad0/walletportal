@@ -171,9 +171,11 @@ const ShippedOrders = () => {
   return (
     <ShippingLayout>
       <div className="relative max-w-full mx-auto pb-20">
-        <h1 className="text-xl font-semibold text-black-600 mb-4">
-          Shipped Orders
-        </h1>
+        <div className="w-full mb-3 pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Shipped Order's
+          </h1>
+        </div>{" "}
         <div className="flex justify-between items-center mb-4">
           {/* Search Input */}
           <Search

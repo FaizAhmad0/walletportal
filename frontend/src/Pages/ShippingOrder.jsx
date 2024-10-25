@@ -181,8 +181,9 @@ const ShippingOrder = () => {
   return (
     <DispatchLayout>
       <div className="relative max-w-full mx-auto pb-20">
-        <h1 className="text-2xl font-bold text-black-800">Shipped Orders</h1>
-
+        <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">Shipped Orders</h1>
+        </div>{" "}
         <div className="flex justify-between items-center mb-4">
           {/* Search Input */}
           <Search
@@ -190,8 +191,10 @@ const ShippingOrder = () => {
             allowClear
             onSearch={(value) => setSearchText(value)}
             onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 200 }}
+            className="shadow-md rounded-lg" // Added Tailwind classes for shadow and rounding
+            style={{ width: 200 }} // Keep the width here
           />
+
           {/* Radio Filter */}
           <Radio.Group
             buttonStyle="solid"

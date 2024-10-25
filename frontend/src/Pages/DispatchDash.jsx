@@ -537,10 +537,11 @@ const DispatchDash = () => {
   return (
     <DispatchLayout>
       <div className="relative max-w-7xl mx-auto bg-white shadow-md rounded-lg">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          Dispatch Dashboard
-        </h1>
-
+        <div className="w-full pb-2 px-4 mb-3 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Dispatch Dashboard
+          </h1>
+        </div>{" "}
         {/* Filter Row */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-6">
           {/* Payment Status */}
@@ -612,7 +613,6 @@ const DispatchDash = () => {
             Total Orders: {dataSource?.length}
           </h2>{" "}
         </div>
-
         {/* Orders Table */}
         <div className="overflow-x-auto mb-16 text-sm text-black">
           <Table

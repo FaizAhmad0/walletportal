@@ -270,9 +270,11 @@ const ManagerReport = () => {
   return (
     <ManagerLayout>
       <div className="relative max-w-7xl mx-auto p-6 pb-20 min-h-screen">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-1">
-          Manager Performance Dashboard
-        </h1>
+        <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Manager Performance Dashboard
+          </h1>
+        </div>{" "}
         <div className="mb-4">
           <label htmlFor="date-picker" className="mr-2">
             Filter By Date:
@@ -321,7 +323,6 @@ const ManagerReport = () => {
             </button>
           </div>
         </div>
-
         {isModalVisible && (
           <div
             ref={modalRef}

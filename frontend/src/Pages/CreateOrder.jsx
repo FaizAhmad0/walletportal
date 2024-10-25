@@ -14,6 +14,7 @@ import {
 import { SearchOutlined } from "@ant-design/icons";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
+const { Search } = Input;
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const CreateOrder = () => {
@@ -169,14 +170,15 @@ const CreateOrder = () => {
       {/* Search Container */}
       <div className="search-container mb-6">
         <Space style={{ width: "100%" }} align="center">
-          <Input
+          <Search
             placeholder="Search by Enrollment, Name, Mobile, or Address"
             value={searchTerm}
             onChange={handleSearch}
             allowClear
-            prefix={<SearchOutlined className="text-gray-500" />}
-            style={{ width: 400, borderRadius: "8px", padding: "6px 12px" }}
+            prefix={<SearchOutlined className="text-black-500" />}
+            style={{ width: 400, borderRadius: "8px" }}
             className="shadow-md"
+            onSearch={(value) => console.log(value)} // Add your search action here
           />
           {searchTerm && (
             <Button

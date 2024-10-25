@@ -97,8 +97,9 @@ const AuditReport = () => {
   return (
     <AdminLayout>
       <div style={{ backgroundColor: "#f5f5f5", padding: "20px" }}>
-        <h1 className="text-2xl font-bold mb-2 italic text-xl">Audit Report</h1>
-
+        <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 mb-3 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">Audit Report</h1>
+        </div>
         {/* Row for Cards */}
         <Row gutter={[8, 8]} justify="space-between">
           {/* Box 1: Total Sales */}

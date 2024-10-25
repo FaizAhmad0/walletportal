@@ -178,14 +178,14 @@ const WalletAction = () => {
     <AdminLayout>
       <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
         {/* Page Title */}
-        <h1 className="text-2xl font-bold  text-black-700">
-          {" "}
-          {/* Decreased font size */}
-          Manage Client's Wallet
-        </h1>
+        <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Manage Client's Wallet
+          </h1>
+        </div>
 
         {/* Search Input */}
-        <div className="mb-4 flex justify-between items-center">
+        <div className="my-4 flex justify-between items-center">
           <Search
             style={{ width: "40%" }}
             placeholder="Search clients by name, email, or enrollment"
@@ -250,33 +250,45 @@ const WalletAction = () => {
           footer={null}
           className="rounded-lg"
         >
-          <List
-            itemLayout="horizontal"
+          <Table
             dataSource={selectedClient?.transactions || []}
-            renderItem={(transaction) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    <span
-                      className={`font-semibold ${
-                        transaction.credit ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      ₹{transaction.amount} - {transaction.description}
-                    </span>
-                  }
-                  description={
-                    transaction.credit
-                      ? `Credited on ${moment(transaction.createdAt).format(
-                          "MMMM Do YYYY, h:mm:ss a"
-                        )}`
-                      : `Debited on ${moment(transaction.createdAt).format(
-                          "MMMM Do YYYY, h:mm:ss a"
-                        )}`
-                  }
-                />
-              </List.Item>
-            )}
+            pagination={false} // Disable pagination if not required
+            rowKey={(record) => record.id || record._id} // Assuming each transaction has a unique id
+            columns={[
+              {
+                title: "Amount",
+                dataIndex: "amount",
+                key: "amount",
+                render: (amount, transaction) => (
+                  <span
+                    className={`${
+                      transaction.credit ? "text-green-600" : "text-red-600"
+                    } font-semibold`}
+                  >
+                    ₹{amount}
+                  </span>
+                ),
+              },
+              {
+                title: "Description",
+                dataIndex: "description",
+                key: "description",
+              },
+              {
+                title: "Date",
+                dataIndex: "createdAt",
+                key: "createdAt",
+                render: (createdAt) =>
+                  moment(createdAt).format("MMMM Do YYYY, h:mm:ss a"),
+              },
+              {
+                title: "Type",
+                key: "type",
+                render: (_, transaction) => (
+                  <span>{transaction.credit ? "Credit" : "Debit"}</span>
+                ),
+              },
+            ]}
             className="bg-gray-50 rounded-lg shadow-sm p-4"
           />
 

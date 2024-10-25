@@ -79,28 +79,37 @@ const AdminDetailsReporting = () => {
 
     userData.forEach((user) => {
       const orders = user.orders || [];
-
       orders.forEach((order) => {
-        // Filter by paymentStatus or productNotAvailable
-        if (type === "paymentStatus") {
-          if (order.paymentStatus === false) {
-            filtered.push(order);
-          }
-        } else if (type === "productNotAvailable") {
-          if (order.items.some((item) => item.productAction !== "Available")) {
-            filtered.push(order);
-          }
+        // Check if the date matches if a date is selected
+        if (selectedDate) {
+          const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
+          if (orderDate !== selectedDate) return;
+        }
+
+        // Filter based on the button clicked
+        if (type === "paymentStatus" && order.paymentStatus === false) {
+          filtered.push(order);
+        } else if (
+          type === "productNotAvailable" &&
+          order.items.some((item) => item.productAction !== "Available")
+        ) {
+          filtered.push(order);
         }
       });
     });
 
-    setFilteredOrders(filtered); // Update the filtered orders state
+    setFilteredOrders(filtered);
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date ? date.format("YYYY-MM-DD") : null);
 
     let filtered = [];
+    let moneyIssueCount = 0;
+    let productNotAvailableCount = 0;
+    let totalHoldOrders = 0;
+    let totalOrders = 0;
+
     userData.forEach((user) => {
       const orders = user.orders || [];
 
@@ -113,11 +122,35 @@ const AdminDetailsReporting = () => {
           }
         }
 
-        filtered.push(order); // Add filtered orders for the table
+        totalOrders += 1; // Count total orders for the selected date
+        let orderHasHold = false;
+
+        if (order.paymentStatus === false) {
+          moneyIssueCount += 1; // Count hold money issues
+          orderHasHold = true;
+        }
+
+        const productHold = order.items.some(
+          (item) => item.productAction !== "Available"
+        );
+        if (productHold) {
+          productNotAvailableCount += 1; // Count product not available holds
+          orderHasHold = true;
+        }
+
+        if (orderHasHold) {
+          totalHoldOrders += 1; // Count total holds
+        }
+
+        filtered.push(order); // Add filtered orders for the modal
       });
     });
 
-    setFilteredOrders(filtered); // Display filtered orders based on date
+    setFilteredOrders(filtered);
+    setTotalOrdersCount(totalOrders); // Update total orders count dynamically
+    setHoldMoneyIssueCount(moneyIssueCount); // Update money issue count dynamically
+    setProductNotAvailableCount(productNotAvailableCount); // Update product not available count dynamically
+    setTotalOrdersHold(totalHoldOrders); // Update total holds dynamically
   };
 
   return (

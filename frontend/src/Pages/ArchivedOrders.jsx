@@ -165,8 +165,11 @@ const ArchivedOrders = () => {
         <Skeleton active />
       ) : (
         <div className="relative max-w-full mx-auto pb-20">
-          <h1 className="text-2xl font-bold text-black-800">Archive Orders</h1>
-
+          <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
+            <h1 className="text-2xl pt-4 font-bold text-white">
+              Archive Orders
+            </h1>
+          </div>{" "}
           <div className="text-sm text-black">
             <Radio.Group
               buttonStyle="solid"
