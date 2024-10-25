@@ -171,6 +171,11 @@ const AdminLayout = ({ children }) => {
               label: "Audit Report",
             },
             {
+              key: "/admin-details-reporting",
+              icon: <InfoIcon />,
+              label: "Details reporting",
+            },
+            {
               key: "/bulkOrders",
               icon: <SignalCellularAltIcon />,
               label: "Bulk Order",

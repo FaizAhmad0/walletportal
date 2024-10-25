@@ -189,13 +189,13 @@ const BulkOrder = () => {
       title: "OrderId",
       dataIndex: "orderId",
       key: "orderId",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Enrollment",
       dataIndex: "enrollment",
       key: "enrollment",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -211,7 +211,7 @@ const BulkOrder = () => {
       title: "Brand Name",
       dataIndex: "brandName",
       key: "brandName",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -228,7 +228,7 @@ const BulkOrder = () => {
       title: "Party Name",
       dataIndex: "partyName",
       key: "partyName",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -245,7 +245,7 @@ const BulkOrder = () => {
       title: "Shipping Address",
       dataIndex: "shippingAddress",
       key: "shippingAddress",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -267,7 +267,7 @@ const BulkOrder = () => {
       title: "SKU",
       dataIndex: "sku",
       key: "sku",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -284,7 +284,7 @@ const BulkOrder = () => {
       title: "Size",
       dataIndex: "size",
       key: "size",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -301,7 +301,7 @@ const BulkOrder = () => {
       title: "Quantity",
       dataIndex: "quantity",
       key: "quantity",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -318,7 +318,7 @@ const BulkOrder = () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id ? (
@@ -336,7 +336,7 @@ const BulkOrder = () => {
       title: "Total Price",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) =>
         editingKey === record._id
@@ -347,14 +347,14 @@ const BulkOrder = () => {
       title: "Total Paid Amount",
       dataIndex: "paymentStage",
       key: "totalPaidAmount",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (paymentStage) => getTotalPaidAmount(paymentStage),
     },
     {
       title: "Remaining Amount",
       key: "remainingAmount",
-      className: "text-xs",
+      className: "text-sm text-black",
       render: (record) => {
         const remainingAmount = getRemainingAmount(record);
         if (remainingAmount <= 0) {
@@ -371,7 +371,7 @@ const BulkOrder = () => {
       title: "Due Date",
       dataIndex: "dueDate",
       key: "dueDate",
-      className: "text-xs",
+      className: "text-sm text-black",
       width: 100,
       render: (dueDate, record) =>
         editingKey === record._id ? (
@@ -389,7 +389,7 @@ const BulkOrder = () => {
     {
       title: "Action",
       key: "action",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (text, record) => {
         if (editingKey === record._id) {
@@ -449,7 +449,7 @@ const BulkOrder = () => {
             <Button
               type="default"
               onClick={() => handleShowStages(record.paymentStage)} // Show payment stages
-              className="text-xs"
+              className="text-sm text-black"
               style={{ flexGrow: 1 }} // Flex to align with other buttons
             >
               Show Payment Stages

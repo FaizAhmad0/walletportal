@@ -125,55 +125,59 @@ const ManagerClients = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Client Name</span>,
+      title: <span className="text-sm text-black">Client Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Email</span>,
+      title: <span className="text-sm text-black">Email</span>,
       dataIndex: "email",
       key: "email",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Enrollment</span>,
+      title: <span className="text-sm text-black">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Phone</span>,
+      title: <span className="text-sm text-black">Phone</span>,
       dataIndex: "mobile",
       key: "mobile",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Balance</span>,
+      title: <span className="text-sm text-black">Balance</span>,
       dataIndex: "amount",
       key: "amount",
-      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
+      render: (text) => (
+        <span className="text-sm text-black">{text.toFixed(3)}</span>
+      ),
     },
     {
-      title: <span className="text-xs">GMS</span>,
+      title: <span className="text-sm text-black">GMS</span>,
       dataIndex: "gms",
       key: "gms",
-      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
+      render: (text) => (
+        <span className="text-sm text-black">{text.toFixed(3)}</span>
+      ),
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (_, client) => (
         <>
           <Button
-            className="text-xs italic"
+            className="text-sm text-white "
             type="primary"
             onClick={() => handleAddGms(client)}
           >
             Update GMS
           </Button>
           <Button
-            className="text-xs italic ml-2"
+            className="text-sm text-black  ml-2"
             onClick={() => {
               setSelectedClient(client);
               setIsEditModalVisible(true);
@@ -182,7 +186,7 @@ const ManagerClients = () => {
             Edit
           </Button>
           <Button
-            className="text-xs italic ml-2"
+            className="text-sm text-black  ml-2"
             onClick={() => {
               Modal.confirm({
                 title: "Are you sure you want to delete this client?",
@@ -203,19 +207,22 @@ const ManagerClients = () => {
 
   return (
     <ManagerLayout>
-      <div className="container mx-auto">
-        <h1 className="text-2xl font-bold mb-6">
+      <div className="container mx-auto px-4 py-6 bg-white shadow-md rounded-md">
+        <h1 className="text-2xl font-bold text-black mb-6">
           {localStorage.getItem("name")}'s Clients
         </h1>
-        <h2>Total client : {clients.length}</h2>
+        <h2 className="text-lg font-bold w-200 bg-blue-50 text-blue-800 px-4 py-1 rounded-md">
+          Total Clients: {clients?.length}
+        </h2>
 
-        {/* Search input */}
+        {/* Search Input */}
         <Input
           type="text"
           placeholder="Search clients"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ marginBottom: "20px", width: "300px" }}
+          className="mb-6 text-black"
+          style={{ width: "300px" }} // Maintain the width
         />
 
         {/* Ant Design Table */}
@@ -226,6 +233,8 @@ const ManagerClients = () => {
           pagination={{ pageSize: 10 }}
           bordered
           size="small"
+          rowClassName="hover:bg-gray-100 transition ease-in-out duration-150" // Add hover effect to rows
+          className="text-black" // Ensure text color is black
         />
 
         {/* Add GMS Modal */}
@@ -246,6 +255,7 @@ const ManagerClients = () => {
             placeholder="Enter GMS value"
             value={gmsValue}
             onChange={(e) => setGmsValue(e.target.value)}
+            className="text-black" // Ensure text color is black
           />
         </Modal>
 
@@ -274,7 +284,7 @@ const ManagerClients = () => {
                 { required: true, message: "Please input the client name!" },
               ]}
             >
-              <Input />
+              <Input className="text-black" />
             </Form.Item>
             <Form.Item
               label="Enrollment"
@@ -286,20 +296,17 @@ const ManagerClients = () => {
                 },
               ]}
             >
-              <Input />
+              <Input className="text-black" />
             </Form.Item>
             <Form.Item
               label="Email"
               name="email"
               rules={[
-                {
-                  type: "email",
-                  message: "The input is not valid E-mail!",
-                },
+                { type: "email", message: "The input is not valid E-mail!" },
                 { required: true, message: "Please input the E-mail!" },
               ]}
             >
-              <Input />
+              <Input className="text-black" />
             </Form.Item>
             <Form.Item
               label="Phone"
@@ -308,7 +315,7 @@ const ManagerClients = () => {
                 { required: true, message: "Please input the client phone!" },
               ]}
             >
-              <Input />
+              <Input className="text-black" />
             </Form.Item>
             <Form.Item
               label="Balance"
@@ -317,7 +324,7 @@ const ManagerClients = () => {
                 { required: true, message: "Please input the client balance!" },
               ]}
             >
-              <Input type="number" />
+              <Input type="number" className="text-black" />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">

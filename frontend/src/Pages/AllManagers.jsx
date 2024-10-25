@@ -102,32 +102,34 @@ const AllManagers = () => {
       title: "Manager Name",
       dataIndex: "name",
       key: "name",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Enrollment",
       dataIndex: "enrollment",
       key: "enrollment",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Phone",
       dataIndex: "mobile",
       key: "mobile",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "GMS",
       dataIndex: "gms",
       key: "gms",
-      className: "text-xs",
-      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
+      className: "text-sm text-black",
+      render: (text) => (
+        <span className="text-sm text-black">{text.toFixed(3)}</span>
+      ),
     },
     {
       title: "Action",
@@ -135,7 +137,7 @@ const AllManagers = () => {
       render: (_, client) => (
         <>
           <Button
-            className="italic"
+            className="font-semibold"
             type="primary"
             onClick={() => {
               setSelectedClient(client);
@@ -155,7 +157,7 @@ const AllManagers = () => {
               marginLeft: "8px",
               background: "red",
               color: "white",
-              fontStyle: "italic",
+              fontStyle: "font-semibold",
             }}
           >
             Delete
@@ -167,39 +169,44 @@ const AllManagers = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-2 bg-white shadow-md rounded-lg">
+      <div className="container mx-auto px-4 bg-white shadow-md rounded-lg">
         {/* Title */}
-        <h1 className="text-3xl font-bold italic mb-4">All Managers</h1>
+        <h1 className="text-2xl font-bold">All Managers</h1>
 
-        {/* Search input */}
-        <div className="flex items-center mb-4">
-          <Search
+        {/* Search input and Actions */}
+        <div className="flex justify-between items-center">
+          {/* Search input */}
+
+          <Input.Search
             placeholder="Search by enrollment"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: "50%", marginRight: "12px" }}
-            className="shadow-sm"
-            allowClear
+            enterButton
+            style={{ width: "100%", maxWidth: "300px" }}
+            className="shadow-md sm:mb-0"
           />
-          {/* CSV Download Button */}
-          <Button
-            type="primary"
-            onClick={downloadCSV}
-            style={{
-              marginLeft: "10px",
-              fontSize: "small",
-              fontWeight: "bold",
-            }}
-          >
-            <DownloadForOfflineIcon />
-            Download Managers
-          </Button>
-        </div>
+          {/* Actions (Download button and total managers) */}
+          <div className="flex items-center">
+            {/* CSV Download Button */}
+            <Button
+              type="primary"
+              onClick={downloadCSV}
+              style={{
+                marginRight: "10px",
+                fontSize: "small",
+                fontWeight: "bold",
+              }}
+            >
+              <DownloadForOfflineIcon />
+              Download Managers
+            </Button>
 
-        {/* Managers count */}
-        <Title level={5} className="text-gray-600 italic mb-4">
-          Total Managers: {clients.length}
-        </Title>
+            {/* Managers count */}
+            <h2 className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 mt-3 rounded-md">
+              Total Managers: {clients?.length}
+            </h2>
+          </div>
+        </div>
 
         {/* Managers Table */}
         <Table
@@ -215,9 +222,7 @@ const AllManagers = () => {
         {/* No results message */}
         {filteredClients.length === 0 && (
           <div className="flex justify-center mt-6">
-            <p className="text-center text-gray-500 italic">
-              No managers found.
-            </p>
+            <p className="text-center text-gray-500">No managers found.</p>
           </div>
         )}
 

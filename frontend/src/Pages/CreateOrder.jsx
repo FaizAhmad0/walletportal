@@ -97,52 +97,54 @@ const CreateOrder = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Enrollment No.</span>,
+      title: <span className="text-sm text-black">Enrollment No.</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Name</span>,
+      title: <span className="text-sm text-black">Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Mob. Number</span>,
+      title: <span className="text-sm text-black">Mob. Number</span>,
       dataIndex: "mobile",
       key: "mobile",
       render: (mobile) => (
-        <span className="text-xs">{maskMobileNumber(mobile)}</span>
+        <span className="text-sm text-black">{maskMobileNumber(mobile)}</span>
       ),
     },
     {
-      title: <span className="text-xs">Address</span>,
+      title: <span className="text-sm text-black">Address</span>,
       dataIndex: "address",
       key: "address",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Wallet Balance</span>,
+      title: <span className="text-sm text-black">Wallet Balance</span>,
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => <span className="text-xs">₹ {amount}.00</span>,
+      render: (amount) => (
+        <span className="text-sm text-black">₹ {amount}.00</span>
+      ),
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (text, user) => (
-        <div className="text-xs">
+        <div className="text-sm text-black">
           <Link to={`/add-items/${user.enrollment}`}>
             {user.gst ? (
-              <Button className="mr-5 text-xs mb-2" type="primary">
+              <Button className="mr-5 text-sm text-white mb-2" type="primary">
                 Add Items
               </Button>
             ) : (
               <Tooltip title={!user.gst ? "Add GST to click" : ""}>
                 <Button
                   disabled={!user.gst}
-                  className="mr-5 text-xs mb-2"
+                  className="mr-5 text-sm text-white mb-2"
                   type="primary"
                 >
                   Add Items
@@ -151,7 +153,7 @@ const CreateOrder = () => {
             )}
           </Link>
           <Button
-            className="text-xs px-5"
+            className="text-sm text-white px-5"
             type="primary"
             onClick={() => showGstModal(user)}
           >

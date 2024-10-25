@@ -12,7 +12,8 @@ import {
 } from "antd";
 import AdminLayout from "../Layout/AdminLayout";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
-
+import DeleteIcon from "@mui/icons-material/Delete";
+import ModeEditOutlineIcon from "@mui/icons-material/ModeEditOutline";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Title } = Typography;
 
@@ -157,64 +158,68 @@ const AllClients = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Client Name</span>,
+      title: <span className="text-sm text-black">Client Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Email</span>,
+      title: <span className="text-sm text-black">Email</span>,
       dataIndex: "email",
       key: "email",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Manager</span>,
+      title: <span className="text-sm text-black">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Enrollment</span>,
+      title: <span className="text-sm text-black">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Phone</span>,
+      title: <span className="text-sm text-black">Phone</span>,
       dataIndex: "mobile",
       key: "mobile",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Balance</span>,
+      title: <span className="text-sm text-black">Balance</span>,
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => <span className="text-xs">₹{amount.toFixed(2)}</span>,
+      render: (amount) => (
+        <span className="text-sm text-black">₹{amount.toFixed(2)}</span>
+      ),
     },
     {
-      title: <span className="text-xs">GMS</span>,
+      title: <span className="text-sm text-black">GMS</span>,
       dataIndex: "gms",
       key: "gms",
-      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
+      render: (text) => (
+        <span className="text-sm text-black">{text.toFixed(3)}</span>
+      ),
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (text, client) => (
-        <>
+        <div className="flex items-center space-x-2">
           <Button
-            className="text-xs italic"
+            className="text-sm text-white"
             type="primary"
             onClick={() => showAssignModal(client)}
           >
-            Assign Manager
+            Assign
           </Button>
           <Button
-            className="text-xs italic ml-2" // Add margin to separate buttons
+            className="text-sm text-black"
             onClick={() => showEditModal(client)}
           >
-            Edit
+            <ModeEditOutlineIcon />
           </Button>
           <Button
             onClick={() => {
@@ -223,16 +228,11 @@ const AllClients = () => {
                 onOk: () => handleDeleteClient(client._id),
               });
             }}
-            style={{
-              marginLeft: "8px",
-              background: "red",
-              color: "white",
-              fontStyle: "italic",
-            }}
+            className="ml-2 bg-red-500 text-white"
           >
-            Delete
+            <DeleteIcon />
           </Button>
-        </>
+        </div>
       ),
     },
   ];
@@ -244,49 +244,43 @@ const AllClients = () => {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto px-2 py-2 bg-white shadow-lg rounded-lg">
+      <div className="container max-w-7xl mx-auto px-4 bg-white shadow-lg rounded-lg ">
         {/* Header */}
-        <div className="flex justify-between items-center mb-2">
-          <h1 className="text-3xl font-bold italic text-gray-800">
-            All Clients
-          </h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold text-black-800">All Clients</h1>
           {/* Download Button */}
-          <Button
-            type="primary"
-            className="italic text-sm px-4"
-            onClick={downloadCSV}
-          >
+          <Button type="primary" className="text-sm px-4" onClick={downloadCSV}>
             <DownloadForOfflineIcon /> Download Users
           </Button>
         </div>
 
         {/* Search and Total Clients */}
-        <div className="flex items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
           {/* Search Input */}
-          <Input
-            type="text"
+          <Input.Search
             placeholder="Search by enrollment"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: "30%" }}
-            className="shadow-sm text-sm"
+            enterButton
+            style={{ width: "100%", maxWidth: "300px" }}
+            className="shadow-md sm:mb-0"
           />
           {/* Total Clients */}
-          <span className="ml-6 text-gray-600 text-sm">
-            Total clients:{" "}
-            <span className="font-semibold">{clients.length}</span>
-          </span>
+          <h2 className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md">
+            Total Users: {clients?.length}
+          </h2>
         </div>
 
         {/* Clients Table */}
-        <Table
-          dataSource={filteredClients}
-          columns={columns}
-          rowKey={(record) => record._id}
-          bordered
-          pagination={{ pageSize: 10 }}
-          className="rounded-lg shadow-md"
-        />
+        <div className="overflow-x-auto">
+          <Table
+            dataSource={filteredClients}
+            columns={columns}
+            rowKey={(record) => record._id}
+            bordered
+            pagination={{ pageSize: 10 }}
+          />
+        </div>
 
         {/* Assign Manager Modal */}
         <Modal
@@ -380,7 +374,7 @@ const AllClients = () => {
               label="GST"
               name="gst"
               rules={[
-                { required: true, message: "Please input the gst number!" },
+                { required: true, message: "Please input the GST number!" },
               ]}
             >
               <Input />

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { DatePicker } from "antd"; // Import Ant Design DatePicker
 import dayjs from "dayjs"; // For date formatting
-import DispatchLayout from "../Layout/DispatchLayout";
+import AdminLayout from "../Layout/AdminLayout";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const DetailsReporting = () => {
+const AdminDetailsReporting = () => {
   const [userData, setUserData] = useState([]);
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
   const [holdMoneyIssueCount, setHoldMoneyIssueCount] = useState(0);
@@ -121,11 +121,11 @@ const DetailsReporting = () => {
   };
 
   return (
-    <DispatchLayout>
+    <AdminLayout>
       <div className="relative max-w-7xl mx-auto pb-20 min-h-screen">
         {/* Date Filter */}
         <div className="mb-4">
-          <label htmlFor="date-picker" className="mr-2 text-black">
+          <label htmlFor="date-picker" className="mr-2">
             Filter By Date:
           </label>
           <DatePicker
@@ -179,7 +179,7 @@ const DetailsReporting = () => {
 
         {/* Display Filtered Orders */}
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-black-800 mb-4 text-center underline">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center underline">
             Orders
           </h2>
           {filteredOrders.length > 0 ? (
@@ -247,8 +247,8 @@ const DetailsReporting = () => {
           )}
         </div>
       </div>
-    </DispatchLayout>
+    </AdminLayout>
   );
 };
 
-export default DetailsReporting;
+export default AdminDetailsReporting;

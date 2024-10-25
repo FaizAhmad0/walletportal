@@ -142,61 +142,61 @@ const ShippingDash = () => {
   };
   const columns = [
     {
-      title: <span className="text-xs">Order Id</span>,
+      title: <span className="text-sm text-black">Order Id</span>,
       dataIndex: "orderId",
       key: "orderId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Enrollment No.</span>,
+      title: <span className="text-sm text-black">Enrollment No.</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Amazon Order Id</span>,
+      title: <span className="text-sm text-black">Amazon Order Id</span>,
       dataIndex: "amazonOrderId",
       key: "amazonOrderId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Manager</span>,
+      title: <span className="text-sm text-black">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Delivery Partner</span>,
+      title: <span className="text-sm text-black">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Tracking Id</span>,
+      title: <span className="text-sm text-black">Tracking Id</span>,
       dataIndex: "trackingId",
       key: "trackingId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">SKU</span>,
+      title: <span className="text-sm text-black">SKU</span>,
       dataIndex: "sku",
       key: "sku",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Pincode</span>,
+      title: <span className="text-sm text-black">Pincode</span>,
       dataIndex: "pincode",
       key: "pincode",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Amount</span>,
+      title: <span className="text-sm text-black">Amount</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (text) => <span className="text-xs">₹ {text}</span>,
+      render: (text) => <span className="text-sm text-black">₹ {text}</span>,
     },
     {
-      title: <span className="text-xs">Product Status</span>,
+      title: <span className="text-sm text-black">Product Status</span>,
       dataIndex: "items",
       key: "productAction",
       render: (items) => {
@@ -204,21 +204,21 @@ const ShippingDash = () => {
           (item) => item.productAction === "Available"
         );
         return allAvailable ? (
-          <span className="text-xs text-green-500">Available</span>
+          <span className="text-sm text-black text-green-500">Available</span>
         ) : (
-          <span className="text-xs text-red-500">Unavailable</span>
+          <span className="text-sm text-black text-red-500">Unavailable</span>
         );
       },
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (_, record) => (
-        <div className="text-xs flex gap-1">
+        <div className="text-sm text-black flex gap-1">
           {role === "dispatch" ? (
             <Button
               type="primary"
-              className="text-xs"
+              className="text-sm text-black"
               onClick={() =>
                 handleRowClick(record.items, record.finalAmount, record._id)
               }
@@ -229,7 +229,7 @@ const ShippingDash = () => {
             <Button
               disabled={true}
               type="primary"
-              className="text-xs"
+              className="text-sm text-black"
               onClick={() =>
                 handleRowClick(record.items, record.finalAmount, record._id)
               }
@@ -240,7 +240,7 @@ const ShippingDash = () => {
           {!record.paymentStatus ? (
             <Button
               type="primary"
-              className="text-xs"
+              className="text-sm text-white"
               onClick={() =>
                 handlePaymentClick(
                   record.finalAmount,
@@ -258,7 +258,7 @@ const ShippingDash = () => {
           {record.paymentStatus ? (
             <Button
               type="primary"
-              className="text-xs"
+              className="text-sm text-white"
               style={{
                 marginRight: "5px",
                 background: "green",
@@ -275,7 +275,7 @@ const ShippingDash = () => {
               <Button
                 disabled={true}
                 type="primary"
-                className="text-xs"
+                className="text-sm text-black"
                 style={{
                   marginRight: "5px",
                   background: "green",
@@ -438,36 +438,34 @@ const ShippingDash = () => {
   return (
     <ShippingLayout>
       <div className="relative max-w-full mx-auto pb-20">
-        <h1 className="text-xl font-semibold text-black-600 mb-4">
-          Shipping Dashboard
-        </h1>
+        <h1 className="text-2xl font-bold text-black-800">All Orders</h1>
 
         {/* Search Input */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center">
             <div className="flex items-center justify-between space-x-4">
               {" "}
-              <div className="text-sm">
+              {/* <div className="text-sm">
                 <label htmlFor="paymentStatus">Payment Status: </label>
                 <Select
                   id="paymentStatus"
                   value={paymentStatusFilter}
                   style={{ width: 200 }}
                   onChange={handlePaymentStatusFilter}
-                  className="text-xs"
+                  className="text-sm text-black"
                   placeholder="Select Status"
                   allowClear
                 >
-                  <Option value="true" className="text-xs">
+                  <Option value="true" className="text-sm text-black">
                     Paid
                   </Option>
-                  <Option value="false" className="text-xs">
+                  <Option value="false" className="text-sm text-black">
                     Unpaid
                   </Option>
                 </Select>
-              </div>
+              </div> */}
               {/* Time Filter */}
-              <div className="text-xs items-end">
+              <div className="text-sm text-black items-end">
                 <Radio.Group
                   buttonStyle="solid"
                   onChange={handleTimeFilter}
@@ -485,16 +483,24 @@ const ShippingDash = () => {
                   value={searchQuery}
                   onChange={handleSearchChange} // This will still handle input change
                   style={{ width: 300 }}
-                  className="text-xs"
+                  className="text-sm text-black"
                   enterButton // Adds a search icon/button next to the input
                 />
               </div>
+              <h2
+                className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md mt-3"
+                style={{
+                  display: "inline-block",
+                }}
+              >
+                Total Orders: {dataSource?.length}
+              </h2>{" "}
             </div>
           </div>
         </div>
 
         {/* Orders Table */}
-        <div className="overflow-x-auto mb-16 text-xs">
+        <div className="overflow-x-auto mb-16 text-sm text-black">
           <Table
             bordered
             columns={columns}

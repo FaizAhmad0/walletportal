@@ -114,49 +114,55 @@ const OrderHistory = () => {
 
   const orderColumns = [
     {
-      title: <span className="text-xs">Order ID</span>,
+      title: <span className="text-sm text-black">Order ID</span>,
       dataIndex: "orderId",
       key: "orderId",
       width: 150,
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Date</span>,
+      title: <span className="text-sm text-black">Date</span>,
       dataIndex: "createdAt",
       key: "createdAt",
       render: (createdAt) => {
         const date = new Date(createdAt);
-        return <span className="text-xs">{date.toLocaleDateString()}</span>;
+        return (
+          <span className="text-sm text-black">
+            {date.toLocaleDateString()}
+          </span>
+        );
       },
       width: 150,
     },
     {
-      title: <span className="text-xs">Total Price</span>,
+      title: <span className="text-sm text-black">Total Price</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (finalAmount) => <span className="text-xs">₹ {finalAmount}</span>,
+      render: (finalAmount) => (
+        <span className="text-sm text-black">₹ {finalAmount}</span>
+      ),
       width: 150,
     },
     {
-      title: <span className="text-xs">Payment Status</span>,
+      title: <span className="text-sm text-black">Payment Status</span>,
       dataIndex: "paymentStatus",
       key: "paymentStatus",
       render: (paymentStatus) => (
-        <span className="text-xs">
+        <span className="text-sm text-black">
           {paymentStatus ? "Completed" : "Not Completed"}
         </span>
       ),
       width: 150,
     },
     {
-      title: <span className="text-xs">Product Availability</span>, // New column for product availability
+      title: <span className="text-sm text-black">Product Availability</span>, // New column for product availability
       key: "availability",
       render: (text, record) => {
         const isAnyProductNotAvailable = record.items.some(
           (item) => item.productAction !== "Available"
         );
         return (
-          <span className="text-xs">
+          <span className="text-sm text-black">
             {isAnyProductNotAvailable ? "Not Available" : "Available"}
           </span>
         );
@@ -164,11 +170,11 @@ const OrderHistory = () => {
       width: 150,
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-white">Action</span>,
       key: "action",
       render: (text, record) => (
         <Button
-          className="text-xs"
+          className="text-sm text-white"
           type="primary"
           onClick={() => handleOrderClick(record)}
         >
@@ -248,7 +254,7 @@ const OrderHistory = () => {
     <ManagerLayout>
       <div className="container mx-auto sm:p-6 lg:p-6">
         <div>
-          <h1 className="text-2xl font-bold text-center">Order History</h1>
+          <h1 className="text-2xl font-bold">Order Details</h1>
 
           <div className="flex justify-between items-center mb-6">
             <DatePicker
@@ -257,7 +263,6 @@ const OrderHistory = () => {
               format="YYYY-MM-DD"
               value={selectedDate}
             />
-
             {/* Radio Group for Filter */}
             <Radio.Group
               onChange={handleFilterChange}
@@ -269,6 +274,14 @@ const OrderHistory = () => {
               <Radio.Button value="month">This Month</Radio.Button>
               <Radio.Button value="year">This Year</Radio.Button>
             </Radio.Group>
+            <h2
+              className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md "
+              style={{
+                display: "inline-block",
+              }}
+            >
+              Total Orders: {filteredOrders?.length}
+            </h2>{" "}
           </div>
         </div>
 

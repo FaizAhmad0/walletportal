@@ -91,77 +91,88 @@ const ShippingOrder = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Order ID</span>,
+      title: <span className="text-sm text-black">Order ID</span>,
       dataIndex: "orderId",
       key: "orderId",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 150, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Name</span>,
+      title: <span className="text-sm text-black">Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 200, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Enrollment No.</span>,
+      title: <span className="text-sm text-black">Enrollment No.</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 200, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Amazon Order Id</span>,
+      title: <span className="text-sm text-black">Amazon Order Id</span>,
       dataIndex: "amazonOrderId",
       key: "amazonOrderId",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 200, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Manager</span>,
+      title: <span className="text-sm text-black">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 150, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Delivery Partner</span>,
+      title: <span className="text-sm text-black">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 200, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Tracking Id</span>,
+      title: <span className="text-sm text-black">Tracking Id</span>,
       dataIndex: "trackingId",
       key: "trackingId",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 200, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">SKU</span>,
+      title: <span className="text-sm text-black">SKU</span>,
       dataIndex: "sku",
       key: "sku",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 150, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Pincode</span>,
+      title: <span className="text-sm text-black">Pincode</span>,
       dataIndex: "pincode",
       key: "pincode",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      width: 150, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Amount</span>,
+      title: <span className="text-sm text-black">Amount</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (text) => <span className="text-xs">₹ {text}</span>, // Apply text-xs
+      width: 150, // Adjust width as needed
+      render: (text) => <span className="text-sm text-black">₹ {text}</span>,
     },
     {
-      title: <span className="text-xs">Product Status</span>,
+      title: <span className="text-sm text-black">Product Status</span>,
       dataIndex: "items",
       key: "productAction",
+      width: 200, // Adjust width as needed
       render: (items) => {
         const allAvailable = items.every(
           (item) => item.productAction === "Available"
         );
         return allAvailable ? (
-          <span className="text-xs text-green-500">Available</span>
+          <span className="text-sm text-black text-green-500">Available</span>
         ) : (
-          <span className="text-xs text-red-500">Unavailable</span>
+          <span className="text-sm text-black text-red-500">Unavailable</span>
         );
       },
     },
@@ -170,9 +181,8 @@ const ShippingOrder = () => {
   return (
     <DispatchLayout>
       <div className="relative max-w-full mx-auto pb-20">
-        <h1 className="text-xl font-semibold text-black-600 mb-4">
-          Shipped Orders
-        </h1>
+        <h1 className="text-2xl font-bold text-black-800">Shipped Orders</h1>
+
         <div className="flex justify-between items-center mb-4">
           {/* Search Input */}
           <Search
@@ -195,11 +205,18 @@ const ShippingOrder = () => {
             <Radio.Button value="year">This Year</Radio.Button>
           </Radio.Group>
         </div>
-        <Table
+        {/* <Table
           bordered
           columns={columns}
           dataSource={filteredOrders}
           pagination={{ pageSize: 10 }}
+        /> */}
+        <Table
+          bordered
+          columns={columns}
+          dataSource={filteredOrders}
+          tableLayout="fixed" // Ensure consistent column width
+          scroll={{ x: "max-content" }} // Optional, allows horizontal scrolling if needed
         />
       </div>
     </DispatchLayout>

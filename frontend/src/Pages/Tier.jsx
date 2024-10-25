@@ -4,7 +4,6 @@ import { FaMedal, FaBullseye } from "react-icons/fa";
 import axios from "axios";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-
 const Tier = () => {
   const [userData, setUserData] = useState({ user: { gms: 0 } }); // Initialize with 0 GMS
   const getUserData = async () => {
@@ -39,7 +38,7 @@ const Tier = () => {
   return (
     <UserLayout>
       <div className="max-w-4xl mx-auto my-8 p-6 bg-white shadow-md rounded-md">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6 flex items-center justify-center">
+        <h2 className="text-3xl font-bold text-center text-black-800 mb-6 flex items-center justify-center">
           Your Tier Status, {localStorage.getItem("name")}
           <FaMedal className="ml-3 text-yellow-500" />
         </h2>
@@ -67,7 +66,7 @@ const Tier = () => {
                       ? "text-green-600"
                       : index === currentStageIndex
                       ? "text-yellow-600"
-                      : "text-gray-600"
+                      : "text-black-600"
                   }`}
                 >
                   {stage.name}
@@ -83,7 +82,7 @@ const Tier = () => {
                       ? "text-green-600"
                       : index === currentStageIndex
                       ? "text-yellow-600"
-                      : "text-gray-600"
+                      : "text-black-600"
                   }`}
                 >
                   {stage.gms.toLocaleString()} + GMS

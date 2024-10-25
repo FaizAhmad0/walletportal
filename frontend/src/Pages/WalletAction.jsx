@@ -107,62 +107,64 @@ const WalletAction = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Client Name</span>,
+      title: <span className="text-sm text-black">Client Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
+      render: (text) => <span className="text-sm text-black">{text}</span>, // Apply class to body
     },
     {
-      title: <span className="text-xs">Email</span>,
+      title: <span className="text-sm text-black">Email</span>,
       dataIndex: "email",
       key: "email",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
+      render: (text) => <span className="text-sm text-black">{text}</span>, // Apply class to body
     },
     {
-      title: <span className="text-xs">Enrollment</span>,
+      title: <span className="text-sm text-black">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
+      render: (text) => <span className="text-sm text-black">{text}</span>, // Apply class to body
     },
     {
-      title: <span className="text-xs">Phone</span>,
+      title: <span className="text-sm text-black">Phone</span>,
       dataIndex: "mobile",
       key: "mobile",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply class to body
+      render: (text) => <span className="text-sm text-black">{text}</span>, // Apply class to body
     },
     {
-      title: <span className="text-xs">Balance</span>,
+      title: <span className="text-sm text-black">Balance</span>,
       dataIndex: "amount",
       key: "amount",
       render: (amount) => (
-        <span className="text-xs">{parseFloat(amount).toFixed(3)}</span> // Apply class to body
+        <span className="text-sm text-black">
+          {parseFloat(amount).toFixed(3)}
+        </span> // Apply class to body
       ),
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (text, client) => (
         <Space size="middle">
           <Button
             type="primary"
-            className="italic text-xs" // Decreased font size
+            className=" text-sm text-white" // Decreased font size
             onClick={() => handleActionClick(client, "add")}
           >
             Add
           </Button>
           <Button
-            className="text-xs"
+            className="text-sm text-black"
             style={{
               background: "red",
               color: "white",
-              fontStyle: "italic",
+              fontStyle: "",
             }} // Decreased font size
             onClick={() => handleActionClick(client, "deduct")}
           >
             Deduct
           </Button>
           <Button
-            className="italic text-xs" // Decreased font size
+            className=" text-sm text-black" // Decreased font size
             onClick={() => handleShowTransactions(client)}
           >
             Show Transactions
@@ -176,7 +178,7 @@ const WalletAction = () => {
     <AdminLayout>
       <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
         {/* Page Title */}
-        <h1 className="text-2xl font-bold mb-6 italic text-gray-700">
+        <h1 className="text-2xl font-bold  text-black-700">
           {" "}
           {/* Decreased font size */}
           Manage Client's Wallet

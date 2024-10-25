@@ -65,39 +65,43 @@ const AdminReport = () => {
       title: "Manager Name",
       dataIndex: "name",
       key: "name",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Enrollment",
       dataIndex: "enrollment",
       key: "enrollment",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Phone",
       dataIndex: "mobile",
       key: "mobile",
-      className: "text-xs",
+      className: "text-sm text-black",
     },
     {
       title: "Balance",
       dataIndex: "amount",
       key: "amount",
-      className: "text-xs",
-      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
+      className: "text-sm text-black",
+      render: (text) => (
+        <span className="text-sm text-black">{text.toFixed(3)}</span>
+      ),
     },
     {
       title: "GMS",
       dataIndex: "gms",
       key: "gms",
-      className: "text-xs",
-      render: (text) => <span className="text-xs">{text.toFixed(3)}</span>,
+      className: "text-sm text-black",
+      render: (text) => (
+        <span className="text-sm text-black">{text.toFixed(3)}</span>
+      ),
     },
     {
       title: "Action",
@@ -105,7 +109,7 @@ const AdminReport = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          className="text-xs italic"
+          className="text-sm text-white "
           onClick={() => handleViewClientsClick(record.name)}
           loading={loading}
         >
@@ -119,7 +123,7 @@ const AdminReport = () => {
     <AdminLayout>
       <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
         {/* Page Title */}
-        <h1 className="text-3xl font-bold mb-6 italic text-gray-700">
+        <h1 className="text-3xl font-bold  text-black-700">
           All Managers Overview
         </h1>
 
@@ -170,33 +174,35 @@ const AdminReport = () => {
                 title: "Name",
                 dataIndex: "name",
                 key: "name",
-                className: "text-xs",
+                className: "text-sm text-black",
               },
               {
                 title: "Enrollment",
                 dataIndex: "enrollment",
                 key: "enrollment",
-                className: "text-xs",
+                className: "text-sm text-black",
               },
               {
                 title: "Email",
                 dataIndex: "email",
                 key: "email",
-                className: "text-xs",
+                className: "text-sm text-black",
               },
               {
                 title: "GMS",
                 dataIndex: "gms",
                 key: "gms",
-                className: "text-xs",
+                className: "text-sm text-black",
                 render: (text) => (
-                  <span className="text-xs">₹ {text.toFixed(3)}</span>
+                  <span className="text-sm text-black">
+                    ₹ {text.toFixed(3)}
+                  </span>
                 ),
               },
             ]}
             pagination={false}
             rowKey="enrollment"
-            className="rounded-lg shadow-sm text-xs"
+            className="rounded-lg shadow-sm text-sm text-black"
           />
         ) : (
           <p className="text-center text-gray-600 py-6">

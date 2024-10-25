@@ -8,7 +8,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const UserDash = () => {
   const location = useLocation();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState([]);
@@ -185,61 +185,61 @@ const UserDash = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white shadow-md rounded-lg border border-gray-200">
+          <table className="min-w-full bg-white shadow-md rounded-lg border border-black-200">
             <thead>
-              <tr className="bg-gray-100 text-black uppercase text-xs leading-normal h-8">
-                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-gray-200">
+              <tr className="bg-black-100 text-black uppercase text-sm text-black leading-normal h-8">
+                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-black-200">
                   Order Id
                 </th>
-                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-gray-200">
+                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-black-200">
                   Amazon Order Id
                 </th>
-                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-gray-200">
+                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-black-200">
                   Date
                 </th>
 
-                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-gray-200">
+                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-black-200">
                   Total Price
                 </th>
-                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-gray-200">
+                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-black-200">
                   Delivery Partner
                 </th>
-                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-gray-200">
+                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-black-200">
                   Tracking ID
                 </th>
-                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-gray-200">
+                <th className="py-3 px-4 text-left whitespace-nowrap border-b border-black-200">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="text-gray-900 text-xs font-light whitespace-nowrap leading-tight">
+            <tbody className="text-black-900 text-sm text-black font-light whitespace-nowrap leading-tight">
               {userData?.user?.orders
                 ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort orders by date in descending order
                 .map((order) => (
                   <tr
                     key={order._id}
-                    className="hover:bg-gray-100 focus:outline-none focus:ring focus:ring-slate-200 transition duration-200"
+                    className="hover:bg-black-100 focus:outline-none focus:ring focus:ring-slate-200 transition duration-200"
                   >
-                    <td className="py-3 px-4 border-b border-gray-200">
+                    <td className="py-3 px-4 border-b border-black-200">
                       {order.orderId}
                     </td>
-                    <td className="py-3 px-4 border-b border-gray-200">
+                    <td className="py-3 px-4 border-b border-black-200">
                       {order.items[0]?.amazonOrderId}
                     </td>
-                    <td className="py-3 px-4 border-b border-gray-200">
+                    <td className="py-3 px-4 border-b border-black-200">
                       {formatDate(order.createdAt)}
                     </td>
 
-                    <td className="py-3 px-4 border-b border-gray-200">
+                    <td className="py-3 px-4 border-b border-black-200">
                       ₹ {order.finalAmount}
                     </td>
-                    <td className="py-3 px-4 border-b border-gray-200">
+                    <td className="py-3 px-4 border-b border-black-200">
                       {order.items[0]?.shippingPartner}
                     </td>
-                    <td className="py-3 px-4 border-b border-gray-200">
+                    <td className="py-3 px-4 border-b border-black-200">
                       {order.items[0]?.trackingId}
                     </td>
-                    <td className="py-3 px-4 border-b border-gray-200 flex gap-2">
+                    <td className="py-3 px-4 border-b border-black-200 flex gap-2">
                       {order.paymentStatus ? (
                         <Button
                           style={{
@@ -247,7 +247,7 @@ const UserDash = () => {
                             background: "green",
                             color: "white",
                           }}
-                          className="mr-2 text-xs"
+                          className="mr-2 text-sm text-black"
                           disabled
                         >
                           Done
@@ -255,14 +255,14 @@ const UserDash = () => {
                       ) : (
                         <Button
                           type="primary"
-                          className="mr-2 text-xs"
+                          className="mr-2 text-sm text-white"
                           onClick={() => handlePaymentClick(order)}
                         >
                           Pay Now
                         </Button>
                       )}
                       <Button
-                        className="mr-2 text-xs"
+                        className="mr-2 text-sm text-black"
                         onClick={() =>
                           handleViewClick(order.items, order.finalAmount)
                         }
@@ -271,21 +271,21 @@ const UserDash = () => {
                       </Button>
                       {order.paymentStatus ? (
                         <Button
-                          className="mr-2 text-xs"
+                          className="mr-2 text-sm text-black"
                           onClick={() => generateInvoice(order)}
                         >
                           Invoice
                         </Button>
                       ) : (
                         <Tooltip
-                          className="text-xs"
+                          className="text-sm text-black"
                           title="Pay to download the invoice"
                         >
                           <Button
                             style={{
                               width: "80px",
                             }}
-                            className="mr-2 text-xs"
+                            className="mr-2 text-sm text-black"
                             disabled
                           >
                             Invoice

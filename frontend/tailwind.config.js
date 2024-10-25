@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["IBM Plex Sans", "sans-serif"],
+        sans: ["Times New Roman", "IBM Plex Sans", "sans-serif"],
       },
     },
   },

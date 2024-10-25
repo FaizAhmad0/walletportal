@@ -96,14 +96,18 @@ const AuditReport = () => {
 
   return (
     <AdminLayout>
-      <div style={{ padding: "20px" }}>
-        <h1 className="text-2xl font-bold mb-2 italic text-xl">Audit report</h1>
-        <Row gutter={[16, 16]} justify="center">
-          <Col xs={24} sm={12} md={8}>
+      <div style={{ backgroundColor: "#f5f5f5", padding: "20px" }}>
+        <h1 className="text-2xl font-bold mb-2 italic text-xl">Audit Report</h1>
+
+        {/* Row for Cards */}
+        <Row gutter={[8, 8]} justify="space-between">
+          {/* Box 1: Total Sales */}
+          <Col xs={24} sm={12} md={4}>
             <Card
               title="Total Sales"
               bordered={false}
               style={{
+                backgroundColor: "white",
                 textAlign: "center",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
@@ -113,11 +117,29 @@ const AuditReport = () => {
               </Title>
             </Card>
           </Col>
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24} sm={12} md={4}>
+            <Card
+              title="Net Sales"
+              bordered={false}
+              style={{
+                backgroundColor: "white",
+                textAlign: "center",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <Title level={4} style={{ color: "#1890ff" }}>
+                ₹ {totalSales.toFixed(2)}
+              </Title>
+            </Card>
+          </Col>
+
+          {/* Box 2: Total Orders */}
+          <Col xs={24} sm={12} md={4}>
             <Card
               title="Total Orders"
               bordered={false}
               style={{
+                backgroundColor: "white",
                 textAlign: "center",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
@@ -127,29 +149,68 @@ const AuditReport = () => {
               </Title>
             </Card>
           </Col>
-          <Col xs={24} sm={12} md={8}>
+
+          {/* Box 3: Company GMS */}
+          <Col xs={24} sm={12} md={4}>
             <Card
               title="Company GMS"
               bordered={false}
               style={{
+                backgroundColor: "white",
                 textAlign: "center",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
             >
               <Title level={4} style={{ color: "#faad14" }}>
-                {totalGMS.toFixed(2)}
+                ₹ {totalGMS.toFixed(2)}
+              </Title>
+            </Card>
+          </Col>
+
+          {/* Box 4: Products Sold */}
+          <Col xs={24} sm={12} md={4}>
+            <Card
+              title="Products Sold"
+              bordered={false}
+              style={{
+                backgroundColor: "white",
+                textAlign: "center",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <Title level={4} style={{ color: "#f5222d" }}>
+                10000
+              </Title>
+            </Card>
+          </Col>
+
+          {/* Box 5: Variations Sold */}
+          <Col xs={24} sm={12} md={4}>
+            <Card
+              title="Variations Sold"
+              bordered={false}
+              style={{
+                backgroundColor: "white",
+                textAlign: "center",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <Title level={4} style={{ color: "#13c2c2" }}>
+                6000
               </Title>
             </Card>
           </Col>
         </Row>
 
         {/* New Row for Top 5 Selling Products and Top 5 Managers */}
-        <Row gutter={[16, 16]} justify="center" style={{ marginTop: "20px" }}>
+        <Row gutter={[8, 8]} justify="start" style={{ marginTop: "20px" }}>
+          {/* Top Selling Products */}
           <Col xs={24} sm={12} md={12}>
             <Card
               title="Top Selling Products"
               bordered={false}
               style={{
+                backgroundColor: "white",
                 textAlign: "center",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
@@ -168,11 +229,14 @@ const AuditReport = () => {
               />
             </Card>
           </Col>
+
+          {/* Top Managers */}
           <Col xs={24} sm={12} md={12}>
             <Card
               title="Top Managers"
               bordered={false}
               style={{
+                backgroundColor: "white",
                 textAlign: "center",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}

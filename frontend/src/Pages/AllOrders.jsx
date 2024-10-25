@@ -128,63 +128,65 @@ const AllOrders = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Date</span>,
+      title: <span className="text-sm text-black">Date</span>,
       dataIndex: "createdAt",
       key: "createdAt",
       render: (text) => (
-        <span className="text-xs">{dayjs(text).format("DD/MM/YYYY")}</span>
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
       ),
     },
     {
-      title: <span className="text-xs">Enrollment</span>,
+      title: <span className="text-sm text-black">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Amazon Order ID</span>,
+      title: <span className="text-sm text-black">Amazon Order ID</span>,
       dataIndex: "amazonOrderId",
       key: "amazonOrderId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Manager</span>,
+      title: <span className="text-sm text-black">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Delivery Partner</span>,
+      title: <span className="text-sm text-black">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Tracking ID</span>,
+      title: <span className="text-sm text-black">Tracking ID</span>,
       dataIndex: "trackingId",
       key: "trackingId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">SKU</span>,
+      title: <span className="text-sm text-black">SKU</span>,
       dataIndex: "sku",
       key: "sku",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Address</span>,
+      title: <span className="text-sm text-black">Address</span>,
       dataIndex: "address",
       key: "address",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Amount</span>,
+      title: <span className="text-sm text-black">Amount</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (text) => <span className="text-xs">₹ {text}</span>,
+      render: (text) => <span className="text-sm text-black">₹ {text}</span>,
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (_, record) => (
         <>
@@ -193,7 +195,7 @@ const AllOrders = () => {
             onClick={() =>
               handleRowClick(record.items, record.finalAmount, record._id)
             }
-            className="mr-2 text-xs italic"
+            className="mr-2 text-sm text-white "
           >
             View
           </Button>
@@ -207,7 +209,7 @@ const AllOrders = () => {
                   record.enrollment
                 )
               }
-              className="text-xs italic"
+              className="text-sm text-black "
             >
               Pay Now
             </Button>
@@ -221,7 +223,7 @@ const AllOrders = () => {
                 paddingRight: "26px",
                 color: "white",
               }}
-              className="text-xs italic"
+              className="text-sm text-black "
             >
               Done
             </Button>
@@ -267,10 +269,7 @@ const AllOrders = () => {
   return (
     <AdminLayout>
       <div className="relative max-w-full mx-auto pb-10 px-2 bg-white shadow-lg rounded-lg">
-        <h1 className="text-3xl font-bold mb-6 italic">
-          A Detailed List of Orders
-        </h1>
-
+        <h1 className="text-2xl font-bold">Order Details</h1>
         {/* Search Input */}
 
         {/* Radio Group for Filtering */}
@@ -287,13 +286,14 @@ const AllOrders = () => {
             <Radio.Button value="month">This Month</Radio.Button>
             <Radio.Button value="year">This Year</Radio.Button>
           </Radio.Group>
-          <div>
+
+          <div className="flex items-center justify-between">
             <Input.Search
               placeholder="Search by Enrollment, Amazon Order ID, or Tracking ID"
               value={searchInput}
               onChange={handleSearchChange}
               onSearch={(value) => setSearchInput(value)} // Optional: handle search button click
-              className="w-full" // Adjust the width if necessary
+              className="w-full sm:w-1/2" // Adjust width for responsiveness
               allowClear // Optional: add a clear button to the input
               enterButton // Adds a search button to the right of the input
               style={{
@@ -302,6 +302,14 @@ const AllOrders = () => {
                 borderColor: "#d9d9d9", // Ant Design default border color
               }}
             />
+            <h2
+              className="text-lg font-bold bg-blue-50 text-blue-800 py-1 mt-3 px-4 rounded-md"
+              style={{
+                display: "inline-block",
+              }}
+            >
+              Total Orders: {filteredDataSource?.length}
+            </h2>
           </div>
         </div>
 

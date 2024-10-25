@@ -108,58 +108,58 @@ const BulkOrders = () => {
       dataIndex: "orderId",
       key: "orderId",
       width: "100px",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
     },
     {
       title: "Brand Name",
       dataIndex: "brandName",
       key: "brandName",
       width: "140px",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.brandName}
             onChange={(e) => handleChange("brandName", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Enrollment",
       dataIndex: "enrollment",
       key: "enrollment",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.enrollment}
             onChange={(e) => handleChange("enrollment", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Manager",
       dataIndex: "managerName",
       key: "managerName",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.managerName}
             onChange={(e) => handleChange("managerName", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
@@ -167,133 +167,133 @@ const BulkOrders = () => {
       dataIndex: "partyName",
       key: "partyName",
       width: "140px",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.partyName}
             onChange={(e) => handleChange("partyName", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Shipping Address",
       dataIndex: "shippingAddress",
       key: "shippingAddress",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.shippingAddress}
             onChange={(e) => handleChange("shippingAddress", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "SKU",
       dataIndex: "sku",
       key: "sku",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.sku}
             onChange={(e) => handleChange("sku", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Size",
       dataIndex: "size",
       key: "size",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.size}
             onChange={(e) => handleChange("size", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Quantity",
       dataIndex: "quantity",
       key: "quantity",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.quantity}
             onChange={(e) => handleChange("quantity", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.price}
             onChange={(e) => handleChange("price", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Total Price",
       dataIndex: "totalPrice",
       key: "totalPrice",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) =>
         editingKey === record._id ? (
           <Input
             value={formData.totalPrice}
             onChange={(e) => handleChange("totalPrice", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{text}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{text}</span> // Apply text-sm text-black class to the text
         ),
     },
     {
       title: "Total Paid Amount",
       dataIndex: "paymentStage",
       key: "totalPaidAmount",
-      className: "text-xs",
+      className: "text-sm text-black",
 
       render: (paymentStage) => getTotalPaidAmount(paymentStage),
     },
     {
       title: "Remaining Amount",
       key: "remainingAmount",
-      className: "text-xs",
+      className: "text-sm text-black",
       render: (record) => {
         const remainingAmount = getRemainingAmount(record);
         if (remainingAmount <= 0) {
@@ -311,7 +311,7 @@ const BulkOrders = () => {
       dataIndex: "dueDate",
       key: "dueDate",
       width: 150,
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) => {
         const formattedDueDate = record.dueDate
@@ -322,17 +322,17 @@ const BulkOrders = () => {
             type="date"
             value={formData.dueDate || formattedDueDate} // Use formatted date
             onChange={(e) => handleChange("dueDate", e.target.value)}
-            className="text-xs" // Apply text-xs class to the input
+            className="text-sm text-black" // Apply text-sm text-black class to the input
           />
         ) : (
-          <span className="text-xs">{formattedDueDate}</span> // Apply text-xs class to the text
+          <span className="text-sm text-black">{formattedDueDate}</span> // Apply text-sm text-black class to the text
         );
       },
     },
     {
       title: "Action",
       key: "action",
-      className: "text-xs", // Apply text-xs class
+      className: "text-sm text-black", // Apply text-sm text-black class
 
       render: (text, record) => {
         if (editingKey === record._id) {
@@ -341,7 +341,7 @@ const BulkOrders = () => {
               type="primary"
               onClick={() => handleSubmitEdit(record)}
               icon={<SaveOutlined />}
-              className="text-xs"
+              className="text-sm text-black"
             >
               Save
             </Button>
@@ -379,7 +379,7 @@ const BulkOrders = () => {
                 setEditingKey(record._id);
               }}
               icon={<EditOutlined />}
-              className="text-xs"
+              className="text-sm text-white"
             ></Button>
             <Popconfirm
               title="Are you sure to delete?"
@@ -389,15 +389,15 @@ const BulkOrders = () => {
                 style={{ background: "red", color: "white" }}
                 danger
                 icon={<DeleteOutlined />}
-                className="text-xs"
+                className="text-sm text-black"
               ></Button>
             </Popconfirm>
             <Button
               type="default"
               onClick={() => handleShowStages(record.paymentStage)}
-              className="text-xs"
+              className="text-sm text-black"
             >
-              Show Payment Stages
+              Payment Stages
             </Button>
           </div>
         );
@@ -408,7 +408,7 @@ const BulkOrders = () => {
   return (
     <AdminLayout>
       <div className="relative max-w-full mx-auto pb-20 z-10">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Bulk Order</h1>
+        <h1 className="text-3xl font-bold text-black-800 mb-4">Bulk Orders</h1>
         <Table
           dataSource={orders} // Display all orders
           columns={columns}

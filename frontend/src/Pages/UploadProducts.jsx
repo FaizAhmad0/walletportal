@@ -192,7 +192,7 @@ const UploadProducts = () => {
             {editingIndex !== null ? "Edit Product" : "Add Product"}
           </h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white text-black text-xs shadow-md rounded-lg border border-gray-200">
+            <table className="min-w-full bg-white text-black text-sm text-black shadow-md rounded-lg border border-gray-200">
               <tbody>
                 <tr>
                   <td className="py-2 px-4 border-b border-gray-200">SKU</td>
@@ -292,7 +292,7 @@ const UploadProducts = () => {
                 <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-gray-600 text-xs font-light">
+            <tbody className="text-gray-600 text-sm text-black ">
               {products.map((product, index) => (
                 <tr
                   key={index}

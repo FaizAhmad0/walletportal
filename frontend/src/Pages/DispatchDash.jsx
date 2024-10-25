@@ -207,70 +207,70 @@ const DispatchDash = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Order Id</span>,
+      title: <span className="text-sm text-black">Order Id</span>,
       dataIndex: "orderId",
       key: "orderId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Enrollment No.</span>,
+      title: <span className="text-sm text-black">Enrollment No.</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">User Amount.</span>,
+      title: <span className="text-sm text-black">User Amount.</span>,
       dataIndex: "amount",
       key: "amount",
       render: (text) => {
         const formattedAmount = Number(text).toFixed(2); // Convert to number and format with 2 decimal places
-        return <span className="text-xs">₹ {formattedAmount}</span>;
+        return <span className="text-sm text-black">₹ {formattedAmount}</span>;
       },
     },
     {
-      title: <span className="text-xs">Amazon Order Id</span>,
+      title: <span className="text-sm text-black">Amazon Order Id</span>,
       dataIndex: "amazonOrderId",
       key: "amazonOrderId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Manager</span>,
+      title: <span className="text-sm text-black">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Delivery Partner</span>,
+      title: <span className="text-sm text-black">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Tracking Id</span>,
+      title: <span className="text-sm text-black">Tracking Id</span>,
       dataIndex: "trackingId",
       key: "trackingId",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">SKU</span>,
+      title: <span className="text-sm text-black">SKU</span>,
       dataIndex: "sku",
       key: "sku",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Pincode</span>,
+      title: <span className="text-sm text-black">Pincode</span>,
       dataIndex: "pincode",
       key: "pincode",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-xs">Amount</span>,
+      title: <span className="text-sm text-black">Amount</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (text) => <span className="text-xs">₹ {text}</span>,
+      render: (text) => <span className="text-sm text-black">₹ {text}</span>,
     },
     {
-      title: <span className="text-xs">Product Status</span>,
+      title: <span className="text-sm text-black">Product Status</span>,
       dataIndex: "items",
       key: "productAction",
       render: (items) => {
@@ -278,20 +278,20 @@ const DispatchDash = () => {
           (item) => item.productAction === "Available"
         );
         return allAvailable ? (
-          <span className="text-xs text-green-500">Available</span>
+          <span className="text-sm text-black text-green-500">Available</span>
         ) : (
-          <span className="text-xs text-red-500">Unavailable</span>
+          <span className="text-sm text-black text-red-500">Unavailable</span>
         );
       },
     },
     {
-      title: <span className="text-xs">Action</span>,
+      title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (_, record) => (
-        <div className="text-xs flex gap-1">
+        <div className="text-sm text-black flex gap-1">
           <Button
             type="primary"
-            className="text-xs"
+            className="text-sm text-white"
             onClick={() =>
               handleRowClick(record.items, record.finalAmount, record._id)
             }
@@ -301,7 +301,7 @@ const DispatchDash = () => {
           {!record.paymentStatus ? (
             <Button
               type="primary"
-              className="text-xs"
+              className="text-sm text-white"
               onClick={() =>
                 handlePaymentClick(
                   record.finalAmount,
@@ -318,7 +318,7 @@ const DispatchDash = () => {
 
           <Button
             type="primary"
-            className="text-xs"
+            className="text-sm text-white"
             style={{ background: "green" }}
             onClick={() =>
               handleArchiveClick(record.items, record.finalAmount, record._id)
@@ -329,7 +329,7 @@ const DispatchDash = () => {
           {role === "shippingmanager" ? (
             <Button
               type="primary"
-              className="text-xs"
+              className="text-sm text-black"
               style={{
                 marginRight: "5px",
                 background: "green",
@@ -345,7 +345,7 @@ const DispatchDash = () => {
             <Button
               disabled={true}
               type="primary"
-              className="text-xs"
+              className="text-sm text-black"
               style={{
                 marginRight: "5px",
                 background: "green",
@@ -544,7 +544,7 @@ const DispatchDash = () => {
         {/* Filter Row */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-6">
           {/* Payment Status */}
-          <div className="flex items-center space-x-3">
+          {/* <div className="flex items-center space-x-3">
             <label
               htmlFor="paymentStatus"
               className="text-sm font-medium text-gray-600"
@@ -556,33 +556,31 @@ const DispatchDash = () => {
               value={paymentStatusFilter}
               style={{ width: 200 }}
               onChange={handlePaymentStatusFilter}
-              className="text-xs"
+              className="text-sm text-black"
               placeholder="Select Status"
               allowClear
             >
-              <Option value="true" className="text-xs">
+              <Option value="true" className="text-sm text-black">
                 Paid
               </Option>
-              <Option value="false" className="text-xs">
+              <Option value="false" className="text-sm text-black">
                 Unpaid
               </Option>
             </Select>
-          </div>
-
+          </div> */}
           {/* Create Order Button */}
-          <div>
+          <div className="pl-4">
             <Link to="/create-order">
               <Button
                 type="primary"
-                className="text-xs md:text-sm font-semibold py-2 px-4"
+                className="text-sm text-white md:text-sm font-semibold py-2 px-4"
               >
                 Create Order
               </Button>
             </Link>
           </div>
-
           {/* Time Filter */}
-          <div className="text-xs">
+          <div className="text-sm text-black">
             <Radio.Group
               buttonStyle="solid"
               onChange={handleTimeFilter}
@@ -594,7 +592,6 @@ const DispatchDash = () => {
               <Radio.Button value="year">This Year</Radio.Button>
             </Radio.Group>
           </div>
-
           {/* Search Bar */}
           <div className="w-full md:w-auto">
             <Search
@@ -602,14 +599,22 @@ const DispatchDash = () => {
               value={searchQuery}
               onChange={handleSearchChange}
               style={{ width: 300 }}
-              className="text-xs md:text-sm"
+              className="text-sm text-black md:text-sm"
               enterButton
             />
           </div>
+          <h2
+            className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md "
+            style={{
+              display: "inline-block",
+            }}
+          >
+            Total Orders: {dataSource?.length}
+          </h2>{" "}
         </div>
 
         {/* Orders Table */}
-        <div className="overflow-x-auto mb-16 text-xs">
+        <div className="overflow-x-auto mb-16 text-sm text-black">
           <Table
             bordered
             columns={columns}
