@@ -5,6 +5,8 @@ import { Modal, Button, Table, message, Select, Radio, Input } from "antd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ArchiveIcon from "@mui/icons-material/Archive";
+import { FilterOutlined } from "@ant-design/icons";
+
 import axios from "axios";
 import moment from "moment"; // Make sure to install moment.js via npm or yarn
 
@@ -15,6 +17,10 @@ const { Search } = Input;
 
 const DispatchDash = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [productStatusFilter, setProductStatusFilter] = useState(null);
+  const handleProductStatusFilter = (value) => {
+    setProductStatusFilter(value);
+  };
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -143,6 +149,8 @@ const DispatchDash = () => {
     // Apply Time Filter
     if (timeFilter !== "") {
       const now = moment();
+      const yesterday = moment().subtract(1, "day"); // Define yesterday once
+
       filtered = filtered
         .map((user) => ({
           ...user,
@@ -151,6 +159,8 @@ const DispatchDash = () => {
             switch (timeFilter) {
               case "today":
                 return orderDate.isSame(now, "day");
+              case "yesterday":
+                return orderDate.isSame(yesterday, "day"); // Compare to yesterday
               case "week":
                 return orderDate.isSame(now, "week");
               case "month":
@@ -172,14 +182,21 @@ const DispatchDash = () => {
           ...user,
           orders: user.orders.filter((order) => {
             const orderId = order.orderId?.toString().toLowerCase() || "";
+            const sku = order.sku?.toString().toLowerCase() || "";
             const enrollment = user.enrollment?.toString().toLowerCase() || "";
+            const manager = user.manager?.toString().toLowerCase() || "";
             const amazonOrderId =
               order.items[0]?.amazonOrderId?.toString().toLowerCase() || "N/A";
+            const trackingId =
+              order.items[0]?.trackingId?.toString().toLowerCase() || "N/A";
 
             return (
               orderId.includes(searchQuery.toLowerCase()) ||
               enrollment.includes(searchQuery.toLowerCase()) ||
-              amazonOrderId.includes(searchQuery.toLowerCase())
+              manager.includes(searchQuery.toLowerCase()) ||
+              amazonOrderId.includes(searchQuery.toLowerCase()) ||
+              trackingId.includes(searchQuery.toLowerCase()) ||
+              sku.includes(searchQuery.toLowerCase())
             );
           }),
         }))
@@ -270,9 +287,44 @@ const DispatchDash = () => {
       render: (text) => <span className="text-sm text-black">₹ {text}</span>,
     },
     {
-      title: <span className="text-sm text-black">Product Status</span>,
+      title: (
+        <span className="text-sm text-black">
+          Product Status
+          <span style={{ marginLeft: 5 }}>
+            <Button
+              type="link"
+              icon={<FilterOutlined />}
+              onClick={() =>
+                setProductStatusFilter(productStatusFilter ? null : "")
+              }
+              style={{ padding: 0 }}
+            />
+          </span>
+        </span>
+      ),
       dataIndex: "items",
       key: "productAction",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Radio.Group
+            value={selectedKeys[0]}
+            onChange={(e) => {
+              setSelectedKeys(e.target.value ? [e.target.value] : []);
+              handleProductStatusFilter(e.target.value);
+              confirm();
+            }}
+          >
+            <Radio value="Available">Available</Radio>
+            <Radio value="Unavailable">Unavailable</Radio>
+          </Radio.Group>
+        </div>
+      ),
+      onFilter: (value, record) => {
+        const allAvailable = record.items.every(
+          (item) => item.productAction === "Available"
+        );
+        return value === "Available" ? allAvailable : !allAvailable;
+      },
       render: (items) => {
         const allAvailable = items.every(
           (item) => item.productAction === "Available"
@@ -316,7 +368,7 @@ const DispatchDash = () => {
             <></>
           )}
 
-          <Button
+          {/* <Button
             type="primary"
             className="text-sm text-white"
             style={{ background: "green" }}
@@ -325,8 +377,8 @@ const DispatchDash = () => {
             }
           >
             <ArchiveIcon style={{ fontSize: "16px" }} />
-          </Button>
-          {role === "shippingmanager" ? (
+          </Button> */}
+          {/* {role === "shippingmanager" ? (
             <Button
               type="primary"
               className="text-sm text-black"
@@ -357,7 +409,7 @@ const DispatchDash = () => {
             >
               Shipped
             </Button>
-          )}
+          )} */}
           <Button
             type="primary"
             onClick={() =>
@@ -536,16 +588,15 @@ const DispatchDash = () => {
 
   return (
     <DispatchLayout>
-      <div className="relative max-w-7xl mx-auto bg-white shadow-md rounded-lg">
+      <div className="relative w-full lg:max-w-full mx-auto bg-white shadow-md rounded-lg">
         <div className="w-full pb-2 px-4 mb-3 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
           <h1 className="text-2xl pt-4 font-bold text-white">
             Dispatch Dashboard
           </h1>
-        </div>{" "}
+        </div>
         {/* Filter Row */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-6">
-          {/* Payment Status */}
-          {/* <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <label
               htmlFor="paymentStatus"
               className="text-sm font-medium text-gray-600"
@@ -555,7 +606,7 @@ const DispatchDash = () => {
             <Select
               id="paymentStatus"
               value={paymentStatusFilter}
-              style={{ width: 200 }}
+              style={{ width: 100 }}
               onChange={handlePaymentStatusFilter}
               className="text-sm text-black"
               placeholder="Select Status"
@@ -568,13 +619,13 @@ const DispatchDash = () => {
                 Unpaid
               </Option>
             </Select>
-          </div> */}
+          </div>
           {/* Create Order Button */}
           <div className="pl-4">
             <Link to="/create-order">
               <Button
                 type="primary"
-                className="text-sm text-white md:text-sm font-semibold py-2 px-4"
+                className="text-sm text-white md:text-sm font-semibold py-2"
               >
                 Create Order
               </Button>
@@ -587,31 +638,34 @@ const DispatchDash = () => {
               onChange={handleTimeFilter}
               value={timeFilter}
             >
+              <Radio.Button value="yesterday">Yesterday</Radio.Button>{" "}
+              {/* New option added */}
               <Radio.Button value="today">Today</Radio.Button>
               <Radio.Button value="week">This Week</Radio.Button>
               <Radio.Button value="month">This Month</Radio.Button>
               <Radio.Button value="year">This Year</Radio.Button>
             </Radio.Group>
           </div>
+
           {/* Search Bar */}
           <div className="w-full md:w-auto">
             <Search
               placeholder="Search by Order ID, Enrollment No., Amazon Order ID"
               value={searchQuery}
               onChange={handleSearchChange}
-              style={{ width: 300 }}
+              style={{ width: 150 }}
               className="text-sm text-black md:text-sm"
               enterButton
             />
           </div>
           <h2
-            className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md "
+            className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md"
             style={{
               display: "inline-block",
             }}
           >
             Total Orders: {dataSource?.length}
-          </h2>{" "}
+          </h2>
         </div>
         {/* Orders Table */}
         <div className="overflow-x-auto mb-16 text-sm text-black">

@@ -156,6 +156,11 @@ const AdminLayout = ({ children }) => {
               label: "View Orders",
             },
             {
+              key: "/admin-order-reports",
+              icon: <GridViewIcon />,
+              label: "Order Report",
+            },
+            {
               key: "/wallet-action",
               icon: <AccountBalanceWalletIcon />,
               label: "Wallet Action",

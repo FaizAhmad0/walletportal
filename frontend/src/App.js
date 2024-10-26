@@ -26,7 +26,6 @@ import AllOrders from "./Pages/AllOrders";
 import WalletAction from "./Pages/WalletAction";
 import InvoicePage from "./Pages/InvoicePage";
 import RegisterManager from "./Pages/RegisterManager";
-import AdminLayout from "./Layout/AdminLayout";
 import AdminReport from "./Pages/AdminReport";
 import BulkOrder from "./Pages/BulkOrder";
 import ArchivedOrders from "./Pages/ArchivedOrders";
@@ -38,6 +37,7 @@ import AuditReport from "./Pages/AuditReport";
 import AddManagerClient from "./Pages/AddManagerClient";
 import AccountantDash from "./Pages/AccountantDash";
 import AdminDetailsReporting from "./Pages/AdminDetailsReporting";
+import AdminOrdersReport from "./Pages/AdminOrdersReport";
 function App() {
   return (
     <>
@@ -83,11 +83,15 @@ function App() {
           <Route path="/add-user" element={<AddManagerClient />} />
           <Route path="/create-manager" element={<RegisterManager />} />
           <Route path="/admin-report" element={<AdminReport />} />
+          <Route path="/admin-order-reports" element={<AdminOrdersReport />} />
           <Route path="/shippingmanager-dash" element={<ShippingDash />} />
           <Route path="/shipped" element={<ShippedOrders />} />
           <Route path="/audit-report" element={<AuditReport />} />
           <Route path="/accountant-dash" element={<AccountantDash />} />
-          <Route path="/admin-details-reporting" element={<AdminDetailsReporting />} />
+          <Route
+            path="/admin-details-reporting"
+            element={<AdminDetailsReporting />}
+          />
         </Routes>
       </Router>
     </>

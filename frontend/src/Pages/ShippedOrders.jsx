@@ -35,11 +35,14 @@ const ShippedOrders = () => {
 
   const filterOrdersByDate = (order) => {
     const orderDate = moment(order.createdAt);
-    const today = moment();
+    const today = moment().startOf("day"); // Start of today
+    const yesterday = moment().subtract(1, "day").startOf("day"); // Start of yesterday
 
     switch (filter) {
       case "today":
         return orderDate.isSame(today, "day");
+      case "yesterday":
+        return orderDate.isSame(yesterday, "day");
       case "week":
         return orderDate.isSame(today, "week");
       case "month":
@@ -192,6 +195,7 @@ const ShippedOrders = () => {
             onChange={(e) => setFilter(e.target.value)}
           >
             <Radio.Button value="all">All</Radio.Button>
+            <Radio.Button value="yesterday">Yesterday</Radio.Button>{" "}
             <Radio.Button value="today">Today</Radio.Button>
             <Radio.Button value="week">This Week</Radio.Button>
             <Radio.Button value="month">This Month</Radio.Button>

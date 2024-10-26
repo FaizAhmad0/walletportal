@@ -55,6 +55,26 @@ const ShippingDash = () => {
   useEffect(() => {
     getOrders();
   }, []);
+  const handleSaveClick = async () => {
+    try {
+      console.log(editValues);
+      await axios.put(
+        `${backendUrl}/orders/update/${editingItem}`,
+        editValues,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      message.success("Order updated successfully!");
+      getOrders();
+      setEditingItem(null); // Exit editing mode
+    } catch (error) {
+      console.error("Error updating order:", error);
+      message.error("Failed to update order. Please try again.");
+    }
+  };
 
   const filterOrders = () => {
     let filtered = [...orders];
@@ -73,6 +93,8 @@ const ShippingDash = () => {
     // Apply Time Filter
     if (timeFilter !== "") {
       const now = moment();
+      const yesterday = moment().subtract(1, "day"); // Define yesterday once
+
       filtered = filtered
         .map((user) => ({
           ...user,
@@ -81,6 +103,8 @@ const ShippingDash = () => {
             switch (timeFilter) {
               case "today":
                 return orderDate.isSame(now, "day");
+              case "yesterday":
+                return orderDate.isSame(yesterday, "day"); // Compare to yesterday
               case "week":
                 return orderDate.isSame(now, "week");
               case "month":
@@ -227,9 +251,8 @@ const ShippingDash = () => {
             </Button>
           ) : (
             <Button
-              disabled={true}
               type="primary"
-              className="text-sm text-black"
+              className="text-sm text-white"
               onClick={() =>
                 handleRowClick(record.items, record.finalAmount, record._id)
               }
@@ -293,7 +316,7 @@ const ShippingDash = () => {
               </Button>
             </Tooltip>
           )}
-          <Button
+          {/* <Button
             type="primary"
             onClick={() =>
               showDeleteConfirm(
@@ -306,7 +329,7 @@ const ShippingDash = () => {
             style={{ background: "red" }}
           >
             <DeleteOutlineIcon style={{ fontSize: "16px" }} />
-          </Button>
+          </Button> */}
         </div>
       ),
     },
@@ -405,6 +428,7 @@ const ShippingDash = () => {
         }
       );
       message.success("Order shipped successfully!");
+      setSearchQuery("");
       getOrders();
     } catch (error) {
       console.error("Error in order shipping:", error);
@@ -432,6 +456,52 @@ const ShippingDash = () => {
     } catch (error) {
       console.error("Error deleting order:", error);
       message.error("Could not delete order. Please try again.");
+    }
+  };
+  const handleChange = (e) => {
+    setEditValues({
+      ...editValues,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedOrderItems([]);
+    setSelectedOrderAmount(0);
+    setSelectedOrderId("");
+    setEditingItem(null); // Reset editing item
+  };
+  const handleEditClick = (item) => {
+    setEditingItem(item._id);
+    // Populate the form with the item details
+    setEditValues({
+      amazonOrderId: item.amazonOrderId,
+      trackingId: item.trackingId,
+      sku: item.sku,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      pincode: item.pincode,
+      shippingPartner: item.shippingPartner,
+      totalPrice: item.totalPrice,
+    });
+  };
+  const handleMarkAvailableClick = async (id) => {
+    try {
+      await axios.put(
+        `${backendUrl}/orders/markavailable/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      message.success("Item marked as available successfully!");
+      getOrders();
+    } catch (error) {
+      console.error("Error marking item as available:", error);
+      message.error("Failed to mark item as available. Please try again.");
     }
   };
 
@@ -472,6 +542,7 @@ const ShippingDash = () => {
                   onChange={handleTimeFilter}
                   value={timeFilter}
                 >
+                  <Radio.Button value="yesterday">Yesterday</Radio.Button>{" "}
                   <Radio.Button value="today">Today</Radio.Button>
                   <Radio.Button value="week">This Week</Radio.Button>
                   <Radio.Button value="month">This Month</Radio.Button>
@@ -511,6 +582,173 @@ const ShippingDash = () => {
             scroll={{ x: "max-content" }}
           />
         </div>
+        <Modal
+          title="Order Details"
+          visible={isModalVisible}
+          onCancel={handleModalClose}
+          footer={[
+            <Button key="close" onClick={handleModalClose}>
+              Close
+            </Button>,
+            editingItem && (
+              <Button key="save" type="primary" onClick={handleSaveClick}>
+                Save
+              </Button>
+            ),
+          ]}
+          className="rounded-lg"
+        >
+          <ul className="space-y-6">
+            {selectedOrderItems.map((item, index) => (
+              <li key={index} className="text-sm pb-6">
+                {editingItem === item._id ? (
+                  <>
+                    <label className="block mb-2 font-semibold">
+                      Amazon Order ID:
+                    </label>
+                    <Input
+                      name="amazonOrderId"
+                      value={editValues.amazonOrderId || ""}
+                      onChange={handleChange}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">
+                      Tracking ID:
+                    </label>
+                    <Input
+                      name="trackingId"
+                      value={editValues.trackingId || ""}
+                      onChange={handleChange}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">SKU:</label>
+                    <Input
+                      name="sku"
+                      value={editValues.sku || ""}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">Name:</label>
+                    <Input
+                      name="name"
+                      value={editValues.name || ""}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">Price:</label>
+                    <Input
+                      name="price"
+                      value={editValues.price || ""}
+                      type="number"
+                      onChange={handleChange}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">
+                      Quantity:
+                    </label>
+                    <Input
+                      name="quantity"
+                      value={editValues.quantity || ""}
+                      onChange={handleChange}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">Pincode:</label>
+                    <Input
+                      name="pincode"
+                      value={editValues.pincode || ""}
+                      onChange={handleChange}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">
+                      Shipping Partner:
+                    </label>
+                    <Input
+                      name="shippingPartner"
+                      value={editValues.shippingPartner || ""}
+                      onChange={handleChange}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">
+                      Total Price:
+                    </label>
+                    <Input
+                      name="totalPrice"
+                      value={editValues.totalPrice || ""}
+                      type="number"
+                      onChange={handleChange}
+                      className="mb-3"
+                    />
+                    <label className="block mb-2 font-semibold">
+                      Product Availability:
+                    </label>
+                    <Select
+                      name="productAction"
+                      placeholder="Select product status"
+                      value={editValues.productAction || "Available"}
+                      onChange={(value) =>
+                        setEditValues({ ...editValues, productAction: value })
+                      }
+                      className="mb-3"
+                    >
+                      <Option value="Available">Available</Option>
+                      <Option value="Product not available">
+                        Product not available
+                      </Option>
+                    </Select>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      <strong>Amazon Order ID:</strong> {item.amazonOrderId}
+                    </p>
+                    <p>
+                      <strong>Tracking ID:</strong> {item.trackingId}
+                    </p>
+                    <p>
+                      <strong>SKU:</strong> {item.sku}
+                    </p>
+                    <p>
+                      <strong>Name:</strong> {item.name}
+                    </p>
+                    <p>
+                      <strong>Price:</strong> {item.price}
+                    </p>
+                    <p>
+                      <strong>Quantity:</strong> {item.quantity}
+                    </p>
+                    <p>
+                      <strong>Pincode:</strong> {item.pincode}
+                    </p>
+                    <p>
+                      <strong>Delivery Partner:</strong> {item.shippingPartner}
+                    </p>
+                    <p>
+                      <strong>Total Price:</strong> {item.totalPrice}
+                    </p>
+                    <p>
+                      <strong>Product Availability:</strong>{" "}
+                      {item.productAction}
+                    </p>
+                    <Button
+                      type="primary"
+                      onClick={() => handleEditClick(item)}
+                      className="mt-4"
+                    >
+                      Edit
+                    </Button>
+                    {item.productAction !== "Available" && (
+                      <Button
+                        type="primary"
+                        className="ml-4 mt-4"
+                        onClick={() => handleMarkAvailableClick(item._id)}
+                      >
+                        Mark Available
+                      </Button>
+                    )}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Modal>
       </div>
     </ShippingLayout>
   );

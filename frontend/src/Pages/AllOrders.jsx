@@ -36,10 +36,13 @@ const AllOrders = () => {
           const filteredUserOrders = user.orders.filter((order) => {
             const orderDate = dayjs(order.createdAt);
             const now = dayjs();
+            const yesterday = now.subtract(1, "day").startOf("day");
 
             // Date filtering logic
             if (filter === "today") {
               return orderDate.isSame(now, "day");
+            } else if (filter === "yesterday") {
+              return orderDate.isSame(yesterday, "day");
             } else if (filter === "week") {
               return orderDate.isSame(now, "week");
             } else if (filter === "month") {
@@ -282,6 +285,7 @@ const AllOrders = () => {
             className="bg-gray-100 p-2 rounded-md shadow-sm"
           >
             <Radio.Button value="all">All</Radio.Button>
+            <Radio.Button value="yesterday">Yesterday</Radio.Button>{" "}
             <Radio.Button value="today">Today</Radio.Button>
             <Radio.Button value="week">This Week</Radio.Button>
             <Radio.Button value="month">This Month</Radio.Button>
