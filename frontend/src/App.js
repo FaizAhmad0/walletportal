@@ -38,6 +38,8 @@ import AddManagerClient from "./Pages/AddManagerClient";
 import AccountantDash from "./Pages/AccountantDash";
 import AdminDetailsReporting from "./Pages/AdminDetailsReporting";
 import AdminOrdersReport from "./Pages/AdminOrdersReport";
+import TotalSale from "./Pages/TotalSale";
+import SpecificDayOrder from "./Pages/SpecificDayOrder";
 function App() {
   return (
     <>
@@ -84,6 +86,8 @@ function App() {
           <Route path="/create-manager" element={<RegisterManager />} />
           <Route path="/admin-report" element={<AdminReport />} />
           <Route path="/admin-order-reports" element={<AdminOrdersReport />} />
+          <Route path="/total-sale" element={<TotalSale />} />
+          <Route path="/orders/:date" element={<SpecificDayOrder />} />
           <Route path="/shippingmanager-dash" element={<ShippingDash />} />
           <Route path="/shipped" element={<ShippedOrders />} />
           <Route path="/audit-report" element={<AuditReport />} />

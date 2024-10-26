@@ -10,9 +10,13 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GridViewIcon from "@mui/icons-material/GridView";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoIcon from "@mui/icons-material/Info";
+import ViewInArIcon from "@mui/icons-material/ViewInAr";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+
 const { Header, Sider, Content } = Layout;
 
 const AdminLayout = ({ children }) => {
@@ -142,17 +146,17 @@ const AdminLayout = ({ children }) => {
             },
             {
               key: "/view-clients",
-              icon: <GridViewIcon />,
+              icon: <AccountCircleIcon />,
               label: "View Clients",
             },
             {
               key: "/view-managers",
-              icon: <GridViewIcon />,
+              icon: <ManageAccountsIcon />,
               label: "View Managers",
             },
             {
               key: "/view-all-orders",
-              icon: <GridViewIcon />,
+              icon: <ViewInArIcon />,
               label: "View Orders",
             },
             {

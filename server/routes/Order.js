@@ -21,6 +21,7 @@ const bulkDelete = require("../controller/bulkDelete");
 const getUserBulkOrder = require("../controller/getUserBulkOrder");
 const getAllBulkOrder = require("../controller/getAllBulkOrder");
 const payBulkOrder = require("../controller/payBulkOrder");
+const getOrderByDate = require("../controller/getOrderByDate");
 const router = express.Router();
 router.post("/bulkorder", bulkOrder);
 router.get("/getbulkorder/:manager", getManagerBulkOrder);
@@ -29,6 +30,7 @@ router.delete("/bulkdelete/:id",bulkDelete);
 router.get("/getuserbulk/:user",getUserBulkOrder);
 router.get("/getallbulk",getAllBulkOrder);
 router.post("/bulkorder/pay", payBulkOrder);
+router.get("/getOrdersByDate", getOrderByDate);
 
 router.post("/payorder");
 router.post("/:enrollment", addProduct);

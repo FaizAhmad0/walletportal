@@ -238,8 +238,11 @@ const AllClients = () => {
   ];
 
   // Filter clients based on search query
-  const filteredClients = clients.filter((client) =>
-    client.enrollment.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredClients = clients.filter(
+    (client) =>
+      client.enrollment.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (

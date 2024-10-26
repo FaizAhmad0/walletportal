@@ -65,25 +65,6 @@ const AdminOrdersReport = () => {
     }
   };
 
-  const handleMarkAvailableClick = async (id) => {
-    try {
-      await axios.put(
-        `${backendUrl}/orders/markavailable/${id}`,
-        {},
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-      message.success("Item marked as available successfully!");
-      getOrders();
-    } catch (error) {
-      console.error("Error marking item as available:", error);
-      message.error("Failed to mark item as available. Please try again.");
-    }
-  };
-
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
   };
