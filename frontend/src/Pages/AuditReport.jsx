@@ -11,6 +11,7 @@ const AuditReport = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [managers, setManagers] = useState([]);
+  console.log(managers);
   const [totalSales, setTotalSales] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [hoveredCard, setHoveredCard] = useState(null);

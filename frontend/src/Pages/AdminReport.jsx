@@ -203,6 +203,7 @@ const AdminReport = () => {
               },
             ]}
             pagination={false}
+            scroll={{ x: true }}
             rowKey="enrollment"
             className="rounded-lg shadow-sm text-sm text-black"
           />

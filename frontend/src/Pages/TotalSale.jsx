@@ -126,7 +126,7 @@ const TotalSale = () => {
       render: (text) => dayjs(text).format("DD/MM/YYYY"),
     },
     {
-      title: "Total Items",
+      title: "Total Orders",
       dataIndex: "totalItems",
       key: "totalItems",
     },
@@ -186,6 +186,7 @@ const TotalSale = () => {
           <Skeleton active paragraph={{ rows: 11 }} />
         ) : (
           <Table
+            bordered
             columns={reportColumns}
             dataSource={dailyReportData}
             pagination={false}
