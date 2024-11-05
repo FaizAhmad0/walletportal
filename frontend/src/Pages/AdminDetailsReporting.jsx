@@ -344,7 +344,7 @@ const AdminDetailsReporting = () => {
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <div className="grid grid-cols-2 gap-4">
             <button
-              className="w-full p-4 bg-yellow-100 rounded-lg hover:bg-yellow-200 active:bg-yellow-300 transition duration-150 ease-in-out"
+              className="w-full p-4 bg-gradient-to-r from-yellow-100 to-yellow-300 rounded-lg hover:bg-yellow-200 active:bg-yellow-300 transition duration-150 ease-in-out"
               onClick={() => filterOrders("paymentStatus")}
             >
               <p className="text-lg font-medium text-yellow-800">
@@ -353,7 +353,7 @@ const AdminDetailsReporting = () => {
             </button>
 
             <button
-              className="w-full p-4 bg-green-100 rounded-lg hover:bg-green-200 active:bg-green-300 transition duration-150 ease-in-out"
+              className="w-full p-4 bg-gradient-to-r from-green-100 to-green-300 rounded-lg hover:bg-green-200 active:bg-green-300 transition duration-150 ease-in-out"
               onClick={() => filterOrders("productNotAvailable")}
             >
               <p className="text-lg font-medium text-green-800">
@@ -364,13 +364,13 @@ const AdminDetailsReporting = () => {
           <br />
 
           <div className="grid grid-cols-2 gap-4">
-            <button className="w-full p-4 bg-blue-100 rounded-lg hover:bg-blue-200 active:bg-blue-300 transition duration-150 ease-in-out">
+            <button className="w-full p-4 bg-gradient-to-r from-blue-100 to-blue-300 rounded-lg hover:bg-blue-200 active:bg-blue-300 transition duration-150 ease-in-out">
               <p className="text-lg font-medium text-blue-800">
                 Total Orders - {totalOrdersCount}
               </p>
             </button>
 
-            <button className="w-full p-4 bg-red-100 rounded-lg hover:bg-red-200 active:bg-red-300 transition duration-150 ease-in-out">
+            <button className="w-full p-4 bg-gradient-to-r from-red-100 to-red-300 rounded-lg hover:bg-red-200 active:bg-red-300 transition duration-150 ease-in-out">
               <p className="text-lg font-medium text-red-800">
                 Total Orders Hold - {totalOrdersHold}
               </p>

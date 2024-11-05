@@ -110,11 +110,7 @@ const DispatchLayout = ({ children }) => {
               icon: <SignalCellularAltIcon />,
               label: "Bulk-Order",
             },
-            {
-              key: "/details-reporting",
-              icon: <SignalCellularAltIcon />,
-              label: "Details Reporting",
-            },
+
             {
               key: "/dispatch-wallet-action",
               icon: <AccountBalanceWalletIcon />,
@@ -134,6 +130,11 @@ const DispatchLayout = ({ children }) => {
               key: "/shipped-orders",
               icon: <LocalShippingIcon />,
               label: "Shipped",
+            },
+            {
+              key: "/details-reporting",
+              icon: <SignalCellularAltIcon />,
+              label: "Details Reporting",
             },
 
             {
