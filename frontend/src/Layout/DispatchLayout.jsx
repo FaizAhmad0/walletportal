@@ -9,6 +9,9 @@ import LocalMallIcon from "@mui/icons-material/LocalMall";
 import LockIcon from "@mui/icons-material/Lock";
 import logoExpanded from "../assets/logo2.png";
 import logoCollapsed from "../assets/Logoratan.png";
+import ViewInArIcon from "@mui/icons-material/ViewInAr";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -111,6 +114,16 @@ const DispatchLayout = ({ children }) => {
               key: "/details-reporting",
               icon: <SignalCellularAltIcon />,
               label: "Details Reporting",
+            },
+            {
+              key: "/dispatch-wallet-action",
+              icon: <AccountBalanceWalletIcon />,
+              label: "Wallet Action",
+            },
+            {
+              key: "/dispatch-order-report",
+              icon: <ViewInArIcon />,
+              label: "Order Report",
             },
             {
               key: "/archive-orders",

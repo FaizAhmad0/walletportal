@@ -323,8 +323,13 @@ const AdminDetailsReporting = () => {
   return (
     <AdminLayout>
       <div className="relative max-w-7xl mx-auto pb-20 min-h-screen">
+        <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Order detail report
+          </h1>
+        </div>{" "}
         {/* Date Filter */}
-        <div className="mb-4">
+        <div>
           <label htmlFor="date-picker" className="mr-2 text-black text-sm">
             Filter By Date:
           </label>
@@ -336,11 +341,6 @@ const AdminDetailsReporting = () => {
             className="border border-gray-300 rounded-md shadow-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
           />
         </div>
-
-        {/* Manager Performance Dashboard */}
-        <h1 className="text-3xl font-bold text-center text-black-800 mb-1">
-          Manager Performance Dashboard
-        </h1>
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <div className="grid grid-cols-2 gap-4">
             <button
@@ -377,7 +377,6 @@ const AdminDetailsReporting = () => {
             </button>
           </div>
         </div>
-
         {/* Display Filtered Orders */}
         <div className="overflow-x-auto mb-16 text-sm text-black">
           <Table

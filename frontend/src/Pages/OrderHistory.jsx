@@ -114,13 +114,6 @@ const OrderHistory = () => {
 
   const orderColumns = [
     {
-      title: <span className="text-sm text-black">Order ID</span>,
-      dataIndex: "orderId",
-      key: "orderId",
-      width: 150,
-      render: (text) => <span className="text-sm text-black">{text}</span>,
-    },
-    {
       title: <span className="text-sm text-black">Date</span>,
       dataIndex: "createdAt",
       key: "createdAt",
@@ -133,6 +126,13 @@ const OrderHistory = () => {
         );
       },
       width: 150,
+    },
+    {
+      title: <span className="text-sm text-black">Order ID</span>,
+      dataIndex: "orderId",
+      key: "orderId",
+      width: 150,
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
       title: <span className="text-sm text-black">Total Price</span>,

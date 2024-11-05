@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Radio, Skeleton } from "antd"; // Import Skeleton
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
+import dayjs from "dayjs";
 import moment from "moment"; // Import moment.js
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -83,10 +84,14 @@ const ArchivedOrders = () => {
   // Column definitions for the Ant Design Table
   const columns = [
     {
-      title: <span className="text-sm text-black">Order Id</span>,
-      dataIndex: "orderId",
-      key: "orderId",
-      render: (text) => <span className="text-sm text-black">{text}</span>,
+      title: <span className="text-sm text-black">Date</span>,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
+      ),
     },
     {
       title: <span className="text-sm text-black">Name</span>,
@@ -182,6 +187,14 @@ const ArchivedOrders = () => {
               <Radio.Button value="month">This Month</Radio.Button>
               <Radio.Button value="year">This Year</Radio.Button>
             </Radio.Group>
+            <h2
+              className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md"
+              style={{
+                display: "inline-block",
+              }}
+            >
+              Total Orders: {dataSource?.length}
+            </h2>
           </div>
           <Table
             bordered

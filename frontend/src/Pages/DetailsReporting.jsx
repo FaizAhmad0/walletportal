@@ -177,10 +177,14 @@ const DetailsReporting = () => {
   };
   const columns = [
     {
-      title: <span className="text-sm text-black">Order Id</span>,
-      dataIndex: "orderId",
-      key: "orderId",
-      render: (text) => <span className="text-sm text-black">{text}</span>,
+      title: <span className="text-sm text-black">Date</span>,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
+      ),
     },
     {
       title: <span className="text-sm text-black">Enrollment No.</span>,
@@ -338,8 +342,13 @@ const DetailsReporting = () => {
   return (
     <DispatchLayout>
       <div className="relative max-w-7xl mx-auto pb-20 min-h-screen">
+        <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
+          <h1 className="text-2xl pt-4 font-bold text-white">
+            Order detail report
+          </h1>
+        </div>{" "}
         {/* Date Filter */}
-        <div className="mb-4">
+        <div className>
           <label htmlFor="date-picker" className="mr-2 text-black">
             Filter By Date:
           </label>
@@ -350,11 +359,6 @@ const DetailsReporting = () => {
             placeholder="Select Date"
           />
         </div>
-
-        {/* Manager Performance Dashboard */}
-        <h1 className="text-3xl font-bold text-center text-black-800 mb-1">
-          Manager Performance Dashboard
-        </h1>
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <div className="grid grid-cols-2 gap-4">
             <button
@@ -391,7 +395,6 @@ const DetailsReporting = () => {
             </button>
           </div>
         </div>
-
         <div className="overflow-x-auto mb-16 text-sm text-black">
           <Table
             bordered

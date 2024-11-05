@@ -147,7 +147,6 @@ const ManagerReport = () => {
     setFilteredOrders(filtered); // Update the filtered orders state
     setIsModalVisible(true); // Show the modal with filtered orders
 
-    // Scroll to the modal
     setTimeout(() => {
       if (modalRef.current) {
         modalRef.current.scrollIntoView({ behavior: "smooth" });
@@ -269,14 +268,17 @@ const ManagerReport = () => {
 
   return (
     <ManagerLayout>
-      <div className="relative max-w-7xl mx-auto p-6 pb-20 min-h-screen">
+      <div className="relative max-w-7xl mx-auto pb-6 pb-20 min-h-screen">
         <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
           <h1 className="text-2xl pt-4 font-bold text-white">
             Manager Performance Dashboard
           </h1>
         </div>{" "}
         <div className="mb-4">
-          <label htmlFor="date-picker" className="mr-2">
+          <label
+            htmlFor="date-picker"
+            className="mr-2 font-semibold text-gray-700"
+          >
             Filter By Date:
           </label>
           <DatePicker
@@ -284,6 +286,7 @@ const ManagerReport = () => {
             format="YYYY-MM-DD"
             onChange={handleDateChange}
             placeholder="Select Date"
+            style={{ width: "100%", maxWidth: "200px" }}
           />
         </div>
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
@@ -328,9 +331,6 @@ const ManagerReport = () => {
             ref={modalRef}
             className="bg-white shadow-md rounded-lg p-6 mb-8"
           >
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center underline">
-              Filtered Orders
-            </h2>
             {filteredOrders.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="table-auto w-full text-left border-collapse">
@@ -345,8 +345,15 @@ const ManagerReport = () => {
                   <tbody>
                     {filteredOrders.map((order, index) => (
                       <tr key={index} className="border-t">
-                        <td className="px-4 py-2 font-semibold">
-                          {order.orderId}
+                        <td className="px-4 py-2">
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            }
+                          )}
                         </td>
                         <td className="px-4 py-2">
                           <span

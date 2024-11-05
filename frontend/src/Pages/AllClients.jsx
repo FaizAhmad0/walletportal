@@ -213,7 +213,7 @@ const AllClients = () => {
             type="primary"
             onClick={() => showAssignModal(client)}
           >
-            Assign
+            Asign
           </Button>
           <Button
             className="text-sm text-black"

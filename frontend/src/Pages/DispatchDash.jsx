@@ -6,7 +6,7 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import { FilterOutlined } from "@ant-design/icons";
-
+import dayjs from "dayjs";
 import axios from "axios";
 import moment from "moment"; // Make sure to install moment.js via npm or yarn
 
@@ -224,10 +224,14 @@ const DispatchDash = () => {
 
   const columns = [
     {
-      title: <span className="text-sm text-black">Order Id</span>,
-      dataIndex: "orderId",
-      key: "orderId",
-      render: (text) => <span className="text-sm text-black">{text}</span>,
+      title: <span className="text-sm text-black">Date</span>,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
+      ),
     },
     {
       title: <span className="text-sm text-black">Enrollment No.</span>,
@@ -368,7 +372,7 @@ const DispatchDash = () => {
             <></>
           )}
 
-          {/* <Button
+          <Button
             type="primary"
             className="text-sm text-white"
             style={{ background: "green" }}
@@ -377,7 +381,7 @@ const DispatchDash = () => {
             }
           >
             <ArchiveIcon style={{ fontSize: "16px" }} />
-          </Button> */}
+          </Button>
           {/* {role === "shippingmanager" ? (
             <Button
               type="primary"

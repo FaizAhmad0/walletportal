@@ -40,6 +40,8 @@ import AdminDetailsReporting from "./Pages/AdminDetailsReporting";
 import AdminOrdersReport from "./Pages/AdminOrdersReport";
 import TotalSale from "./Pages/TotalSale";
 import SpecificDayOrder from "./Pages/SpecificDayOrder";
+import DispatchOrdersReport from "./Pages/DispatchOrdersReport";
+import DispatchWalletAction from "./Pages/DispatchWalletAction";
 function App() {
   return (
     <>
@@ -92,6 +94,14 @@ function App() {
           <Route path="/shipped" element={<ShippedOrders />} />
           <Route path="/audit-report" element={<AuditReport />} />
           <Route path="/accountant-dash" element={<AccountantDash />} />
+          <Route
+            path="/dispatch-order-report"
+            element={<DispatchOrdersReport />}
+          />
+          <Route
+            path="/dispatch-wallet-action"
+            element={<DispatchWalletAction />}
+          />
           <Route
             path="/admin-details-reporting"
             element={<AdminDetailsReporting />}

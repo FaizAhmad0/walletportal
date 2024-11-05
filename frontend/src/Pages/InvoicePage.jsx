@@ -233,7 +233,7 @@ const InvoicePage = () => {
             <Title level={4}>Terms & Conditions</Title>
             <Text>Online download only. No physical delivery.</Text>
             <br />
-            <Text>Thank you for your business!</Text>
+            <Text>Thank you for your order!</Text>
           </Col>
 
           <Col span={12} style={{ textAlign: "right" }}>

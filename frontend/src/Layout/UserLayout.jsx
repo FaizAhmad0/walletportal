@@ -66,7 +66,6 @@ const UserLayout = ({ children }) => {
     };
   }, [isMobile]);
 
-
   const handleMenuClick = ({ key }) => {
     if (key === "/") {
       localStorage.removeItem("name");
@@ -136,7 +135,7 @@ const UserLayout = ({ children }) => {
               label: "Wallet",
             },
             { key: "/tiar", icon: <SignalCellularAltIcon />, label: "Tiar" },
-            { key: "/bod", icon: <LocalMallIcon />, label: "BOD/FBA" },
+            { key: "/bod", icon: <LocalMallIcon />, label: "Bulk Order" },
             {
               key: "https://support.saumiccraft.com",
               icon: <SupportAgentIcon />,

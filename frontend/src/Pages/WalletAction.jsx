@@ -183,7 +183,6 @@ const WalletAction = () => {
             Manage Client's Wallet
           </h1>
         </div>
-
         {/* Search Input */}
         <div className="my-4 flex justify-between items-center">
           <Search
@@ -194,7 +193,6 @@ const WalletAction = () => {
             className="shadow-md rounded-md"
           />
         </div>
-
         {/* Clients Table */}
         <Table
           columns={columns}
@@ -204,7 +202,6 @@ const WalletAction = () => {
           bordered
           className="wallet-table shadow-sm rounded-lg"
         />
-
         {/* Add/Deduct Money Modal */}
         <Modal
           title={actionType === "add" ? "Add Money" : "Deduct Money"}
@@ -241,7 +238,6 @@ const WalletAction = () => {
             </div>
           </div>
         </Modal>
-
         {/* Transaction Modal */}
         <Modal
           title="Client Transactions"
@@ -251,9 +247,11 @@ const WalletAction = () => {
           className="rounded-lg"
         >
           <Table
-            dataSource={selectedClient?.transactions || []}
-            pagination={false} // Disable pagination if not required
-            rowKey={(record) => record.id || record._id} // Assuming each transaction has a unique id
+            dataSource={(selectedClient?.transactions || []).sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            )}
+            pagination={false}
+            rowKey={(record) => record.id || record._id}
             columns={[
               {
                 title: "Amount",

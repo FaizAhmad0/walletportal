@@ -365,7 +365,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://dukaan.b-cdn.net/700x700/webp/324453/d75f587a-1653-4234-94d2-d77b0d0444dc.png"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/06/CPP07911-Large.jpeg"
                   className="product-image"
                 />
               }
@@ -379,7 +379,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/06/FPGEGz.jpg"
                   className="product-image"
                 />
               }
@@ -393,7 +393,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://dukaan.b-cdn.net/700x700/webp/324453/d75f587a-1653-4234-94d2-d77b0d0444dc.png"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/03/5G7lsv.jpg"
                   className="product-image"
                 />
               }

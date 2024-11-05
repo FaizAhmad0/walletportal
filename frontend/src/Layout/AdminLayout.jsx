@@ -170,11 +170,6 @@ const AdminLayout = ({ children }) => {
               label: "Wallet Action",
             },
             {
-              key: "/admin-report",
-              icon: <SignalCellularAltIcon />,
-              label: "Report",
-            },
-            {
               key: "/audit-report",
               icon: <InfoIcon />,
               label: "Audit Report",

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Radio, Input } from "antd";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
+import dayjs from "dayjs";
 import moment from "moment";
 
 const { Search } = Input; // Destructure Search from Input
@@ -94,11 +95,14 @@ const ShippingOrder = () => {
 
   const columns = [
     {
-      title: <span className="text-sm text-black">Order ID</span>,
-      dataIndex: "orderId",
-      key: "orderId",
-      width: 150, // Adjust width as needed
-      render: (text) => <span className="text-sm text-black">{text}</span>,
+      title: <span className="text-sm text-black">Date</span>,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
+      ),
     },
     {
       title: <span className="text-sm text-black">Name</span>,
@@ -211,6 +215,14 @@ const ShippingOrder = () => {
             <Radio.Button value="month">This Month</Radio.Button>
             <Radio.Button value="year">This Year</Radio.Button>
           </Radio.Group>
+          <h2
+            className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md"
+            style={{
+              display: "inline-block",
+            }}
+          >
+            Total Orders: {filteredOrders?.length}
+          </h2>
         </div>
         {/* <Table
           bordered

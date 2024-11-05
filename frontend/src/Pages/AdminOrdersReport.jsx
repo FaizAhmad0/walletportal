@@ -197,7 +197,7 @@ const AdminOrdersReport = () => {
                   record.enrollment
                 )
               }
-              className="text-sm text-black "
+              className="text-sm text-white "
             >
               Pay Now
             </Button>
