@@ -3,6 +3,7 @@ import { Table, Radio, Input } from "antd";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
 import moment from "moment";
+import dayjs from "dayjs";
 import ShippingLayout from "../Layout/ShippingLayout";
 
 const { Search } = Input; // Destructure Search from Input
@@ -95,67 +96,91 @@ const ShippedOrders = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Order ID</span>,
-      dataIndex: "orderId",
-      key: "orderId",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      title: <span className="text-sm text-black">Date</span>,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
+      ),
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Name</span>,
+      title: <span className="text-sm">Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Enrollment No.</span>,
+      title: <span className="text-sm">Enrollment No.</span>,
       dataIndex: "enrollment",
       key: "enrollment",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Amazon Order Id</span>,
+      title: <span className="text-sm">Amazon Order Id</span>,
       dataIndex: "amazonOrderId",
       key: "amazonOrderId",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Manager</span>,
+      title: <span className="text-sm">Manager</span>,
       dataIndex: "manager",
       key: "manager",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Delivery Partner</span>,
+      title: <span className="text-sm">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Tracking Id</span>,
+      title: <span className="text-sm">Tracking Id</span>,
       dataIndex: "trackingId",
       key: "trackingId",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">SKU</span>,
+      title: <span className="text-sm">SKU</span>,
       dataIndex: "sku",
       key: "sku",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Pincode</span>,
+      title: <span className="text-sm">Pincode</span>,
       dataIndex: "pincode",
       key: "pincode",
-      render: (text) => <span className="text-xs">{text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">{text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Amount</span>,
+      title: <span className="text-sm">Amount</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (text) => <span className="text-xs">₹ {text}</span>, // Apply text-xs
+      render: (text) => <span className="text-sm">₹ {text}</span>,
+      width: "auto",
+      ellipsis: true,
     },
     {
-      title: <span className="text-xs">Product Status</span>,
+      title: <span className="text-sm">Product Status</span>,
       dataIndex: "items",
       key: "productAction",
       render: (items) => {
@@ -163,11 +188,13 @@ const ShippedOrders = () => {
           (item) => item.productAction === "Available"
         );
         return allAvailable ? (
-          <span className="text-xs text-green-500">Available</span>
+          <span className="text-sm text-green-500">Available</span>
         ) : (
-          <span className="text-xs text-red-500">Unavailable</span>
+          <span className="text-sm text-red-500">Unavailable</span>
         );
       },
+      width: "auto",
+      ellipsis: true,
     },
   ];
 
@@ -215,6 +242,7 @@ const ShippedOrders = () => {
           columns={columns}
           dataSource={filteredOrders}
           pagination={{ pageSize: 10 }}
+          scroll={{ x: "max-content" }}
         />
       </div>
     </ShippingLayout>
