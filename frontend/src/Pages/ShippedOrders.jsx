@@ -201,6 +201,14 @@ const ShippedOrders = () => {
             <Radio.Button value="month">This Month</Radio.Button>
             <Radio.Button value="year">This Year</Radio.Button>
           </Radio.Group>
+          <h2
+            className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md mt-3"
+            style={{
+              display: "inline-block",
+            }}
+          >
+            Total Orders: {filteredOrders?.length}
+          </h2>{" "}
         </div>
         <Table
           bordered
