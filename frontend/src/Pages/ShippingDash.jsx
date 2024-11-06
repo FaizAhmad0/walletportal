@@ -24,6 +24,10 @@ const { Search } = Input;
 
 const ShippingDash = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [shippingPartnerFilter, setShippingPartnerFilter] = useState("");
+  const handleShippingPartnerFilter = (value) => {
+    setShippingPartnerFilter(value);
+  };
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -87,6 +91,16 @@ const ShippingDash = () => {
         .map((user) => ({
           ...user,
           orders: user.orders.filter((order) => order.paymentStatus === isPaid),
+        }))
+        .filter((user) => user.orders.length > 0);
+    }
+    if (shippingPartnerFilter !== "") {
+      filtered = filtered
+        .map((user) => ({
+          ...user,
+          orders: user.orders.filter(
+            (order) => order.shippingPartner === shippingPartnerFilter
+          ),
         }))
         .filter((user) => user.orders.length > 0);
     }
@@ -198,6 +212,24 @@ const ShippingDash = () => {
       title: <span className="text-sm text-black">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Radio.Group
+            value={selectedKeys[0]}
+            onChange={(e) => {
+              setSelectedKeys(e.target.value ? [e.target.value] : []);
+              handleShippingPartnerFilter(e.target.value);
+              confirm();
+            }}
+          >
+            <Radio value="DTDC">DTDC</Radio>
+            <Radio value="Tirupati">Tirupati</Radio>
+            <Radio value="Maruti">Maruti</Radio>
+            <Radio value="Delivery">Delivery</Radio>
+          </Radio.Group>
+        </div>
+      ),
+      onFilter: (value, record) => record.shippingPartner === value,
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {

@@ -407,7 +407,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/03/Z4xZps.jpg"
                   className="product-image"
                 />
               }
@@ -421,7 +421,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/06/CiTIjM.jpg"
                   className="product-image"
                 />
               }
@@ -435,7 +435,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/08/1hwIIC.jpg"
                   className="product-image"
                 />
               }
@@ -449,7 +449,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/07/e7wwmP.jpg"
                   className="product-image"
                 />
               }
@@ -463,91 +463,7 @@ const Home = () => {
               cover={
                 <img
                   alt="Product 4"
-                  src="https://dukaan.b-cdn.net/700x700/webp/324453/d75f587a-1653-4234-94d2-d77b0d0444dc.png"
-                  className="product-image"
-                />
-              }
-              data-aos="fade-up"
-            >
-              <Card.Meta title="Product 4" description="$499.99" />
-            </Card>
-            <Card
-              className="product-card"
-              hoverable
-              cover={
-                <img
-                  alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
-                  className="product-image"
-                />
-              }
-              data-aos="fade-up"
-            >
-              <Card.Meta title="Product 4" description="$499.99" />
-            </Card>
-            <Card
-              className="product-card"
-              hoverable
-              cover={
-                <img
-                  alt="Product 4"
-                  src="https://dukaan.b-cdn.net/700x700/webp/324453/d75f587a-1653-4234-94d2-d77b0d0444dc.png"
-                  className="product-image"
-                />
-              }
-              data-aos="fade-up"
-            >
-              <Card.Meta title="Product 4" description="$499.99" />
-            </Card>
-            <Card
-              className="product-card"
-              hoverable
-              cover={
-                <img
-                  alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
-                  className="product-image"
-                />
-              }
-              data-aos="fade-up"
-            >
-              <Card.Meta title="Product 4" description="$499.99" />
-            </Card>
-            <Card
-              className="product-card"
-              hoverable
-              cover={
-                <img
-                  alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
-                  className="product-image"
-                />
-              }
-              data-aos="fade-up"
-            >
-              <Card.Meta title="Product 4" description="$499.99" />
-            </Card>
-            <Card
-              className="product-card"
-              hoverable
-              cover={
-                <img
-                  alt="Product 4"
-                  src="https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg"
-                  className="product-image"
-                />
-              }
-              data-aos="fade-up"
-            >
-              <Card.Meta title="Product 4" description="$499.99" />
-            </Card>
-            <Card
-              className="product-card"
-              hoverable
-              cover={
-                <img
-                  alt="Product 4"
-                  src="https://img.freepik.com/free-photo/beautiful-rose-studio_23-2150737335.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1724630400&semt=ais_hybrid"
+                  src="https://gallery.saumiccraft.com/wp-content/uploads/2024/03/RW1uGQ.jpg"
                   className="product-image"
                 />
               }

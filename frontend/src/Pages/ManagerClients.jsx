@@ -400,5 +400,4 @@ const ManagerClients = () => {
     </ManagerLayout>
   );
 };
-
 export default ManagerClients;
