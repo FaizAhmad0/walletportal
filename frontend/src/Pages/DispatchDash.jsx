@@ -17,6 +17,10 @@ const { Search } = Input;
 
 const DispatchDash = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [shippingPartnerFilter, setShippingPartnerFilter] = useState("");
+  const handleShippingPartnerFilter = (value) => {
+    setShippingPartnerFilter(value);
+  };
   const [productStatusFilter, setProductStatusFilter] = useState(null);
   const handleProductStatusFilter = (value) => {
     setProductStatusFilter(value);
@@ -146,10 +150,22 @@ const DispatchDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
+    // Apply Shipping Partner Filter
+    if (shippingPartnerFilter !== "") {
+      filtered = filtered
+        .map((user) => ({
+          ...user,
+          orders: user.orders.filter(
+            (order) => order.shippingPartner === shippingPartnerFilter
+          ),
+        }))
+        .filter((user) => user.orders.length > 0);
+    }
+
     // Apply Time Filter
     if (timeFilter !== "") {
       const now = moment();
-      const yesterday = moment().subtract(1, "day"); // Define yesterday once
+      const yesterday = moment().subtract(1, "day");
 
       filtered = filtered
         .map((user) => ({
@@ -160,7 +176,7 @@ const DispatchDash = () => {
               case "today":
                 return orderDate.isSame(now, "day");
               case "yesterday":
-                return orderDate.isSame(yesterday, "day"); // Compare to yesterday
+                return orderDate.isSame(yesterday, "day");
               case "week":
                 return orderDate.isSame(now, "week");
               case "month":
@@ -200,11 +216,12 @@ const DispatchDash = () => {
             );
           }),
         }))
-        .filter((user) => user.orders.length > 0); // Ensure to filter out users with no orders left after filtering
+        .filter((user) => user.orders.length > 0);
     }
 
     setFilteredOrders(filtered);
   };
+
   const getRowClassName = (record) => {
     const allUnavailable = record.items.some(
       (item) => item.productAction !== "Available"
@@ -264,6 +281,24 @@ const DispatchDash = () => {
       title: <span className="text-sm text-black">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Radio.Group
+            value={selectedKeys[0]}
+            onChange={(e) => {
+              setSelectedKeys(e.target.value ? [e.target.value] : []);
+              handleShippingPartnerFilter(e.target.value);
+              confirm();
+            }}
+          >
+            <Radio value="DTDC">DTDC</Radio>
+            <Radio value="Tirupati">Tirupati</Radio>
+            <Radio value="Maruti">Maruti</Radio>
+            <Radio value="Delivery">Delivery</Radio>
+          </Radio.Group>
+        </div>
+      ),
+      onFilter: (value, record) => record.shippingPartner === value,
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {

@@ -8,11 +8,13 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const ManagerClients = () => {
   const [clients, setClients] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // New state for edit modal
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [gmsModalVisible, setGmsModalVisible] = useState(false);
   const [gmsValue, setGmsValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [gstModalVisible, setGstModalVisible] = useState(false); // New state for GST modal
+  const [gstValue, setGstValue] = useState(""); // New state for GST value
 
   const getClients = async () => {
     const name = localStorage.getItem("name");
@@ -60,6 +62,36 @@ const ManagerClients = () => {
     }
   };
 
+  const handleAddGst = (client) => {
+    setSelectedClient(client);
+    setGstModalVisible(true);
+  };
+
+  const handleGstSubmit = async () => {
+    if (!gstValue) {
+      message.error("Please enter a valid GST value");
+      return;
+    }
+    try {
+      await axios.post(
+        `${backendUrl}/user/add-gst/${selectedClient.enrollment}`,
+        { gst: gstValue },
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      message.success("GST updated successfully!");
+      setGstModalVisible(false);
+      setGstValue("");
+      getClients();
+    } catch (error) {
+      message.error("Could not update the GST!");
+      console.error("Error saving GST:", error);
+    }
+  };
+
   useEffect(() => {
     getClients();
   }, []);
@@ -79,7 +111,11 @@ const ManagerClients = () => {
     setSelectedClient(null);
   };
 
-  // Filter clients based on the search query
+  const handleCloseGstModal = () => {
+    setGstModalVisible(false);
+    setGstValue("");
+  };
+
   const filteredClients = clients.filter(
     (client) =>
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -116,7 +152,7 @@ const ManagerClients = () => {
         },
       });
       message.success("Client deleted successfully!");
-      getClients(); // Refresh the client list
+      getClients();
     } catch (error) {
       message.error("Error deleting client.");
       console.error("Error deleting client:", error);
@@ -170,14 +206,14 @@ const ManagerClients = () => {
       render: (_, client) => (
         <>
           <Button
-            className="text-sm text-white "
+            className="text-sm text-white"
             type="primary"
             onClick={() => handleAddGms(client)}
           >
             Update GMS
           </Button>
           <Button
-            className="text-sm text-black  ml-2"
+            className="text-sm text-black ml-2"
             onClick={() => {
               setSelectedClient(client);
               setIsEditModalVisible(true);
@@ -186,17 +222,20 @@ const ManagerClients = () => {
             Edit
           </Button>
           <Button
-            className="text-sm text-black  ml-2"
+            className="text-sm text-black ml-2"
+            onClick={() => handleAddGst(client)}
+          >
+            Add GST
+          </Button>
+          <Button
+            className="text-sm text-black ml-2"
             onClick={() => {
               Modal.confirm({
                 title: "Are you sure you want to delete this client?",
                 onOk: () => handleDeleteClient(client._id),
               });
             }}
-            style={{
-              background: "red",
-              color: "white",
-            }}
+            style={{ background: "red", color: "white" }}
           >
             Delete
           </Button>
@@ -210,20 +249,18 @@ const ManagerClients = () => {
       <div className="container mx-auto px-4 py-2 bg-white shadow-md rounded-md">
         <div className="w-full pb-2 px-4 mb-3 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
           <h1 className="text-2xl pt-4 font-bold text-white">All Clients</h1>
-        </div>{" "}
+        </div>
         <h2 className="text-lg font-bold w-200 bg-blue-50 text-blue-800 px-4 py-1 rounded-md">
           Total Clients: {clients?.length}
         </h2>
-        {/* Search Input */}
         <Input
           type="text"
           placeholder="Search clients"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-6 text-black"
-          style={{ width: "300px" }} // Maintain the width
+          style={{ width: "300px" }}
         />
-        {/* Ant Design Table */}
         <Table
           columns={columns}
           dataSource={filteredClients}
@@ -231,20 +268,22 @@ const ManagerClients = () => {
           pagination={{ pageSize: 10 }}
           bordered
           size="small"
-          rowClassName="hover:bg-gray-100 transition ease-in-out duration-150" // Add hover effect to rows
-          className="text-black" // Ensure text color is black
+          rowClassName="hover:bg-gray-100 transition ease-in-out duration-150"
+          className="text-black"
         />
-        {/* Add GMS Modal */}
+
         <Modal
           title={`Add GMS for ${selectedClient?.name}`}
           visible={gmsModalVisible}
           onCancel={handleCloseGmsModal}
           footer={[
             <Button key="close" onClick={handleCloseGmsModal}>
-              Cancel
+              {" "}
+              Cancel{" "}
             </Button>,
             <Button key="submit" type="primary" onClick={handleSubmitGms}>
-              Submit
+              {" "}
+              Submit{" "}
             </Button>,
           ]}
         >
@@ -252,10 +291,9 @@ const ManagerClients = () => {
             placeholder="Enter GMS value"
             value={gmsValue}
             onChange={(e) => setGmsValue(e.target.value)}
-            className="text-black" // Ensure text color is black
           />
         </Modal>
-        {/* Edit Client Modal */}
+
         <Modal
           title="Edit Client"
           visible={isEditModalVisible}
@@ -335,6 +373,28 @@ const ManagerClients = () => {
               </Button>
             </Form.Item>
           </Form>
+        </Modal>
+
+        <Modal
+          title={`Add GST for ${selectedClient?.name}`}
+          visible={gstModalVisible}
+          onCancel={handleCloseGstModal}
+          footer={[
+            <Button key="close" onClick={handleCloseGstModal}>
+              {" "}
+              Cancel{" "}
+            </Button>,
+            <Button key="submit" type="primary" onClick={handleGstSubmit}>
+              {" "}
+              Submit{" "}
+            </Button>,
+          ]}
+        >
+          <Input
+            placeholder="Enter GST value"
+            value={gstValue}
+            onChange={(e) => setGstValue(e.target.value)}
+          />
         </Modal>
       </div>
     </ManagerLayout>

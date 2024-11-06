@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Radio, Input } from "antd";
+import { Table, Radio, Input, DatePicker } from "antd";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
 import moment from "moment";
@@ -12,7 +12,8 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const ShippedOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("all");
-  const [searchText, setSearchText] = useState(""); // Add searchText state
+  const [searchText, setSearchText] = useState("");
+  const [customDate, setCustomDate] = useState(null); // Add state for custom date
 
   const getOrders = async () => {
     try {
@@ -36,8 +37,8 @@ const ShippedOrders = () => {
 
   const filterOrdersByDate = (order) => {
     const orderDate = moment(order.createdAt);
-    const today = moment().startOf("day"); // Start of today
-    const yesterday = moment().subtract(1, "day").startOf("day"); // Start of yesterday
+    const today = moment().startOf("day");
+    const yesterday = moment().subtract(1, "day").startOf("day");
 
     switch (filter) {
       case "today":
@@ -50,6 +51,8 @@ const ShippedOrders = () => {
         return orderDate.isSame(today, "month");
       case "year":
         return orderDate.isSame(today, "year");
+      case "custom":
+        return customDate && orderDate.isSame(moment(customDate), "day");
       case "all":
       default:
         return true;
@@ -80,7 +83,6 @@ const ShippedOrders = () => {
         }))
     )
     .filter((order) => {
-      // Convert all values to strings before applying search filtering
       const searchString = searchText.toLowerCase();
       return (
         String(order.name).toLowerCase().includes(searchString) ||
@@ -202,10 +204,8 @@ const ShippedOrders = () => {
     <ShippingLayout>
       <div className="relative max-w-full mx-auto pb-20">
         <div className="w-full mb-3 pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
-          <h1 className="text-2xl pt-4 font-bold text-white">
-            Shipped Order's
-          </h1>
-        </div>{" "}
+          <h1 className="text-2xl pt-4 font-bold text-white">Shipped Orders</h1>
+        </div>
         <div className="flex justify-between items-center mb-4">
           {/* Search Input */}
           <Search
@@ -219,23 +219,31 @@ const ShippedOrders = () => {
           <Radio.Group
             buttonStyle="solid"
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setCustomDate(null); // Reset custom date on filter change
+            }}
           >
             <Radio.Button value="all">All</Radio.Button>
-            <Radio.Button value="yesterday">Yesterday</Radio.Button>{" "}
+            <Radio.Button value="yesterday">Yesterday</Radio.Button>
             <Radio.Button value="today">Today</Radio.Button>
             <Radio.Button value="week">This Week</Radio.Button>
             <Radio.Button value="month">This Month</Radio.Button>
             <Radio.Button value="year">This Year</Radio.Button>
+            <Radio.Button value="custom">Custom Date</Radio.Button>
           </Radio.Group>
-          <h2
-            className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md mt-3"
-            style={{
-              display: "inline-block",
-            }}
-          >
-            Total Orders: {filteredOrders?.length}
-          </h2>{" "}
+          {/* DatePicker for custom date */}
+          {filter === "custom" && (
+            <DatePicker
+              onChange={(date) => setCustomDate(date)}
+              disabledDate={(current) =>
+                current && current > moment().endOf("day")
+              }
+            />
+          )}
+          <h2 className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md mt-3">
+            Total Orders: {filteredOrders.length}
+          </h2>
         </div>
         <Table
           bordered

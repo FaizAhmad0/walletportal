@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         orders: filteredOrders, // Replace the orders with the filtered ones
       };
     });
-    console.log(filteredUsers);
+    // console.log(filteredUsers);
 
     res.status(201).json({ orders: filteredUsers });
   } catch (error) {
