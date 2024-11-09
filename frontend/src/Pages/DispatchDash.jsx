@@ -286,8 +286,9 @@ const DispatchDash = () => {
           <Radio.Group
             value={selectedKeys[0]}
             onChange={(e) => {
-              setSelectedKeys(e.target.value ? [e.target.value] : []);
-              handleShippingPartnerFilter(e.target.value);
+              const selectedValue = e.target.value;
+              setSelectedKeys(selectedValue ? [selectedValue] : []); // Reset or apply the filter
+              handleShippingPartnerFilter(selectedValue); // Apply the filter logic
               confirm();
             }}
           >
@@ -295,12 +296,19 @@ const DispatchDash = () => {
             <Radio value="Tirupati">Tirupati</Radio>
             <Radio value="Maruti">Maruti</Radio>
             <Radio value="Delivery">Delivery</Radio>
+            <Radio value="">All</Radio> {/* This removes the filter */}
           </Radio.Group>
         </div>
       ),
-      onFilter: (value, record) => record.shippingPartner === value,
+      onFilter: (value, record) => {
+        if (value === "") {
+          return true; // Return true to show all records when no filter is applied
+        }
+        return record.shippingPartner === value;
+      },
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
+
     {
       title: <span className="text-sm text-black">Tracking Id</span>,
       dataIndex: "trackingId",

@@ -163,12 +163,6 @@ const DispatchOrdersReport = () => {
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-sm text-black">Address</span>,
-      dataIndex: "address",
-      key: "address",
-      render: (text) => <span className="text-sm text-black">{text}</span>,
-    },
-    {
       title: <span className="text-sm text-black">Amount</span>,
       dataIndex: "finalAmount",
       key: "finalAmount",
