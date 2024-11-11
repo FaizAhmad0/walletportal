@@ -22,6 +22,7 @@ const getUserBulkOrder = require("../controller/getUserBulkOrder");
 const getAllBulkOrder = require("../controller/getAllBulkOrder");
 const payBulkOrder = require("../controller/payBulkOrder");
 const getOrderByDate = require("../controller/getOrderByDate");
+const getAllTransaction = require("../controller/getAllTransaction");
 const router = express.Router();
 router.post("/bulkorder", bulkOrder);
 router.get("/getbulkorder/:manager", getManagerBulkOrder);
@@ -31,6 +32,7 @@ router.get("/getuserbulk/:user",getUserBulkOrder);
 router.get("/getallbulk",getAllBulkOrder);
 router.post("/bulkorder/pay", payBulkOrder);
 router.get("/getOrdersByDate", getOrderByDate);
+router.get("/alltransactions",getAllTransaction);
 
 router.post("/payorder");
 router.post("/:enrollment", addProduct);

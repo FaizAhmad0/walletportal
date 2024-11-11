@@ -74,7 +74,6 @@ const DispatchOrdersReport = () => {
     setSearchInput(e.target.value);
   };
 
-  // Filter orders based on filter criteria
   const filteredDataSource = orders
     .flatMap((user) =>
       user.orders.map((order) => ({
@@ -103,10 +102,8 @@ const DispatchOrdersReport = () => {
           (subItem) => subItem.productAction === "Product not available"
         );
       return true;
-      // "all" filter should return all orders
     })
     .filter((item) => {
-      // Dynamic filtering based on search input
       return (
         item.enrollment.toLowerCase().includes(searchInput.toLowerCase()) ||
         item.amazonOrderId.toLowerCase().includes(searchInput.toLowerCase()) ||
@@ -114,6 +111,48 @@ const DispatchOrdersReport = () => {
       );
     })
     .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)));
+
+  const downloadOrdersAsExcel = () => {
+    const header = [
+      "Date",
+      "Enrollment",
+      "Amazon Order ID",
+      "Manager",
+      "Delivery Partner",
+      "Tracking ID",
+      "SKU",
+      "Amount",
+      "Payment Status",
+      "Shipped",
+    ];
+
+    const csvRows = [
+      header.join(","), // Add headers
+      ...filteredDataSource.map((row) =>
+        [
+          dayjs(row.createdAt).format("DD/MM/YYYY"),
+          row.enrollment,
+          row.amazonOrderId,
+          row.manager,
+          row.shippingPartner,
+          row.trackingId,
+          row.sku,
+          row.finalAmount,
+          row.paymentStatus ? "Paid" : "Pending",
+          row.shipped ? "Yes" : "No",
+        ].join(",")
+      ),
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "filtered_orders.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const columns = [
     {
@@ -251,12 +290,14 @@ const DispatchOrdersReport = () => {
               borderColor: "#d9d9d9",
             }}
           />
-          <h2
-            className="text-lg font-bold bg-blue-50 text-blue-800 py-1 mt-3 px-4 rounded-md"
-            style={{
-              display: "inline-block",
-            }}
+          <Button
+            type="primary"
+            onClick={downloadOrdersAsExcel}
+            className="ml-4"
           >
+            Download
+          </Button>
+          <h2 className="text-lg font-bold bg-blue-50 text-blue-800 py-1 mt-3 px-4 rounded-md">
             Total Orders: {filteredDataSource?.length}
           </h2>
         </div>
@@ -309,6 +350,15 @@ const DispatchOrdersReport = () => {
         <p className="text-lg mt-4">
           <strong>Total Amount:</strong> ₹ {selectedOrderAmount}
         </p>
+        <Button
+          type="primary"
+          className="mt-4"
+          onClick={() =>
+            handlePaymentClick(selectedOrderAmount, selectedOrderId)
+          }
+        >
+          Mark as Paid
+        </Button>
       </Modal>
     </DispatchLayout>
   );

@@ -596,6 +596,7 @@ const DispatchDash = () => {
       trackingId: item.trackingId,
       sku: item.sku,
       name: item.name,
+      shippingPrice: item.shippingPrice,
       price: item.price,
       quantity: item.quantity,
       pincode: item.pincode,
@@ -789,6 +790,17 @@ const DispatchDash = () => {
                     onChange={handleChange}
                     className="mb-3"
                   />
+
+                  <label className="block mb-2 font-semibold">
+                    Shipping Price:
+                  </label>
+                  <Input
+                    name="shippingPrice"
+                    value={editValues.shippingPrice || ""}
+                    onChange={handleChange}
+                    className="mb-3"
+                  />
+
                   <label className="block mb-2 font-semibold">Quantity:</label>
                   <Input
                     name="quantity"
@@ -856,6 +868,9 @@ const DispatchDash = () => {
                   </p>
                   <p>
                     <strong>Price:</strong> {item.price}
+                  </p>
+                  <p>
+                    <strong>Shipping Price:</strong> {item.shippingPrice}
                   </p>
                   <p>
                     <strong>Quantity:</strong> {item.quantity}

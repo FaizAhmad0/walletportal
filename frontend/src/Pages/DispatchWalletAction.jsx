@@ -12,6 +12,7 @@ import {
   List,
 } from "antd";
 import moment from "moment"; // For formatting timestamps
+import * as XLSX from "xlsx"; // Import xlsx library
 
 const { Search } = Input;
 const { Title } = Typography;
@@ -174,6 +175,24 @@ const DispatchWalletAction = () => {
     },
   ];
 
+  // Function to export transactions to Excel
+  const handleDownloadTransactions = () => {
+    const transactions = selectedClient?.transactions || [];
+    const formattedData = transactions.map((transaction) => ({
+      Amount: transaction.amount,
+      Description: transaction.description,
+      Date: moment(transaction.createdAt).format("MMMM Do YYYY, h:mm:ss a"),
+      Type: transaction.credit ? "Credit" : "Debit",
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(formattedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Transactions");
+
+    // Create a Blob and download it
+    XLSX.writeFile(wb, `${selectedClient?.name}_transactions.xlsx`);
+  };
+
   return (
     <DispatchLayout>
       <div className="container mx-auto p-2 bg-white shadow-lg rounded-lg">
@@ -209,7 +228,8 @@ const DispatchWalletAction = () => {
           onCancel={() => setIsModalVisible(false)}
           onOk={handleSubmit}
           okText="Submit"
-          className="rounded-lg"
+          cancelText="Cancel"
+          className="rounded-lg" // Reverted to original modal style
         >
           <div className="space-y-4">
             <div>
@@ -243,7 +263,21 @@ const DispatchWalletAction = () => {
           title="Client Transactions"
           visible={isTransactionModalVisible}
           onCancel={() => setIsTransactionModalVisible(false)}
-          footer={null}
+          footer={[
+            <Button
+              key="download"
+              type="primary"
+              onClick={handleDownloadTransactions}
+            >
+              Download Transactions
+            </Button>,
+            <Button
+              key="close"
+              onClick={() => setIsTransactionModalVisible(false)}
+            >
+              Close
+            </Button>,
+          ]}
           className="rounded-lg"
         >
           <Table

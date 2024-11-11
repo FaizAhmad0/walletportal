@@ -1,46 +1,58 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Bar, Line } from "react-chartjs-2";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  LineElement,
-  PointElement,
-} from "chart.js";
+import { DatePicker, Table, Radio, Button, Select, Input } from "antd"; // Import Ant Design DatePicker
+import dayjs from "dayjs"; // For date formatting
 import ManagerLayout from "../Layout/ManagerLayout";
-import { DatePicker } from "antd";
-import dayjs from "dayjs";
+import { FilterOutlined } from "@ant-design/icons";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+const { Option } = Select;
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  LineElement,
-  PointElement
-);
-
-const ManagerReport = () => {
+const DetailsReporting = () => {
   const [userData, setUserData] = useState([]);
+  const [managers, setManagers] = useState([]);
+  const [managerFilter, setManagerFilter] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value); // Update the search term on input change
+  };
+  const handleManagerFilter = (manager) => {
+    setManagerFilter(manager);
+  };
+  const [shippingPartnerFilter, setShippingPartnerFilter] = useState(null);
+
+  const handleShippingPartnerFilter = (value) => {
+    setShippingPartnerFilter(value);
+    // You can add any additional logic here to handle the filter if necessary
+  };
+
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
   const [holdMoneyIssueCount, setHoldMoneyIssueCount] = useState(0);
+  const [selectedOrderItems, setSelectedOrderItems] = useState([]);
+  const [filterType, setFilterType] = useState(null);
+  const [selectedOrderAmount, setSelectedOrderAmount] = useState(0);
+  const [selectedOrderId, setSelectedOrderId] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const [productNotAvailableCount, setProductNotAvailableCount] = useState(0);
   const [totalOrdersHold, setTotalOrdersHold] = useState(0);
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [manager, setManager] = useState("");
-  console.log(manager);
-  const modalRef = useRef(null);
+  const [productStatusFilter, setProductStatusFilter] = useState(null);
 
+  const [selectedDate, setSelectedDate] = useState(null); // State for selected date
+  const handleProductStatusFilter = (value) => {
+    setProductStatusFilter(value);
+  };
+  const handleRowClick = (orderItems, finalAmount, orderId) => {
+    setSelectedOrderItems(orderItems);
+    setSelectedOrderAmount(finalAmount);
+    setSelectedOrderId(orderId);
+    setIsModalVisible(true);
+  };
+
+  // Fetch user data and orders from the backend
   const getUserData = async () => {
     const manager = localStorage.getItem("name");
     try {
@@ -59,6 +71,7 @@ const ManagerReport = () => {
       let holdMoneyIssue = 0;
       let productNotAvailable = 0;
       let totalHoldOrders = 0;
+      let allOrders = [];
 
       users.forEach((user) => {
         const orders = user.orders || [];
@@ -66,6 +79,7 @@ const ManagerReport = () => {
 
         orders.forEach((order) => {
           let orderHasHold = false;
+          allOrders.push(order); // Add all orders
 
           if (order.paymentStatus === false) {
             holdMoneyIssue += 1;
@@ -92,66 +106,57 @@ const ManagerReport = () => {
       setHoldMoneyIssueCount(holdMoneyIssue);
       setProductNotAvailableCount(productNotAvailable);
       setTotalOrdersHold(totalHoldOrders);
+      setFilteredOrders(allOrders); // Display all orders initially
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
 
-  const getManagerData = async () => {
-    const manager = localStorage.getItem("name");
+  const getallmanagers = async () => {
     try {
-      const response = await axios.get(
-        `${backendUrl}/user/getManagerData/${manager}`,
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-      setManager(response.data.manager);
-    } catch (e) {
-      console.error(e);
+      const response = await axios.get(`${backendUrl}/user/getallmanagers`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      setManagers(response.data.clients);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
     }
   };
+
   useEffect(() => {
-    getUserData();
-    getManagerData();
+    getUserData(); // Fetch data when the component is mounted
+    getallmanagers();
   }, []);
 
   const filterOrders = (type) => {
+    setFilterType(type); // Set the filterType state
+
     let filtered = [];
 
     userData.forEach((user) => {
       const orders = user.orders || [];
-
       orders.forEach((order) => {
-        // Filter by selected date if any
+        // Check if the date matches if a date is selected
         if (selectedDate) {
           const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
-          if (orderDate !== selectedDate) {
-            return; // Skip this order if the date doesn't match
-          }
+          if (orderDate !== selectedDate) return;
         }
-        if (type === "paymentStatus") {
-          if (order.paymentStatus === false) {
-            filtered.push(order);
-          }
-        } else if (type === "productNotAvailable") {
-          if (order.items.some((item) => item.productAction !== "Available")) {
-            filtered.push(order);
-          }
+
+        // Filter based on the button clicked
+        if (type === "paymentStatus" && order.paymentStatus === false) {
+          filtered.push(order);
+        } else if (
+          type === "productNotAvailable" &&
+          order.items.some((item) => item.productAction !== "Available")
+        ) {
+          filtered.push(order);
         }
       });
     });
 
-    setFilteredOrders(filtered); // Update the filtered orders state
-    setIsModalVisible(true); // Show the modal with filtered orders
-
-    setTimeout(() => {
-      if (modalRef.current) {
-        modalRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
+    setFilteredOrders(filtered);
   };
 
   const handleDateChange = (date) => {
@@ -205,89 +210,266 @@ const ManagerReport = () => {
     setProductNotAvailableCount(productNotAvailableCount); // Update product not available count dynamically
     setTotalOrdersHold(totalHoldOrders); // Update total holds dynamically
   };
-
-  const managerData = {
-    name: "Manish",
-    totalOrders: totalOrdersCount,
-    totalOrdersHold: totalOrdersHold,
-    holdMoneyIssue: holdMoneyIssueCount,
-    holdProductNotAvailable: productNotAvailableCount,
-    gms: {
-      today: 5000,
-      yesterday: 4500,
-      thisWeek: 30000,
-      thisMonth: 120000,
-      custom: 15000,
+  const columns = [
+    {
+      title: <span className="text-sm text-black">Date</span>,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
+      ),
     },
-    hold: {
-      today: 2,
-      yesterday: 3,
-      thisWeek: 10,
-      thisMonth: 40,
-      custom: 5,
+    {
+      title: <span className="text-sm text-black">Enrollment No.</span>,
+      dataIndex: "enrollment",
+      key: "enrollment",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
     },
-  };
-
-  const gmsData = {
-    labels: ["Today", "Yesterday", "This Week", "This Month", "Custom"],
-    datasets: [
-      {
-        label: "Gross Merchandise Sales (GMS)",
-        data: [
-          managerData.gms.today,
-          managerData.gms.yesterday,
-          managerData.gms.thisWeek,
-          managerData.gms.thisMonth,
-          managerData.gms.custom,
-        ],
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
+    {
+      title: <span className="text-sm text-black">User Amount.</span>,
+      dataIndex: "amount",
+      key: "amount",
+      render: (text) => {
+        const formattedAmount = Number(text).toFixed(2); // Convert to number and format with 2 decimal places
+        return <span className="text-sm text-black">₹ {formattedAmount}</span>;
       },
-    ],
-  };
-
-  const holdData = {
-    labels: ["Today", "Yesterday", "This Week", "This Month", "Custom"],
-    datasets: [
-      {
-        label: "Holds",
-        data: [
-          managerData.hold.today,
-          managerData.hold.yesterday,
-          managerData.hold.thisWeek,
-          managerData.hold.thisMonth,
-          managerData.hold.custom,
-        ],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
+    },
+    {
+      title: <span className="text-sm text-black">Amazon Order Id</span>,
+      dataIndex: "amazonOrderId",
+      key: "amazonOrderId",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
+      title: (
+        <span className="text-sm text-black">
+          Manager
+          <span style={{ marginLeft: 5 }}>
+            <Button
+              type="link"
+              icon={<FilterOutlined />}
+              onClick={() => setManagerFilter(managerFilter ? null : "")}
+              style={{ padding: 0 }}
+            />
+          </span>
+        </span>
+      ),
+      dataIndex: "manager",
+      key: "manager",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Select
+            placeholder="Filter by Manager"
+            value={selectedKeys[0]}
+            onChange={(value) => {
+              setSelectedKeys(value ? [value] : []);
+              handleManagerFilter(value);
+              confirm();
+            }}
+            style={{ width: 200 }}
+            allowClear
+          >
+            {managers.map((manager) => (
+              <Option key={manager.name} value={manager.name}>
+                {manager.name}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      ),
+      onFilter: (value, record) => (value ? record.manager === value : true),
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
+      title: <span className="text-sm text-black">Delivery Partner</span>,
+      dataIndex: "shippingPartner",
+      key: "shippingPartner",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Radio.Group
+            value={selectedKeys[0]}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              setSelectedKeys(selectedValue ? [selectedValue] : []);
+              handleShippingPartnerFilter(selectedValue); // Apply the filter logic
+              confirm();
+            }}
+          >
+            <Radio value="DTDC">DTDC</Radio>
+            <Radio value="Tirupati">Tirupati</Radio>
+            <Radio value="Maruti">Maruti</Radio>
+            <Radio value="Delivery">Delivery</Radio>
+            <Radio value="">All</Radio> {/* To clear the filter */}
+          </Radio.Group>
+        </div>
+      ),
+      onFilter: (value, record) => {
+        if (value === "") {
+          return true; // Return true to show all records when no filter is applied
+        }
+        return record.shippingPartner === value;
       },
-    ],
-  };
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
+      title: <span className="text-sm text-black">Tracking Id</span>,
+      dataIndex: "trackingId",
+      key: "trackingId",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
+      title: <span className="text-sm text-black">SKU</span>,
+      dataIndex: "sku",
+      key: "sku",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
+      title: <span className="text-sm text-black">Pincode</span>,
+      dataIndex: "pincode",
+      key: "pincode",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
+      title: <span className="text-sm text-black">Amount</span>,
+      dataIndex: "finalAmount",
+      key: "finalAmount",
+      render: (text) => <span className="text-sm text-black">₹ {text}</span>,
+    },
+    {
+      title: (
+        <span className="text-sm text-black">
+          Product Status
+          <span style={{ marginLeft: 5 }}>
+            <Button
+              type="link"
+              icon={<FilterOutlined />}
+              onClick={() =>
+                setProductStatusFilter(productStatusFilter ? null : "")
+              }
+              style={{ padding: 0 }}
+            />
+          </span>
+        </span>
+      ),
+      dataIndex: "items",
+      key: "productAction",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Radio.Group
+            value={selectedKeys[0]}
+            onChange={(e) => {
+              setSelectedKeys(e.target.value ? [e.target.value] : []);
+              handleProductStatusFilter(e.target.value);
+              confirm();
+            }}
+          >
+            <Radio value="Available">Available</Radio>
+            <Radio value="Unavailable">Unavailable</Radio>
+          </Radio.Group>
+        </div>
+      ),
+      onFilter: (value, record) => {
+        const allAvailable = record.items.every(
+          (item) => item.productAction === "Available"
+        );
+        return value === "Available" ? allAvailable : !allAvailable;
+      },
+      render: (items) => {
+        const allAvailable = items.every(
+          (item) => item.productAction === "Available"
+        );
+        return allAvailable ? (
+          <span className="text-sm text-black text-green-500">Available</span>
+        ) : (
+          <span className="text-sm text-black text-red-500">Unavailable</span>
+        );
+      },
+    },
+  ];
+
+  const dataSource = userData
+    .flatMap((user) =>
+      (user.orders || []).map((order) => ({
+        key: order._id,
+        name: user.name,
+        amount: user.amount,
+        orderId: order.orderId,
+        enrollment: user.enrollment,
+        amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
+        manager: user.manager,
+        shippingPartner: order.items[0]?.shippingPartner || "N/A",
+        trackingId: order.items[0]?.trackingId || "N/A",
+        sku: order.items[0]?.sku || "N/A",
+        pincode: order.items[0]?.pincode || "N/A",
+        address: user.address,
+        finalAmount: order.finalAmount,
+        paymentStatus: order.paymentStatus,
+        items: order.items,
+        _id: order._id,
+        createdAt: order.createdAt,
+      }))
+    )
+    .filter((order) => {
+      const searchTermLower = searchTerm.toLowerCase(); // Convert search term to lowercase for case-insensitive search
+      return (
+        order.amazonOrderId.toLowerCase().includes(searchTermLower) ||
+        order.trackingId.toLowerCase().includes(searchTermLower) ||
+        order.enrollment.toLowerCase().includes(searchTermLower)
+      );
+    })
+    .filter((order) => {
+      if (selectedDate) {
+        const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
+        if (orderDate !== selectedDate) return false;
+      }
+      if (filterType === "paymentStatus" && order.paymentStatus === false) {
+        return true;
+      } else if (
+        filterType === "productNotAvailable" &&
+        order.items.some((item) => item.productAction !== "Available")
+      ) {
+        return true;
+      }
+      if (managerFilter) {
+        return order.manager === managerFilter;
+      }
+      return filterType === null;
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
     <ManagerLayout>
-      <div className="relative max-w-7xl mx-auto pb-6 pb-20 min-h-screen">
+      <div className="relative max-w-7xl mx-auto pb-20 min-h-screen">
         <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
           <h1 className="text-2xl pt-4 font-bold text-white">
-            Manager Performance Dashboard
+            Order detail report
           </h1>
         </div>{" "}
-        <div className="mb-4">
-          <label
-            htmlFor="date-picker"
-            className="mr-2 font-semibold text-gray-700"
-          >
-            Filter By Date:
-          </label>
-          <DatePicker
-            id="date-picker"
-            format="YYYY-MM-DD"
-            onChange={handleDateChange}
-            placeholder="Select Date"
-            style={{ width: "100%", maxWidth: "200px" }}
-          />
+        {/* Date Filter */}
+        <div className="mb-4 flex items-center space-x-4">
+          <div>
+            <label htmlFor="date-picker" className="mr-2 text-black">
+              Filter By Date:
+            </label>
+            <DatePicker
+              id="date-picker"
+              format="YYYY-MM-DD"
+              onChange={handleDateChange}
+              placeholder="Select Date"
+            />
+          </div>
+
+          <div>
+            <Input.Search
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search by Amazon Order ID, Tracking ID, or Enrollment"
+              allowClear
+              style={{ width: 300 }}
+            />
+          </div>
         </div>
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <div className="grid grid-cols-2 gap-4">
@@ -296,7 +478,7 @@ const ManagerReport = () => {
               onClick={() => filterOrders("paymentStatus")}
             >
               <p className="text-lg font-medium text-yellow-800">
-                Hold: Money Issue - {managerData.holdMoneyIssue}
+                Hold: Money Issue - {holdMoneyIssueCount}
               </p>
             </button>
 
@@ -305,8 +487,7 @@ const ManagerReport = () => {
               onClick={() => filterOrders("productNotAvailable")}
             >
               <p className="text-lg font-medium text-green-800">
-                Hold: Product Not Available -{" "}
-                {managerData.holdProductNotAvailable}
+                Hold: Product Not Available - {productNotAvailableCount}
               </p>
             </button>
           </div>
@@ -315,99 +496,31 @@ const ManagerReport = () => {
           <div className="grid grid-cols-2 gap-4">
             <button className="w-full p-4 bg-gradient-to-r from-blue-100 to-blue-300 rounded-lg hover:bg-blue-200 active:bg-blue-300 transition duration-150 ease-in-out">
               <p className="text-lg font-medium text-blue-800">
-                Total Orders - {managerData.totalOrders}
+                Total Orders - {totalOrdersCount}
               </p>
             </button>
 
             <button className="w-full p-4 bg-gradient-to-r from-red-100 to-red-300 rounded-lg hover:bg-red-200 active:bg-red-300 transition duration-150 ease-in-out">
               <p className="text-lg font-medium text-red-800">
-                Total Orders Hold - {managerData.totalOrdersHold}
+                Total Orders Hold - {totalOrdersHold}
               </p>
             </button>
           </div>
         </div>
-        {isModalVisible && (
-          <div
-            ref={modalRef}
-            className="bg-white shadow-md rounded-lg p-6 mb-8"
-          >
-            {filteredOrders.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="table-auto w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-4 py-2">Order ID</th>
-                      <th className="px-4 py-2">Payment Status</th>
-                      <th className="px-4 py-2">Product Name</th>
-                      <th className="px-4 py-2">Product Availability</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOrders.map((order, index) => (
-                      <tr key={index} className="border-t">
-                        <td className="px-4 py-2">
-                          {new Date(order.createdAt).toLocaleDateString(
-                            "en-GB",
-                            {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            }
-                          )}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              order.paymentStatus
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {order.paymentStatus ? "Paid" : "Not Paid"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <ul>
-                            {order.items.map((item, i) => (
-                              <li key={i}>{item.name}</li>
-                            ))}
-                          </ul>
-                        </td>
-                        <td className="px-4 py-2">
-                          <ul>
-                            {order.items.map((item, i) => (
-                              <li
-                                key={i}
-                                className={`px-2 py-1 text-xs rounded-full ${
-                                  item.productAction === "Available"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
-                                }`}
-                              >
-                                {item.productAction}
-                              </li>
-                            ))}
-                          </ul>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>No orders found</p>
-            )}
-            <button
-              className="mt-4 p-2 bg-red-500 text-white rounded"
-              onClick={() => setIsModalVisible(false)}
-            >
-              Close
-            </button>
-          </div>
-        )}
+        <div className="overflow-x-auto mb-16 text-sm text-black">
+          <Table
+            bordered
+            columns={columns}
+            dataSource={dataSource}
+            pagination={{ pageSize: 10 }}
+            rowKey={(record) => record._id}
+            scroll={{ x: "max-content" }}
+            className="shadow-lg rounded-lg"
+          />
+        </div>
       </div>
     </ManagerLayout>
   );
 };
 
-export default ManagerReport;
+export default DetailsReporting;

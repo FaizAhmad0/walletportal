@@ -16,6 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import InfoIcon from "@mui/icons-material/Info";
 import ViewInArIcon from "@mui/icons-material/ViewInAr";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import PaidIcon from "@mui/icons-material/Paid";
 
 const { Header, Sider, Content } = Layout;
 
@@ -168,6 +169,11 @@ const AdminLayout = ({ children }) => {
               key: "/wallet-action",
               icon: <AccountBalanceWalletIcon />,
               label: "Wallet Action",
+            },
+            {
+              key: "/all-transactions",
+              icon: <PaidIcon />,
+              label: "All Transaction",
             },
             {
               key: "/audit-report",

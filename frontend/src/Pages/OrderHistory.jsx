@@ -7,6 +7,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
+  console.log(orders);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);

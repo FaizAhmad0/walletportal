@@ -1,16 +1,33 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { DatePicker, Table, Radio, Button } from "antd"; // Import Ant Design DatePicker
+import { DatePicker, Table, Radio, Button, Select, Input } from "antd"; // Import Ant Design DatePicker
 import dayjs from "dayjs"; // For date formatting
 import DispatchLayout from "../Layout/DispatchLayout";
 import { FilterOutlined } from "@ant-design/icons";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+const { Option } = Select;
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const DetailsReporting = () => {
   const [userData, setUserData] = useState([]);
-  console.log(userData);
+  const [managers, setManagers] = useState([]);
+  const [managerFilter, setManagerFilter] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value); // Update the search term on input change
+  };
+  const handleManagerFilter = (manager) => {
+    setManagerFilter(manager);
+  };
+  const [shippingPartnerFilter, setShippingPartnerFilter] = useState(null);
+
+  const handleShippingPartnerFilter = (value) => {
+    setShippingPartnerFilter(value);
+    // You can add any additional logic here to handle the filter if necessary
+  };
+
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
   const [holdMoneyIssueCount, setHoldMoneyIssueCount] = useState(0);
   const [selectedOrderItems, setSelectedOrderItems] = useState([]);
@@ -91,8 +108,22 @@ const DetailsReporting = () => {
     }
   };
 
+  const getallmanagers = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/user/getallmanagers`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      setManagers(response.data.clients);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    }
+  };
+
   useEffect(() => {
     getUserData(); // Fetch data when the component is mounted
+    getallmanagers();
   }, []);
 
   const filterOrders = (type) => {
@@ -208,15 +239,74 @@ const DetailsReporting = () => {
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
-      title: <span className="text-sm text-black">Manager</span>,
+      title: (
+        <span className="text-sm text-black">
+          Manager
+          <span style={{ marginLeft: 5 }}>
+            <Button
+              type="link"
+              icon={<FilterOutlined />}
+              onClick={() => setManagerFilter(managerFilter ? null : "")}
+              style={{ padding: 0 }}
+            />
+          </span>
+        </span>
+      ),
       dataIndex: "manager",
       key: "manager",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Select
+            placeholder="Filter by Manager"
+            value={selectedKeys[0]}
+            onChange={(value) => {
+              setSelectedKeys(value ? [value] : []);
+              handleManagerFilter(value);
+              confirm();
+            }}
+            style={{ width: 200 }}
+            allowClear
+          >
+            {managers.map((manager) => (
+              <Option key={manager.name} value={manager.name}>
+                {manager.name}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      ),
+      onFilter: (value, record) => (value ? record.manager === value : true),
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
       title: <span className="text-sm text-black">Delivery Partner</span>,
       dataIndex: "shippingPartner",
       key: "shippingPartner",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Radio.Group
+            value={selectedKeys[0]}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              setSelectedKeys(selectedValue ? [selectedValue] : []);
+              handleShippingPartnerFilter(selectedValue); // Apply the filter logic
+              confirm();
+            }}
+          >
+            <Radio value="DTDC">DTDC</Radio>
+            <Radio value="Tirupati">Tirupati</Radio>
+            <Radio value="Maruti">Maruti</Radio>
+            <Radio value="Delivery">Delivery</Radio>
+            <Radio value="">All</Radio> {/* To clear the filter */}
+          </Radio.Group>
+        </div>
+      ),
+      onFilter: (value, record) => {
+        if (value === "") {
+          return true; // Return true to show all records when no filter is applied
+        }
+        return record.shippingPartner === value;
+      },
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
@@ -318,24 +408,30 @@ const DetailsReporting = () => {
       }))
     )
     .filter((order) => {
-      // Check if the date matches if a date is selected
+      const searchTermLower = searchTerm.toLowerCase(); // Convert search term to lowercase for case-insensitive search
+      return (
+        order.amazonOrderId.toLowerCase().includes(searchTermLower) ||
+        order.trackingId.toLowerCase().includes(searchTermLower) ||
+        order.enrollment.toLowerCase().includes(searchTermLower)
+      );
+    })
+    .filter((order) => {
       if (selectedDate) {
         const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
         if (orderDate !== selectedDate) return false;
       }
-
-      // Use the filterType to determine if the order should be included
       if (filterType === "paymentStatus" && order.paymentStatus === false) {
-        return true; // Include in filtered results
+        return true;
       } else if (
         filterType === "productNotAvailable" &&
         order.items.some((item) => item.productAction !== "Available")
       ) {
-        return true; // Include in filtered results
+        return true;
       }
-
-      // Include all other orders when no specific filter is applied
-      return filterType === null; // Assumes null means no filter
+      if (managerFilter) {
+        return order.manager === managerFilter;
+      }
+      return filterType === null;
     })
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -348,16 +444,28 @@ const DetailsReporting = () => {
           </h1>
         </div>{" "}
         {/* Date Filter */}
-        <div className>
-          <label htmlFor="date-picker" className="mr-2 text-black">
-            Filter By Date:
-          </label>
-          <DatePicker
-            id="date-picker"
-            format="YYYY-MM-DD"
-            onChange={handleDateChange}
-            placeholder="Select Date"
-          />
+        <div className="mb-4 flex items-center space-x-4">
+          <div>
+            <label htmlFor="date-picker" className="mr-2 text-black">
+              Filter By Date:
+            </label>
+            <DatePicker
+              id="date-picker"
+              format="YYYY-MM-DD"
+              onChange={handleDateChange}
+              placeholder="Select Date"
+            />
+          </div>
+
+          <div>
+            <Input.Search
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search by Amazon Order ID, Tracking ID, or Enrollment"
+              allowClear
+              style={{ width: 300 }}
+            />
+          </div>
         </div>
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <div className="grid grid-cols-2 gap-4">

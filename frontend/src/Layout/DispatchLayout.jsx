@@ -8,6 +8,7 @@ import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import LockIcon from "@mui/icons-material/Lock";
 import logoExpanded from "../assets/logo2.png";
+import PaidIcon from "@mui/icons-material/Paid";
 import logoCollapsed from "../assets/Logoratan.png";
 import ViewInArIcon from "@mui/icons-material/ViewInAr";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
@@ -130,6 +131,11 @@ const DispatchLayout = ({ children }) => {
               key: "/shipped-orders",
               icon: <LocalShippingIcon />,
               label: "Shipped",
+            },
+            {
+              key: "/all-transaction",
+              icon: <PaidIcon />,
+              label: "All Transaction",
             },
             {
               key: "/details-reporting",
