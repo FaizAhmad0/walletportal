@@ -18,7 +18,7 @@ app.use(
     // origin: "http://localhost:3000",
     origin: "https://wallet.saumiccraft.in",
 
-    methods: "GET,POST,PUT,DELETE",
+    methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true, // Enable sending of cookies and HTTP Authentication information
   })
 );

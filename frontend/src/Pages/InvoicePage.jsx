@@ -240,7 +240,7 @@ const InvoicePage = () => {
             <Title level={4}>Company Details</Title>
             <Text>Company PAN: CANPJ3390R</Text>
             <br />
-            <Text>Company GSTN/UN: 08CANPJ3390R1ZT</Text>
+            <Text>Company GSTIN/UN: 08CANPJ3390R1ZT</Text>
           </Col>
         </Row>
       </div>
