@@ -526,6 +526,17 @@ const Home = () => {
         </Form>
       </div>
 
+      <div>
+        <iframe
+          sandbox="allow-same-origin allow-scripts"
+          src="https://drive.google.com/file/d/1dlCEwXNYu_VpUvxXPlLyvmeb7GwSVWUD/preview"
+          frameborder="0"
+          width="640"
+          height="480"
+          allow="autoplay; encrypted-media"
+        ></iframe>
+      </div>
+
       <Footer />
     </>
   );

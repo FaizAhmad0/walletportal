@@ -66,8 +66,10 @@ module.exports = async (req, res) => {
             },
             templateName: "hello", // Make sure the template exists on Double Tick
           },
-          from: process.env.WHATSAPP_FROM_NUMBER, // Sender's WhatsApp number (should be in your environment variables)
-          to: user.mobile, // User's WhatsApp number (make sure it's in your User model)
+          from: "Double Tick",
+          //from: process.env.WHATSAPP_FROM_NUMBER,
+          // Sender's WhatsApp number (should be in your environment variables)
+          to: user.mobile,
         },
       ],
     };

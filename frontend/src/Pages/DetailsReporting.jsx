@@ -29,6 +29,8 @@ const DetailsReporting = () => {
   };
 
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
+  const [shippedCount, setShippedCount] = useState(0);
+  const [levelNotFoundCount, setLevelNotFoundCount] = useState(0);
   const [holdMoneyIssueCount, setHoldMoneyIssueCount] = useState(0);
   const [selectedOrderItems, setSelectedOrderItems] = useState([]);
   const [filterType, setFilterType] = useState(null);
@@ -67,6 +69,8 @@ const DetailsReporting = () => {
       let holdMoneyIssue = 0;
       let productNotAvailable = 0;
       let totalHoldOrders = 0;
+      let shippedCount = 0;
+      let levelNotFound = 0; // Initialize levelNotFound count
       let allOrders = [];
 
       users.forEach((user) => {
@@ -75,13 +79,15 @@ const DetailsReporting = () => {
 
         orders.forEach((order) => {
           let orderHasHold = false;
-          allOrders.push(order); // Add all orders
+          allOrders.push(order);
 
+          // Count hold money issue orders
           if (order.paymentStatus === false) {
             holdMoneyIssue += 1;
             orderHasHold = true;
           }
 
+          // Count product not available orders
           const items = order.items || [];
           const productHold = items.some(
             (item) => item.productAction !== "Available"
@@ -92,6 +98,17 @@ const DetailsReporting = () => {
             orderHasHold = true;
           }
 
+          // Count shipped orders
+          if (order.shipped === true) {
+            shippedCount += 1;
+          }
+
+          // Count levelNotFound orders
+          if (order.paymentStatus === true && order.shipped === false) {
+            levelNotFound += 1;
+          }
+
+          // Count total hold orders
           if (orderHasHold) {
             totalHoldOrders += 1;
           }
@@ -102,6 +119,8 @@ const DetailsReporting = () => {
       setHoldMoneyIssueCount(holdMoneyIssue);
       setProductNotAvailableCount(productNotAvailable);
       setTotalOrdersHold(totalHoldOrders);
+      setShippedCount(shippedCount);
+      setLevelNotFoundCount(levelNotFound); // Update levelNotFound count state
       setFilteredOrders(allOrders); // Display all orders initially
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -134,14 +153,22 @@ const DetailsReporting = () => {
     userData.forEach((user) => {
       const orders = user.orders || [];
       orders.forEach((order) => {
-        // Check if the date matches if a date is selected
+        // If there is a selected date, only match orders with that date
         if (selectedDate) {
           const orderDate = dayjs(order.createdAt).format("YYYY-MM-DD");
           if (orderDate !== selectedDate) return;
         }
 
-        // Filter based on the button clicked
-        if (type === "paymentStatus" && order.paymentStatus === false) {
+        // Filter based on the selected type
+        if (type === "shippedCount" && order.shipped === true) {
+          filtered.push(order);
+        } else if (type === "paymentStatus" && order.paymentStatus === false) {
+          filtered.push(order);
+        } else if (
+          type === "levelNotFound" &&
+          order.paymentStatus === true &&
+          order.shipped === false
+        ) {
           filtered.push(order);
         } else if (
           type === "productNotAvailable" &&
@@ -152,7 +179,7 @@ const DetailsReporting = () => {
       });
     });
 
-    setFilteredOrders(filtered);
+    setFilteredOrders(filtered); // Update filtered orders state
   };
 
   const handleDateChange = (date) => {
@@ -402,6 +429,7 @@ const DetailsReporting = () => {
         address: user.address,
         finalAmount: order.finalAmount,
         paymentStatus: order.paymentStatus,
+        shipped: order.shipped,
         items: order.items,
         _id: order._id,
         createdAt: order.createdAt,
@@ -422,9 +450,17 @@ const DetailsReporting = () => {
       }
       if (filterType === "paymentStatus" && order.paymentStatus === false) {
         return true;
-      } else if (
+      } else if (filterType === "shippedCount" && order.shipped === true)
+        return true;
+      else if (
         filterType === "productNotAvailable" &&
         order.items.some((item) => item.productAction !== "Available")
+      ) {
+        return true;
+      } else if (
+        filterType === "levelNotFound" &&
+        order.paymentStatus === true &&
+        order.shipped === false
       ) {
         return true;
       }
@@ -467,37 +503,56 @@ const DetailsReporting = () => {
             />
           </div>
         </div>
-        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white shadow-md rounded-lg p-4 mb-6">
+          <div className="grid grid-cols-2 gap-3">
             <button
-              className="w-full p-4 bg-gradient-to-r from-yellow-100 to-yellow-300 rounded-lg hover:bg-yellow-200 active:bg-yellow-300 transition duration-150 ease-in-out"
+              className="w-full p-2 bg-gradient-to-r from-yellow-100 to-yellow-300 rounded-md hover:bg-yellow-200 active:bg-yellow-300 transition duration-150 ease-in-out"
               onClick={() => filterOrders("paymentStatus")}
             >
-              <p className="text-lg font-medium text-yellow-800">
+              <p className="text-base font-medium text-yellow-800">
                 Hold: Money Issue - {holdMoneyIssueCount}
               </p>
             </button>
 
             <button
-              className="w-full p-4 bg-gradient-to-r from-green-100 to-green-300 rounded-lg hover:bg-green-200 active:bg-green-300 transition duration-150 ease-in-out"
+              className="w-full p-2 bg-gradient-to-r from-green-100 to-green-300 rounded-md hover:bg-green-200 active:bg-green-300 transition duration-150 ease-in-out"
               onClick={() => filterOrders("productNotAvailable")}
             >
-              <p className="text-lg font-medium text-green-800">
+              <p className="text-base font-medium text-green-800">
                 Hold: Product Not Available - {productNotAvailableCount}
               </p>
             </button>
+
+            <button
+              className="w-full p-2 bg-gradient-to-r from-purple-100 to-purple-300 rounded-md hover:bg-purple-200 active:bg-purple-300 transition duration-150 ease-in-out"
+              onClick={() => filterOrders("levelNotFound")}
+            >
+              <p className="text-base font-medium text-purple-800">
+                Label Not Found - {levelNotFoundCount}
+              </p>
+            </button>
+
+            <button
+              className="w-full p-2 bg-gradient-to-r from-blue-100 to-blue-300 rounded-md hover:bg-blue-200 active:bg-blue-300 transition duration-150 ease-in-out"
+              onClick={() => filterOrders("shippedCount")}
+            >
+              <p className="text-base font-medium text-blue-800">
+                Total Shipped Orders - {shippedCount}
+              </p>
+            </button>
           </div>
+
           <br />
 
-          <div className="grid grid-cols-2 gap-4">
-            <button className="w-full p-4 bg-gradient-to-r from-blue-100 to-blue-300 rounded-lg hover:bg-blue-200 active:bg-blue-300 transition duration-150 ease-in-out">
-              <p className="text-lg font-medium text-blue-800">
+          <div className="grid grid-cols-2 gap-3">
+            <button className="w-full p-2 bg-gradient-to-r from-cyan-100 to-cyan-300 rounded-md hover:bg-cyan-200 active:bg-cyan-300 transition duration-150 ease-in-out">
+              <p className="text-base font-medium text-cyan-800">
                 Total Orders - {totalOrdersCount}
               </p>
             </button>
 
-            <button className="w-full p-4 bg-gradient-to-r from-red-100 to-red-300 rounded-lg hover:bg-red-200 active:bg-red-300 transition duration-150 ease-in-out">
-              <p className="text-lg font-medium text-red-800">
+            <button className="w-full p-2 bg-gradient-to-r from-red-100 to-red-300 rounded-md hover:bg-red-200 active:bg-red-300 transition duration-150 ease-in-out">
+              <p className="text-base font-medium text-red-800">
                 Total Orders Hold - {totalOrdersHold}
               </p>
             </button>

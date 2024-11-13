@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Table, Radio, Skeleton } from "antd"; // Import Skeleton
+import { Table, Radio, Skeleton, Button, message, Input } from "antd";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
 import dayjs from "dayjs";
-import moment from "moment"; // Import moment.js
+import moment from "moment";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const ArchivedOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [filter, setFilter] = useState("all"); // Default to "all"
-  const [loading, setLoading] = useState(true); // State for loading
-  console.log(orders);
+  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const getOrders = async () => {
     try {
@@ -35,11 +35,9 @@ const ArchivedOrders = () => {
     getOrders();
   }, []);
 
-  // Function to filter the orders based on the createdAt date
   const filterOrdersByDate = (order) => {
     const orderDate = moment(order.createdAt);
     const today = moment();
-
     switch (filter) {
       case "today":
         return orderDate.isSame(today, "day");
@@ -49,17 +47,22 @@ const ArchivedOrders = () => {
         return orderDate.isSame(today, "month");
       case "year":
         return orderDate.isSame(today, "year");
-      case "all": // Return all orders when the filter is "all"
+      case "all":
       default:
         return true;
     }
   };
 
-  // Data processing to match DispatchDash style
-  const dataSource = orders
+  const filteredDataSource = orders
     .flatMap((user) =>
       user.orders
-        .filter((order) => order.archive === true && filterOrdersByDate(order)) // Only include archived orders and apply the filter
+        .filter(
+          (order) =>
+            order.archive === true &&
+            filterOrdersByDate(order) &&
+            (order.items[0]?.amazonOrderId?.includes(searchTerm) ||
+              order.items[0]?.trackingId?.includes(searchTerm))
+        )
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -81,7 +84,20 @@ const ArchivedOrders = () => {
     )
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  // Column definitions for the Ant Design Table
+  const handleOrderAction = async (enrollment, orderId) => {
+    try {
+      await axios.post(
+        `${backendUrl}/orders/orderAction`,
+        { enrollment, orderId },
+        { headers: { Authorization: localStorage.getItem("token") } }
+      );
+      message.success("Order action successful!");
+    } catch (error) {
+      console.error("Error performing order action:", error);
+      message.error("Failed to perform order action.");
+    }
+  };
+
   const columns = [
     {
       title: <span className="text-sm text-black">Date</span>,
@@ -162,6 +178,18 @@ const ArchivedOrders = () => {
         );
       },
     },
+    {
+      title: <span className="text-sm text-black">Action</span>,
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          onClick={() => handleOrderAction(record.enrollment, record.orderId)}
+        >
+          Unarchive
+        </Button>
+      ),
+    },
   ];
 
   return (
@@ -174,33 +202,46 @@ const ArchivedOrders = () => {
             <h1 className="text-2xl pt-4 font-bold text-white">
               Archive Orders
             </h1>
-          </div>{" "}
-          <div className="text-sm text-black">
-            <Radio.Group
-              buttonStyle="solid"
-              value={filter} // Bind the selected filter to the state
-              onChange={(e) => setFilter(e.target.value)} // Update the filter state when the user selects an option
-            >
-              <Radio.Button value="all">All</Radio.Button>
-              <Radio.Button value="today">Today</Radio.Button>
-              <Radio.Button value="week">This Week</Radio.Button>
-              <Radio.Button value="month">This Month</Radio.Button>
-              <Radio.Button value="year">This Year</Radio.Button>
-            </Radio.Group>
-            <h2
-              className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md"
-              style={{
-                display: "inline-block",
-              }}
-            >
-              Total Orders: {dataSource?.length}
-            </h2>
+          </div>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <Radio.Group
+                buttonStyle="solid"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                <Radio.Button value="all">All</Radio.Button>
+                <Radio.Button value="today">Today</Radio.Button>
+                <Radio.Button value="week">This Week</Radio.Button>
+                <Radio.Button value="month">This Month</Radio.Button>
+                <Radio.Button value="year">This Year</Radio.Button>
+              </Radio.Group>
+              <Input.Search
+                placeholder="Search by Amazon Order ID or Tracking ID"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  width: "250px",
+                  marginLeft: "30px",
+                  marginTop: "3px",
+                }}
+              />
+              <h2
+                className="text-lg font-bold bg-blue-50 text-blue-800 px-4 py-1 rounded-md"
+                style={{
+                  display: "inline-block",
+                }}
+              >
+                Total Orders: {filteredDataSource?.length}
+              </h2>
+            </div>
           </div>
           <Table
             bordered
             columns={columns}
-            dataSource={dataSource}
+            dataSource={filteredDataSource}
             pagination={{ pageSize: 10 }}
+            scroll={{ x: true }}
           />
         </div>
       )}
