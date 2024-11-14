@@ -20,6 +20,7 @@ const AddItems = () => {
       quantity: "",
       gstRate: 0, // New field for gstRate
       amazonOrderId: "",
+      brandName:"",
       pincode: "",
       trackingId: "",
       shippingPartner: "",
@@ -175,6 +176,7 @@ const AddItems = () => {
         gstRate: 0, // New gstRate field
         amazonOrderId: "",
         pincode: "",
+        brandName:"",
         trackingId: "",
         shippingPartner: "",
         shippingPrice: "",
@@ -267,6 +269,9 @@ const AddItems = () => {
                     Amazon Order ID
                   </th>
                   <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Brand Name
+                  </th>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     PinCode
                   </th>
                   <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -349,6 +354,15 @@ const AddItems = () => {
                         type="text"
                         name="amazonOrderId"
                         value={item.amazonOrderId}
+                        onChange={(e) => handleChange(index, e)}
+                        className="w-30 py-1 px-3 border rounded-md focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <input
+                        type="text"
+                        name="brandName"
+                        value={item.brandName}
                         onChange={(e) => handleChange(index, e)}
                         className="w-30 py-1 px-3 border rounded-md focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
                       />

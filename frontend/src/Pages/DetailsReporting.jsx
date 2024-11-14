@@ -190,6 +190,8 @@ const DetailsReporting = () => {
     let productNotAvailableCount = 0;
     let totalHoldOrders = 0;
     let totalOrders = 0;
+    let levelNotFound = 0;
+    let shippedCount = 0;
 
     userData.forEach((user) => {
       const orders = user.orders || [];
@@ -205,6 +207,12 @@ const DetailsReporting = () => {
 
         totalOrders += 1; // Count total orders for the selected date
         let orderHasHold = false;
+        if (order.shipped === true) {
+          shippedCount += 1;
+        }
+        if (order.paymentStatus === true && order.shipped === false) {
+          levelNotFound += 1;
+        }
 
         if (order.paymentStatus === false) {
           moneyIssueCount += 1; // Count hold money issues
@@ -228,6 +236,8 @@ const DetailsReporting = () => {
     });
 
     setFilteredOrders(filtered);
+    setLevelNotFoundCount(levelNotFound);
+    setShippedCount(shippedCount);
     setTotalOrdersCount(totalOrders); // Update total orders count dynamically
     setHoldMoneyIssueCount(moneyIssueCount); // Update money issue count dynamically
     setProductNotAvailableCount(productNotAvailableCount); // Update product not available count dynamically

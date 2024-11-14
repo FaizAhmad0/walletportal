@@ -128,7 +128,7 @@ const CreateOrder = () => {
       dataIndex: "amount",
       key: "amount",
       render: (amount) => (
-        <span className="text-sm text-black">₹ {amount}.00</span>
+        <span className="text-sm text-black">₹ {amount.toFixed(2)}</span>
       ),
     },
     {

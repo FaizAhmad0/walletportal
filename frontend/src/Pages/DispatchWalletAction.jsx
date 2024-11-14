@@ -137,7 +137,7 @@ const DispatchWalletAction = () => {
       key: "amount",
       render: (amount) => (
         <span className="text-sm text-black">
-          {parseFloat(amount).toFixed(3)}
+          {parseFloat(amount).toFixed(2)}
         </span> // Apply class to body
       ),
     },

@@ -29,6 +29,10 @@ const itemSchema = new Schema({
     type: String,
     required: true,
   },
+  brandName: {
+    type: String,
+    required: true,
+  },
   gstRate: {
     type: Number,
     required: true,
@@ -159,7 +163,14 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["user", "manager", "dispatch", "shippingmanager", "admin","accountant"],
+      enum: [
+        "user",
+        "manager",
+        "dispatch",
+        "shippingmanager",
+        "admin",
+        "accountant",
+      ],
       required: true,
       default: "user",
     },
