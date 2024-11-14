@@ -31,7 +31,6 @@ const itemSchema = new Schema({
   },
   brandName: {
     type: String,
-    required: true,
   },
   gstRate: {
     type: Number,
