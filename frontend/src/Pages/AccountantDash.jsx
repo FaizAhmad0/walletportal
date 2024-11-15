@@ -100,7 +100,7 @@ const AccountantDash = () => {
     setFilteredOrders(filtered);
   };
   const handleDownload = () => {
-    // Create a new data source excluding the items field
+    // Create a new data source excluding the items field and updating createdAt
     const dataToDownload = dataSource.map(
       ({
         shippingPartner,
@@ -110,8 +110,15 @@ const AccountantDash = () => {
         key,
         amount,
         items,
+        createdAt, // Include createdAt to modify it
         ...rest
       }) => {
+        // Format createdAt to only include the date
+        const formattedCreatedAt = new Date(createdAt)
+          .toISOString()
+          .split("T")[0];
+
+        // Format items to include separate GST fields
         const itemsWithGST = items.map(({ IGST, CGST, SGST, ...itemRest }) => ({
           ...itemRest,
           IGST,
@@ -121,12 +128,13 @@ const AccountantDash = () => {
 
         return {
           ...rest,
+          createdAt: formattedCreatedAt, // Use the formatted date
           items: itemsWithGST, // Include updated items with separate GST fields
         };
       }
     );
 
-    const jsonData = JSON.stringify(dataToDownload, null, 2); // Convert the dataToDownload to JSON format
+    const jsonData = JSON.stringify(dataToDownload, null, 2); // Convert data to JSON format
 
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = window.URL.createObjectURL(blob);

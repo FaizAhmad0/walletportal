@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Row, Col, Table, Typography, Divider, Button } from "antd";
 import numberToWords from "number-to-words";
+import ForwardIcon from "@mui/icons-material/Forward";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+
 import "./InvoicePage.css";
 
 const { Title, Text } = Typography;
@@ -231,7 +234,12 @@ const InvoicePage = () => {
         <Row>
           <Col span={12}>
             <Title level={4}>Terms & Conditions</Title>
-            <Text>Online download only. No physical delivery.</Text>
+            <Text> Online download only. No physical delivery.</Text>
+            <br />
+            <Text>Goods Once Sold will not be taken back or exchange.</Text>
+            <br />
+            <Text>Seller is not responsible for any loss or damage of </Text>
+            <Text>goods in transit.</Text>
             <br />
             <Text>Thank you for your order!</Text>
           </Col>

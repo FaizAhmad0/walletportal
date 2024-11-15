@@ -308,6 +308,7 @@ const ManagerClients = () => {
               mobile: selectedClient?.mobile,
               amount: selectedClient?.amount,
               enrollment: selectedClient?.enrollment,
+              address: selectedClient?.address,
             }}
             onFinish={handleEditClient}
           >
@@ -359,6 +360,15 @@ const ManagerClients = () => {
               ]}
             >
               <Input type="number" className="text-black" />
+            </Form.Item>
+            <Form.Item
+              label="Address"
+              name="address"
+              rules={[
+                { required: true, message: "Please input the client address!" },
+              ]}
+            >
+              <Input className="text-black" />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">

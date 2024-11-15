@@ -86,6 +86,7 @@ const OrderHistory = () => {
         enrollment: user.enrollment,
         createdAt: order.createdAt,
         amazonOrderId: order.items[0].amazonOrderId,
+        brandName: order.items[0].brandName,
         manager: user.manager,
         shippingPartner: order.items[0].shippingPartner,
         trackingId: order.items[0].trackingId,
@@ -173,6 +174,12 @@ const OrderHistory = () => {
       title: <span className="text-sm text-black">Enrollment</span>,
       dataIndex: "enrollment",
       key: "enrollment",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
+      title: <span className="text-sm text-black">Brand Name</span>,
+      dataIndex: "brandName",
+      key: "brandName",
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
