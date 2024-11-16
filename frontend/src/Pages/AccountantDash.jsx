@@ -308,64 +308,66 @@ const AccountantDash = () => {
 
   const dataSource = filteredOrders
     .flatMap((user) =>
-      user.orders.map((order) => ({
-        key: order._id,
-        name: user.name,
-        amount: user.amount,
-        invoiceNo: order.orderId,
-        enrollment: user.enrollment,
-        amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
-        itemName: order.items[0]?.name || "N/A",
-        manager: user.manager,
-        shippingPartner: order.items[0]?.shippingPartner || "N/A",
-        quantity: order.items[0]?.quantity || "N/A",
-        price: order.items[0]?.price || "N/A",
-        trackingId: order.items[0]?.trackingId || "N/A",
-        sku: order.items[0]?.sku || "N/A",
-        pincode: order.items[0]?.pincode || "N/A",
-        address: user.address,
-        aot: "No",
-        itemRate: "Nos",
-        country: user.country,
-        state: user.state,
-        gst: user.gst,
-        invoiceVal: order.finalAmount,
-        paymentStatus: order.paymentStatus,
-        items: order.items.map((item) => {
-          const gstRate = parseFloat(item.gstRate || 0);
-          const totalPrice = parseFloat(item.totalPrice || 0);
-          const shippingPrice = parseFloat(item.shippingPrice || 0);
+      user.orders
+        .filter((order) => order.paymentStatus === true) // Filter orders by paymentStatus
+        .map((order) => ({
+          key: order._id,
+          name: user.name,
+          amount: user.amount,
+          invoiceNo: order.orderId,
+          enrollment: user.enrollment,
+          amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
+          itemName: order.items[0]?.name || "N/A",
+          manager: user.manager,
+          shippingPartner: order.items[0]?.shippingPartner || "N/A",
+          quantity: order.items[0]?.quantity || "N/A",
+          price: order.items[0]?.price || "N/A",
+          trackingId: order.items[0]?.trackingId || "N/A",
+          sku: order.items[0]?.sku || "N/A",
+          pincode: order.items[0]?.pincode || "N/A",
+          address: user.address,
+          aot: "No",
+          itemRate: "Nos",
+          country: user.country,
+          state: user.state,
+          gst: user.gst,
+          invoiceVal: order.finalAmount,
+          paymentStatus: order.paymentStatus,
+          items: order.items.map((item) => {
+            const gstRate = parseFloat(item.gstRate || 0);
+            const totalPrice = parseFloat(item.totalPrice || 0);
+            const shippingPrice = parseFloat(item.shippingPrice || 0);
 
-          const itemGST = (totalPrice * gstRate) / 100;
-          const shippingGST = (shippingPrice * 18) / 100;
-          const totalGST = itemGST + shippingGST;
+            const itemGST = (totalPrice * gstRate) / 100;
+            const shippingGST = (shippingPrice * 18) / 100;
+            const totalGST = itemGST + shippingGST;
 
-          let gstData = {};
-          if (user.state === "Rajasthan") {
-            const halfGstRate = (totalGST / 2).toFixed(2);
-            gstData = {
-              CGST: parseFloat(halfGstRate),
-              SGST: parseFloat(halfGstRate),
-              IGST: 0,
+            let gstData = {};
+            if (user.state === "Rajasthan") {
+              const halfGstRate = (totalGST / 2).toFixed(2);
+              gstData = {
+                CGST: parseFloat(halfGstRate),
+                SGST: parseFloat(halfGstRate),
+                IGST: 0,
+              };
+            } else {
+              gstData = {
+                CGST: 0,
+                SGST: 0,
+                IGST: parseFloat(totalGST.toFixed(2)),
+              };
+            }
+
+            return {
+              ...item,
+              gstData,
             };
-          } else {
-            gstData = {
-              CGST: 0,
-              SGST: 0,
-              IGST: parseFloat(totalGST.toFixed(2)),
-            };
-          }
-
-          return {
-            ...item,
-            gstData,
-          };
-        }),
-        gstRegistration: "Regular",
-        voucherType: "Sales",
-        _id: order._id,
-        createdAt: order.createdAt,
-      }))
+          }),
+          gstRegistration: "Regular",
+          voucherType: "Sales",
+          _id: order._id,
+          createdAt: order.createdAt,
+        }))
     )
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 

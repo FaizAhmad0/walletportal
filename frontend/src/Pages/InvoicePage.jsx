@@ -151,7 +151,8 @@ const InvoicePage = () => {
             </Text>
             <br />
             <Text>
-              <strong>State:</strong> {customer.state} <strong>Country:</strong>
+              <strong>State:</strong> {customer.state},{" "}
+              <strong>Country:</strong>
               {customer.country}
             </Text>
             <br />
