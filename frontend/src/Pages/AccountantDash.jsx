@@ -430,6 +430,14 @@ const AccountantDash = () => {
                 Download Orders Data
               </Button>
             </div>
+            <h2
+              className="text-lg font-bold bg-blue-50 text-blue-800 py-1 mt-3 px-4 rounded-md"
+              style={{
+                display: "inline-block",
+              }}
+            >
+              Total Orders: {filteredOrders?.length}
+            </h2>
           </div>
         </div>
 
