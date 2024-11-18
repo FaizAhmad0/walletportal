@@ -163,10 +163,14 @@ const AdminDetailsReporting = () => {
   };
   const columns = [
     {
-      title: <span className="text-sm text-black">Order Id</span>,
-      dataIndex: "orderId",
-      key: "orderId",
-      render: (text) => <span className="text-sm text-black">{text}</span>,
+      title: <span className="text-sm text-black">Date</span>,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (
+        <span className="text-sm text-black">
+          {dayjs(text).format("DD/MM/YYYY")}
+        </span>
+      ),
     },
     {
       title: <span className="text-sm text-black">Enrollment No.</span>,

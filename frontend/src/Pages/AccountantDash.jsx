@@ -2,20 +2,23 @@ import React, { useEffect, useState } from "react";
 import AccountantLayout from "../Layout/AccountantLayout";
 import { Table, message, Select, Radio, Input, Button, DatePicker } from "antd";
 import axios from "axios";
+import dayjs from "dayjs";
 import moment from "moment"; // Make sure to install moment.js via npm or yarn
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Search } = Input;
+const { RangePicker } = DatePicker;
 
 const AccountantDash = () => {
   const [orders, setOrders] = useState([]);
+  const [dateRange, setDateRange] = useState([null, null]);
+  console.log(dateRange);
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [dateRange, setDateRange] = useState([]);
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("");
   const [timeFilter, setTimeFilter] = useState(""); // Initialize with empty string for no filter
   const [searchQuery, setSearchQuery] = useState(""); // Add state for search
-  const handleDateChange = (dates) => {
-    setDateRange(dates);
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates); // Set the selected date range
   };
   // Fetch orders from backend
   const getOrders = async () => {
@@ -51,31 +54,6 @@ const AccountantDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Apply Time Filter
-    if (timeFilter !== "") {
-      const now = moment();
-      filtered = filtered
-        .map((user) => ({
-          ...user,
-          orders: user.orders.filter((order) => {
-            const orderDate = moment(order.createdAt);
-            switch (timeFilter) {
-              case "today":
-                return orderDate.isSame(now, "day");
-              case "week":
-                return orderDate.isSame(now, "week");
-              case "month":
-                return orderDate.isSame(now, "month");
-              case "year":
-                return orderDate.isSame(now, "year");
-              default:
-                return true;
-            }
-          }),
-        }))
-        .filter((user) => user.orders.length > 0);
-    }
-
     // Apply Search Filter
     if (searchQuery.trim() !== "") {
       filtered = filtered
@@ -95,6 +73,30 @@ const AccountantDash = () => {
           }),
         }))
         .filter((user) => user.orders.length > 0); // Ensure to filter out users with no orders left after filtering
+    }
+
+    // Apply Date Range Filter
+    if (dateRange[0] && dateRange[1]) {
+      const [startDate, endDate] = dateRange;
+
+      // Ensure startDate and endDate are Dayjs objects (if they're not already)
+      const startMoment = dayjs(startDate);
+      const endMoment = dayjs(endDate);
+
+      filtered = filtered
+        .map((user) => ({
+          ...user,
+          orders: user.orders.filter((order) => {
+            const orderDate = dayjs(order.createdAt);
+
+            // Check if the order date is within the range (inclusive)
+            return (
+              orderDate.isSameOrAfter(startMoment) &&
+              orderDate.isSameOrBefore(endMoment)
+            );
+          }),
+        }))
+        .filter((user) => user.orders.length > 0); // Remove users with no orders after filtering
     }
 
     setFilteredOrders(filtered);
@@ -165,11 +167,11 @@ const AccountantDash = () => {
 
   const columns = [
     {
-      title: <span className="text-xs">Date</span>,
+      title: <span className="text-sm">Date</span>,
       dataIndex: "createdAt",
       key: "createdAt",
       render: (text) => (
-        <span className="text-xs">
+        <span className="text-sm">
           {new Date(text).toLocaleDateString("en-GB", {
             day: "2-digit",
             month: "2-digit",
@@ -179,125 +181,125 @@ const AccountantDash = () => {
       ),
     },
     {
-      title: <span className="text-xs">Invoice No.</span>,
+      title: <span className="text-sm">Invoice No.</span>,
       dataIndex: "invoiceNo",
       key: "invoiceNo",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Voucher type</span>,
+      title: <span className="text-sm">Voucher type</span>,
       dataIndex: "voucherType",
       key: "voucherType",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Party Name</span>,
+      title: <span className="text-sm">Party Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Invoice Value</span>,
+      title: <span className="text-sm">Invoice Value</span>,
       dataIndex: "invoiceVal",
       key: "invoiceVal",
       render: (text) => {
         const formattedAmount = Number(text).toFixed(2); // Convert to number and format with 2 decimal places
-        return <span className="text-xs">₹ {formattedAmount}</span>;
+        return <span className="text-sm">₹ {formattedAmount}</span>;
       },
     },
     {
-      title: <span className="text-xs">Item Name</span>,
+      title: <span className="text-sm">Item Name</span>,
       dataIndex: "itemName",
       key: "itemName",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Quantity</span>,
+      title: <span className="text-sm">Quantity</span>,
       dataIndex: "quantity",
       key: "quantity",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Item Rate</span>,
+      title: <span className="text-sm">Item Rate</span>,
       dataIndex: "price",
       key: "price",
-      render: (text) => <span className="text-xs">₹ {text}</span>,
+      render: (text) => <span className="text-sm">₹ {text}</span>,
     },
     {
-      title: <span className="text-xs">Bill to</span>,
+      title: <span className="text-sm">Bill to</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Mailing Name</span>,
+      title: <span className="text-sm">Mailing Name</span>,
       dataIndex: "name",
       key: "name",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Address</span>,
+      title: <span className="text-sm">Address</span>,
       dataIndex: "address",
       key: "address",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Country</span>,
+      title: <span className="text-sm">Country</span>,
       dataIndex: "country",
       key: "country",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">State</span>,
+      title: <span className="text-sm">State</span>,
       dataIndex: "state",
       key: "state",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Pincode</span>,
+      title: <span className="text-sm">Pincode</span>,
       dataIndex: "pincode",
       key: "pincode",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Item Rate</span>,
+      title: <span className="text-sm">Item Rate</span>,
       dataIndex: "itemRate",
       key: "itemRate",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">GST Registration Type</span>,
+      title: <span className="text-sm">GST Registration Type</span>,
       dataIndex: "gstRegistration",
       key: "gstRegistration",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Assessee of Other Territory</span>,
+      title: <span className="text-sm">Assessee of Other Territory</span>,
       dataIndex: "aot",
       key: "aot",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">GSTIN/UIN</span>,
+      title: <span className="text-sm">GSTIN/UIN</span>,
       dataIndex: "gst",
       key: "gst",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     {
-      title: <span className="text-xs">Place of supply</span>,
+      title: <span className="text-sm">Place of supply</span>,
       dataIndex: "state",
       key: "state",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <span className="text-sm">{text}</span>,
     },
     // Add new column for GST rate (CGST, SGST or IGST)
     {
-      title: <span className="text-xs">GST Rate</span>,
+      title: <span className="text-sm">GST Rate</span>,
       dataIndex: "items", // Accessing items array
       key: "gstRateDisplay",
       render: (_, record) => (
         <div>
           {record.items.map((item, index) => (
-            <div key={index} className="text-xs">
+            <div key={index} className="text-sm">
               {item.gstRateDisplay}
             </div>
           ))}
@@ -375,7 +377,7 @@ const AccountantDash = () => {
   useEffect(() => {
     filterOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentStatusFilter, timeFilter, searchQuery, orders]);
+  }, [paymentStatusFilter, timeFilter, searchQuery, dateRange, orders]);
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -394,25 +396,32 @@ const AccountantDash = () => {
           <div className="flex items-center justify-between space-x-4">
             {" "}
             {/* Time Filter */}
-            <div className="text-xs items-end">
+            {/* <div className="text-sm text-black">
               <Radio.Group
                 buttonStyle="solid"
                 onChange={handleTimeFilter}
                 value={timeFilter}
               >
+                <Radio.Button value="yesterday">Yesterday</Radio.Button>{" "}
                 <Radio.Button value="today">Today</Radio.Button>
                 <Radio.Button value="week">This Week</Radio.Button>
                 <Radio.Button value="month">This Month</Radio.Button>
                 <Radio.Button value="year">This Year</Radio.Button>
               </Radio.Group>
-            </div>
+            </div> */}
+            <RangePicker
+              value={dateRange}
+              onChange={handleDateRangeChange}
+              format="DD/MM/YYYY"
+              style={{ width: 300 }}
+            />
             <div>
               <Search
                 placeholder="Search by Order ID, Enrollment No., Amazon Order ID"
                 value={searchQuery}
                 onChange={handleSearchChange} // This will still handle input change
                 style={{ width: 300 }}
-                className="text-xs"
+                className="text-sm"
                 enterButton // Adds a search icon/button next to the input
               />
             </div>
@@ -425,7 +434,7 @@ const AccountantDash = () => {
         </div>
 
         {/* Orders Table */}
-        <div className="overflow-x-auto mb-16 text-xs">
+        <div className="overflow-x-auto mb-16 text-sm">
           <Table
             bordered
             columns={columns}

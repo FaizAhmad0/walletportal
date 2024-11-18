@@ -201,6 +201,12 @@ const ManagerClients = () => {
       ),
     },
     {
+      title: <span className="text-sm text-black">GST</span>,
+      dataIndex: "gst",
+      key: "gst",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
       title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (_, client) => (
