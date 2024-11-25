@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const sampleData = require("./data"); // Import the data
 const User = require("../models/User"); // Import the Mongoose model
+const Product = require("../models/Product");
 
 const app = express();
 const PORT = 7500;
@@ -22,13 +23,15 @@ mongoose
 // Save all users from data.js to the database
 const saveAllUsers = async () => {
   try {
-    await User.deleteMany({role:"user"}); // Clear the collection before inserting
-    await User.insertMany(sampleData);
-    console.log("All users saved to the database");
+    const products = await Product.find({
+      name: "Digital wall painting",
+    }); // Clear the collection before inserting
+    console.log(products);
   } catch (error) {
     console.error("Error saving users:", error);
   }
 };
+
 saveAllUsers();
 
 app.listen(PORT, () => {

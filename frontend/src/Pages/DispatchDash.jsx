@@ -257,6 +257,12 @@ const DispatchDash = () => {
       render: (text) => <span className="text-sm text-black">{text}</span>,
     },
     {
+      title: <span className="text-sm text-black">Brand Name</span>,
+      dataIndex: "brandName",
+      key: "brandName",
+      render: (text) => <span className="text-sm text-black">{text}</span>,
+    },
+    {
       title: <span className="text-sm text-black">User Amount.</span>,
       dataIndex: "amount",
       key: "amount",
@@ -486,6 +492,8 @@ const DispatchDash = () => {
           orderId: order.orderId,
           enrollment: user.enrollment,
           amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
+          brandName: order.items[0]?.brandName || "N/A",
+
           manager: user.manager,
           shippingPartner: order.items[0]?.shippingPartner || "N/A",
           trackingId: order.items[0]?.trackingId || "N/A",
