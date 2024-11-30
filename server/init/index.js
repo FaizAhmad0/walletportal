@@ -23,12 +23,20 @@ mongoose
 // Save all users from data.js to the database
 const saveAllUsers = async () => {
   try {
-    const products = await Product.find({
-      name: "Digital wall painting",
-    }); // Clear the collection before inserting
-    console.log(products);
+    // Find products with the specified GST rate
+    const products = await Product.find({ gstRate: 0.18 });
+    const length = products.length;
+    console.log(`Number of products to update: ${length}`);
+
+    // Update GST rate for each product individually
+    for (const product of products) {
+      product.gstRate = 18; // Update GST rate
+      await product.save(); // Save the updated product
+    }
+
+    console.log("All products updated successfully.");
   } catch (error) {
-    console.error("Error saving users:", error);
+    console.error("Error updating products:", error);
   }
 };
 

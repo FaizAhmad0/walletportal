@@ -4,6 +4,7 @@ const authService = require("../services/login");
 module.exports = async (req, res) => {
   try {
     const { enrollment, password } = req.body;
+    console.log(enrollment, password);
 
     const user = await User.findOne({ enrollment });
     if (!user) {
@@ -15,7 +16,7 @@ module.exports = async (req, res) => {
     res.status(200).json({
       token: token,
       name: user.name,
-      enrollment:user.enrollment,
+      enrollment: user.enrollment,
       email: user.email,
       message: "Logged in successfully!",
       id: user._id,
