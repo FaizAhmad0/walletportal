@@ -21,26 +21,112 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Save all users from data.js to the database
-const saveAllUsers = async () => {
+// const saveAllUsers = async () => {
+//   try {
+//     // Find products with the specified GST rate
+//     const products = await Product.find({ gstRate: 0.18 });
+//     const length = products.length;
+//     console.log(`Number of products to update: ${length}`);
+
+//     // Update GST rate for each product individually
+//     for (const product of products) {
+//       product.gstRate = 18; // Update GST rate
+//       await product.save(); // Save the updated product
+//     }
+
+//     console.log("All products updated successfully.");
+//   } catch (error) {
+//     console.error("Error updating products:", error);
+//   }
+// };
+
+// saveAllUsers();
+// const fetchOrdersWithInvalidGST = async () => {
+//   try {
+//     // Fetch orders that have at least one item with gstRate not in [18, 12]
+//     const orders = await User.aggregate([
+//       {
+//         $unwind: "$orders", // Unwind orders array to work with each order individually
+//       },
+//       {
+//         $unwind: "$orders.items", // Unwind items array to work with each item individually
+//       },
+//       {
+//         $match: {
+//           "orders.items.gstRate": { $nin: [18, 12] }, // Match items with gstRate not in [18, 12]
+//         },
+//       },
+//       {
+//         $project: {
+//           orderId: "$orders.orderId", // Include orderId
+//           items: "$orders.items", // Include only the items of the order
+//           finalAmount: "$orders.finalAmount", // Include finalAmount
+//           paymentStatus: "$orders.paymentStatus", // Include paymentStatus
+//           name: 1, // Include user name
+//           email: 1, // Include user email
+//           enrollment: 1, // Include user enrollment
+//           createdAt: "$orders.createdAt", // Include order's createdAt timestamp
+//           userCreatedAt: "$createdAt", // Include user's createdAt timestamp
+//         },
+//       },
+//     ]);
+
+//     console.log(
+//       "Orders with invalid GST rates and createdAt:",
+//       JSON.stringify(orders, null, 2)
+//     );
+//     console.log("Total orders with wrong GST rate:", orders.length);
+//   } catch (error) {
+//     console.error("Error fetching orders with invalid GST:", error);
+//   }
+// };
+
+// // Call the function to fetch the data
+// fetchOrdersWithInvalidGST();
+
+const fetchOrderByAmazonOrderId = async (amazonOrderId) => {
   try {
-    // Find products with the specified GST rate
-    const products = await Product.find({ gstRate: 0.18 });
-    const length = products.length;
-    console.log(`Number of products to update: ${length}`);
+    const order = await User.aggregate([
+      { $unwind: "$orders" },
+      { $unwind: "$orders.items" },
+      {
+        $match: {
+          "orders.items.amazonOrderId": amazonOrderId,
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude internal MongoDB ID
+          name: 1, // Include user details
+          email: 1,
+          enrollment: 1,
+          userCreatedAt: "$createdAt",
+          order: {
+            orderId: "$orders.orderId",
+            items: "$orders.items",
+            finalAmount: "$orders.finalAmount",
+            paymentStatus: "$orders.paymentStatus",
+            createdAt: "$orders.createdAt",
+          },
+        },
+      },
+    ]);
 
-    // Update GST rate for each product individually
-    for (const product of products) {
-      product.gstRate = 18; // Update GST rate
-      await product.save(); // Save the updated product
+    if (order.length > 0) {
+      console.log(
+        "Order with Amazon Order ID:",
+        JSON.stringify(order[0], null, 2)
+      );
+    } else {
+      console.log("No order found with the specified Amazon Order ID.");
     }
-
-    console.log("All products updated successfully.");
   } catch (error) {
-    console.error("Error updating products:", error);
+    console.error("Error fetching order by Amazon Order ID:", error);
   }
 };
 
-saveAllUsers();
+// Call the function
+fetchOrderByAmazonOrderId("408-8170367-7810747");
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

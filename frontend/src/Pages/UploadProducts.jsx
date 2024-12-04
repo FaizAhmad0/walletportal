@@ -135,6 +135,10 @@ const UploadProducts = () => {
   const handleEditProduct = (index) => {
     setNewProduct({ ...products[index], productId: products[index]._id });
     setEditingIndex(index);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Add a smooth scrolling effect
+    });
   };
 
   const handleDownloadSample = () => {

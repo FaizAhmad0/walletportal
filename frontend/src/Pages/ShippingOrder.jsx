@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Radio, Input } from "antd";
+import { Table, Radio, Input, message } from "antd";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
 import dayjs from "dayjs";
 import moment from "moment";
+import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
 
 const { Search } = Input; // Destructure Search from Input
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -12,6 +13,24 @@ const ShippingOrder = () => {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("all");
   const [searchText, setSearchText] = useState(""); // Add searchText state
+
+  const handleUnshipped = async (record) => {
+    try {
+      // Replace 'your-backend-endpoint' with your actual API endpoint
+      const response = await axios.post(`${backendUrl}/orders/unshipped`, {
+        orderId: record.orderId, // Include any required data from the record
+      });
+
+      if (response.status === 200) {
+        message.success("Order marked as unshipped successfully!"); // Optionally refresh the data or update the UI
+      } else {
+        message.error("Failed to mark order as unshipped. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error marking order as unshipped:", error);
+      alert("An error occurred while processing the request.");
+    }
+  };
 
   const getOrders = async () => {
     try {
@@ -182,6 +201,21 @@ const ShippingOrder = () => {
           <span className="text-sm text-black text-red-500">Unavailable</span>
         );
       },
+    },
+    {
+      title: <span className="text-sm text-black">Action</span>,
+      key: "action",
+      width: 150, // Adjust width as needed
+      render: (_, record) => (
+        <button
+          onClick={() => handleUnshipped(record)}
+          className="bg-blue-500 text-white text-sm px-4 py-2 rounded hover:bg-blue-600 flex items-center justify-center gap-2"
+        >
+          <LocalShippingOutlined />
+          <span className="hidden md:inline">Unshipped</span>{" "}
+          {/* Optional text */}
+        </button>
+      ),
     },
   ];
 
