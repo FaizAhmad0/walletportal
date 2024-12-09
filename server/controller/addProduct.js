@@ -74,14 +74,14 @@ module.exports = async (req, res) => {
       ],
     };
 
-    doubletick
-      .outgoingMessagesWhatsappTemplate(whatsappMessage)
-      .then(({ data }) => {
-        console.log("WhatsApp message sent:", data);
-      })
-      .catch((err) => {
-        console.error("Error sending WhatsApp message:", err);
-      });
+    // doubletick
+    //   .outgoingMessagesWhatsappTemplate(whatsappMessage)
+    //   .then(({ data }) => {
+    //     console.log("WhatsApp message sent:", data);
+    //   })
+    //   .catch((err) => {
+    //     console.error("Error sending WhatsApp message:", err);
+    //   });
 
     res.status(200).json({
       message:

@@ -113,11 +113,6 @@ const DispatchLayout = ({ children }) => {
             },
 
             {
-              key: "/dispatch-wallet-action",
-              icon: <AccountBalanceWalletIcon />,
-              label: "Wallet Action",
-            },
-            {
               key: "/dispatch-order-report",
               icon: <ViewInArIcon />,
               label: "Order Report",
