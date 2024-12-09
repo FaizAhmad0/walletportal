@@ -12,16 +12,14 @@ const DispatchAllTransaction = () => {
 
   const getTransaction = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/orders/alltransactions`, {
+      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
         headers: {
           Authorization: localStorage.getItem("token"),
         },
       });
-      const sortedTransactions = response.data.transactions.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setTransactions(sortedTransactions);
-      setFilteredTransactions(sortedTransactions);
+
+      setTransactions(response.data.orders);
+      setFilteredTransactions(response.data.orders);
     } catch (error) {
       console.error("Error fetching transactions:", error);
       message.error("Failed to fetch transactions. Please try again.");
@@ -36,11 +34,12 @@ const DispatchAllTransaction = () => {
     setFilterDate(date);
 
     if (date) {
-      const filtered = transactions.filter(
-        (transaction) =>
-          new Date(transaction.createdAt).toLocaleDateString() ===
-          new Date(date).toLocaleDateString()
-      );
+      const filtered = transactions.filter((transaction) => {
+        const transactionDate = new Date(transaction.createdAt)
+          .toISOString()
+          .split("T")[0];
+        return transactionDate === date; // Compare ISO date strings (YYYY-MM-DD)
+      });
       setFilteredTransactions(filtered);
     } else {
       setFilteredTransactions(transactions);
@@ -48,6 +47,18 @@ const DispatchAllTransaction = () => {
   };
 
   const columns = [
+    {
+      title: "Enrollment",
+      dataIndex: "enrollment",
+      key: "enrollment",
+      render: (text) => <span style={{ color: "black" }}>{text}</span>,
+    },
+    {
+      title: "User",
+      dataIndex: "userName",
+      key: "userName",
+      render: (text) => <span style={{ color: "black" }}>{text}</span>,
+    },
     {
       title: "Amount",
       dataIndex: "amount",
@@ -65,16 +76,20 @@ const DispatchAllTransaction = () => {
       ),
     },
     {
-      title: "Type",
-      key: "type",
-      render: (_, record) => {
-        if (record.credit) {
-          return <span style={{ color: "green" }}>Credit</span>;
-        } else if (record.debit) {
-          return <span style={{ color: "red" }}>Debit</span>;
-        }
-        return null;
-      },
+      title: "Debit",
+      key: "debit",
+      render: (_, record) =>
+        record.debit ? (
+          <span style={{ color: "red" }}>{record.amount}</span>
+        ) : null,
+    },
+    {
+      title: "Credit",
+      key: "credit",
+      render: (_, record) =>
+        record.credit ? (
+          <span style={{ color: "green" }}>{record.amount}</span>
+        ) : null,
     },
     {
       title: "Description",
@@ -83,6 +98,23 @@ const DispatchAllTransaction = () => {
       render: (text) => <span style={{ color: "black" }}>{text}</span>,
     },
   ];
+
+  const dataSource = filteredTransactions
+    .flatMap((user) =>
+      user.transactions.map((transaction) => ({
+        key: transaction._id,
+        userName: user.name,
+        userId: user._id,
+        enrollment: user.enrollment,
+        userEmail: user.email,
+        amount: transaction.amount,
+        credit: transaction.credit,
+        debit: transaction.debit,
+        description: transaction.description,
+        createdAt: transaction.createdAt,
+      }))
+    )
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
     <DispatchLayout>
@@ -102,9 +134,9 @@ const DispatchAllTransaction = () => {
       </div>
       <Table
         bordered
-        dataSource={filteredTransactions}
+        dataSource={dataSource}
         columns={columns}
-        rowKey={(record) => record._id}
+        rowKey={(record) => record.key}
         pagination={{ pageSize: 10 }}
       />
     </DispatchLayout>

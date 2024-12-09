@@ -526,7 +526,7 @@ const Home = () => {
         </Form>
       </div>
 
-      <div>
+      {/* <div>
         <iframe
           sandbox="allow-same-origin allow-scripts"
           src="https://drive.google.com/file/d/1dlCEwXNYu_VpUvxXPlLyvmeb7GwSVWUD/preview"
@@ -535,7 +535,7 @@ const Home = () => {
           height="480"
           allow="autoplay; encrypted-media"
         ></iframe>
-      </div>
+      </div> */}
 
       <Footer />
     </>

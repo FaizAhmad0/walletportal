@@ -5,7 +5,6 @@ import axios from "axios";
 import dayjs from "dayjs";
 import moment from "moment";
 import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
-
 const { Search } = Input; // Destructure Search from Input
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -23,6 +22,7 @@ const ShippingOrder = () => {
 
       if (response.status === 200) {
         message.success("Order marked as unshipped successfully!"); // Optionally refresh the data or update the UI
+        getOrders();
       } else {
         message.error("Failed to mark order as unshipped. Please try again.");
       }
