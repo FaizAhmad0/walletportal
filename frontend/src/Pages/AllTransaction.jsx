@@ -1,27 +1,44 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../Layout/AdminLayout";
-import { Table, message, Input } from "antd";
+import { Table, message, Input, Button } from "antd";
 import axios from "axios";
+import * as XLSX from "xlsx";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AllTransaction = () => {
   const [transactions, setTransactions] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [filterDate, setFilterDate] = useState("");
 
   const getTransaction = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/orders/alltransactions`, {
+      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
         headers: {
           Authorization: localStorage.getItem("token"),
         },
       });
-      const sortedTransactions = response.data.transactions.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setTransactions(sortedTransactions);
-      setFilteredTransactions(sortedTransactions);
+
+      const flattenedTransactions = response.data.orders
+        .flatMap((user) =>
+          user.transactions.map((transaction) => ({
+            key: transaction._id,
+            userName: user.name,
+            enrollment: user.enrollment,
+            userEmail: user.email,
+            amount: transaction.amount,
+            credit: transaction.credit,
+            debit: transaction.debit,
+            description: transaction.description,
+            createdAt: transaction.createdAt,
+          }))
+        )
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      setTransactions(response.data.orders);
+      setDataSource(flattenedTransactions);
+      setFilteredTransactions(flattenedTransactions);
     } catch (error) {
       console.error("Error fetching transactions:", error);
       message.error("Failed to fetch transactions. Please try again.");
@@ -36,18 +53,49 @@ const AllTransaction = () => {
     setFilterDate(date);
 
     if (date) {
-      const filtered = transactions.filter(
-        (transaction) =>
-          new Date(transaction.createdAt).toLocaleDateString() ===
-          new Date(date).toLocaleDateString()
-      );
+      const filtered = dataSource.filter((transaction) => {
+        const transactionDate = new Date(transaction.createdAt)
+          .toISOString()
+          .split("T")[0];
+        return transactionDate === date;
+      });
       setFilteredTransactions(filtered);
     } else {
-      setFilteredTransactions(transactions);
+      setFilteredTransactions(dataSource);
     }
   };
 
+  const handleDownload = () => {
+    const exportData = filteredTransactions.map((transaction) => ({
+      Enrollment: transaction.enrollment,
+      UserName: transaction.userName,
+      Amount: transaction.amount,
+      Credit: transaction.credit ? "Yes" : "No",
+      Debit: transaction.debit ? "Yes" : "No",
+      Description: transaction.description,
+      Date: new Date(transaction.createdAt).toLocaleDateString(),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+
+    XLSX.writeFile(workbook, "transactions.xlsx");
+  };
+
   const columns = [
+    {
+      title: "Enrollment",
+      dataIndex: "enrollment",
+      key: "enrollment",
+      render: (text) => <span style={{ color: "black" }}>{text}</span>,
+    },
+    {
+      title: "User",
+      dataIndex: "userName",
+      key: "userName",
+      render: (text) => <span style={{ color: "black" }}>{text}</span>,
+    },
     {
       title: "Amount",
       dataIndex: "amount",
@@ -65,16 +113,20 @@ const AllTransaction = () => {
       ),
     },
     {
-      title: "Type",
-      key: "type",
-      render: (_, record) => {
-        if (record.credit) {
-          return <span style={{ color: "green" }}>Credit</span>;
-        } else if (record.debit) {
-          return <span style={{ color: "red" }}>Debit</span>;
-        }
-        return null;
-      },
+      title: "Debit",
+      key: "debit",
+      render: (_, record) =>
+        record.debit ? (
+          <span style={{ color: "red" }}>{record.amount}</span>
+        ) : null,
+    },
+    {
+      title: "Credit",
+      key: "credit",
+      render: (_, record) =>
+        record.credit ? (
+          <span style={{ color: "green" }}>{record.amount}</span>
+        ) : null,
     },
     {
       title: "Description",
@@ -89,7 +141,7 @@ const AllTransaction = () => {
       <div className="w-full pb-2 px-4 mb-3 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
         <h1 className="text-2xl pt-4 font-bold text-white">All Transactions</h1>
       </div>
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
         <Input.Search
           type="date"
           value={filterDate}
@@ -99,12 +151,15 @@ const AllTransaction = () => {
           style={{ width: 250 }}
           enterButton="Search"
         />
+        <Button type="primary" onClick={handleDownload}>
+          Download as Excel
+        </Button>
       </div>
       <Table
         bordered
         dataSource={filteredTransactions}
         columns={columns}
-        rowKey={(record) => record._id}
+        rowKey={(record) => record.key}
         pagination={{ pageSize: 10 }}
       />
     </AdminLayout>
