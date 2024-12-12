@@ -107,7 +107,7 @@ const DispatchLayout = ({ children }) => {
               label: "Products",
             },
             {
-              key: `/order-report/${enrollment}`,
+              key: `/dispatch-bulkorder`,
               icon: <SignalCellularAltIcon />,
               label: "Bulk-Order",
             },

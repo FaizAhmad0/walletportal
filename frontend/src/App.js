@@ -44,6 +44,8 @@ import DispatchOrdersReport from "./Pages/DispatchOrdersReport";
 import DispatchWalletAction from "./Pages/DispatchWalletAction";
 import DispatchAllTransaction from "./Pages/DispatchAllTransaction";
 import AllTransaction from "./Pages/AllTransaction";
+import BulkOrderDetails from "./Pages/BulkOrderDetails";
+import DispatchBulk from "./Pages/DispatchBulk";
 function App() {
   return (
     <>
@@ -63,14 +65,11 @@ function App() {
           <Route path="/success" exact element={<PaymentSuccess />} />
           <Route path="/payment-status" exact element={<PaymentStatus />} />
           <Route path="/clients" exact element={<ManagerClients />} />
-          <Route
-            path="/order-report/:enrollment"
-            exact
-            element={<OrderReport />}
-          />
+          <Route path="/dispatch-bulkorder" exact element={<DispatchBulk />} />
           <Route path="/archive-orders" exact element={<ArchivedOrders />} />
           <Route path="/shipped-orders" exact element={<ShippingOrder />} />
           <Route path="/bulkOrders" exact element={<BulkOrders />} />
+          <Route path="/bulkorder/:orderId" element={<BulkOrderDetails />} />
           <Route
             path="/details-reporting"
             exact
@@ -97,10 +96,7 @@ function App() {
           <Route path="/audit-report" element={<AuditReport />} />
           <Route path="/accountant-dash" element={<AccountantDash />} />
           <Route path="/all-transaction" element={<DispatchAllTransaction />} />
-          <Route
-            path="/all-transactions"
-            element={<AllTransaction />}
-          />
+          <Route path="/all-transactions" element={<AllTransaction />} />
           <Route
             path="/dispatch-order-report"
             element={<DispatchOrdersReport />}

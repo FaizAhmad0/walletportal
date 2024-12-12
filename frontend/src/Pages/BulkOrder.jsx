@@ -5,41 +5,40 @@ import {
   Button,
   Select,
   DatePicker,
-  message,
-  Popconfirm,
   Modal,
+  Form,
+  message,
 } from "antd";
-import { SaveOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { SaveOutlined } from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 import ManagerLayout from "../Layout/ManagerLayout";
 import "antd/dist/reset.css";
 
+const { Option } = Select;
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-const { Option } = Select;
-
 const BulkOrder = () => {
-  const [orders, setOrders] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [paymentStages, setPaymentStages] = useState([]);
-  const [editingKey, setEditingKey] = useState(""); // Track the currently editing row
   const [formData, setFormData] = useState({
     enrollment: "",
     brandName: "",
-    partyName: "",
-    shippingAddress: "",
-    managerName: localStorage.getItem("name") || "", // prefilled with the logged-in manager's name
-    sku: "",
-    size: "",
-    quantity: "",
-    price: "",
-    totalPrice: "",
-    dueDate: null,
+    manager: localStorage.getItem("name") || "",
+    orderType: "",
+    paymentStatus: "",
+    remark: "",
   });
+  const [orders, setOrders] = useState([]);
+  console.log(orders);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState("");
+  const [modalValue, setModalValue] = useState("");
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
-  // Fetch bulk orders
-  const getBulkOrders = async () => {
+  const navigate = useNavigate();
+
+  // Fetch all bulk orders
+  const fetchOrders = async () => {
     const manager = localStorage.getItem("name");
     try {
       const response = await axios.get(
@@ -49,416 +48,83 @@ const BulkOrder = () => {
         }
       );
 
-      // Assuming orders have a 'createdAt' field, sort by 'createdAt' in descending order
       const sortedOrders = response.data.orders.sort((a, b) => {
-        return new Date(b.createdAt) - new Date(a.createdAt); // Sorts in descending order
+        return new Date(b.createdAt) - new Date(a.createdAt);
       });
 
-      setOrders(sortedOrders); // Set the sorted orders to state
+      setOrders(sortedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   };
-  const handleShowStages = (paymentStage) => {
-    setPaymentStages(paymentStage); // Set payment stages for the selected order
-    setIsModalVisible(true); // Show modal
-  };
 
   useEffect(() => {
-    getBulkOrders();
+    fetchOrders();
   }, []);
 
-  // Calculate total price
-  const calculateTotalPrice = (price, quantity) => {
-    return price && quantity ? price * quantity : 0;
-  };
-
   const handleChange = (name, value) => {
-    let updatedFormData = { ...formData, [name]: value };
-
-    // Recalculate total price if price or quantity is changed
-    if (name === "price" || name === "quantity") {
-      updatedFormData.totalPrice = calculateTotalPrice(
-        updatedFormData.price,
-        updatedFormData.quantity
-      );
-    }
-
-    setFormData(updatedFormData);
+    setFormData({ ...formData, [name]: value });
   };
 
-  // Handle submitting a new bulk order
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const payload = {
-      ...formData,
-      managerName: formData.managerName,
-    };
-
     try {
-      const response = await axios.post(
-        `${backendUrl}/orders/bulkorder`,
-        payload,
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
+      await axios.post(`${backendUrl}/orders/bulkorder`, formData, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
       message.success("Order created successfully!");
       setFormData({
         enrollment: "",
         brandName: "",
-        partyName: "",
-        shippingAddress: "",
-        managerName: localStorage.getItem("name") || "",
-        sku: "",
-        size: "",
-        quantity: "",
-        price: "",
-        totalPrice: "",
-        dueDate: null,
+        manager: localStorage.getItem("name") || "",
+        orderType: "",
+        paymentStatus: "",
+        remark: "",
       });
-      getBulkOrders(); // Refresh orders after saving a new one
+      fetchOrders();
     } catch (error) {
-      console.error("Error:", error);
-      message.error("Failed to save data.");
+      console.error("Error creating order:", error);
+      message.error("Failed to create order.");
     }
   };
 
-  // Handle editing a row (only sets editingKey without resetting form data)
-  const handleEdit = (record) => {
-    setEditingKey(record._id); // Set the key of the row being edited
-    setFormData({
-      ...record,
-      dueDate: record.dueDate ? moment(record.dueDate) : null,
-      totalPrice: record.price * record.quantity, // Set initial totalPrice for editing
-    });
+  const handleRowClick = (orderId) => {
+    navigate(`/orders/details/${orderId}`);
   };
 
-  // Submit the edited data
-  const handleSubmitEdit = async (record) => {
-    const id = record._id;
-    console.log(id);
-    const updatedData = {
-      ...formData,
-      dueDate: formData.dueDate ? formData.dueDate.toISOString() : null,
-    };
+  const openModal = (type, orderId) => {
+    setModalType(type);
+    setSelectedOrderId(orderId);
+    setModalVisible(true);
+  };
 
+  const handleModalSubmit = async () => {
     try {
-      await axios.put(`${backendUrl}/orders/bulkupdate/${id}`, updatedData, {
-        headers: { Authorization: localStorage.getItem("token") },
-      });
-      message.success("Order updated successfully!");
-      setEditingKey(""); // Exit edit mode
-      getBulkOrders(); // Refresh orders
+      const endpointMap = {
+        boxLabel: "update-box-label",
+        fnsku: "update-fnsku",
+        pickupDate: "update-pickup-date",
+      };
+
+      await axios.post(
+        `${backendUrl}/orders/${endpointMap[modalType]}`,
+        { orderId: selectedOrderId, value: modalValue },
+        {
+          headers: { Authorization: localStorage.getItem("token") },
+        }
+      );
+      message.success(`${modalType} updated successfully!`);
+      setModalVisible(false);
+      setModalValue("");
+      fetchOrders();
     } catch (error) {
-      console.error("Error updating order:", error);
-      message.error("Failed to update order.");
+      console.error(`Error updating ${modalType}:", error`);
+      message.error(`Failed to update ${modalType}.`);
     }
   };
 
-  // Handle deleting an order
-  const handleDelete = async (record) => {
-    const id = record._id;
-    try {
-      await axios.delete(`${backendUrl}/orders/bulkdelete/${id}`, {
-        headers: { Authorization: localStorage.getItem("token") },
-      });
-      message.success("Order deleted successfully!");
-      getBulkOrders(); // Refresh orders
-    } catch (error) {
-      console.error("Error deleting order:", error);
-      message.error("Failed to delete order.");
-    }
-  };
-  const getTotalPaidAmount = (paymentStage) => {
-    return paymentStage
-      ? paymentStage.reduce((acc, stage) => acc + stage.amount, 0)
-      : 0;
-  };
-
-  const getRemainingAmount = (order) => {
-    const totalPaid = getTotalPaidAmount(order.paymentStage);
-    return order.totalPrice - totalPaid;
-  };
-
-  const columns = [
-    {
-      title: "OrderId",
-      dataIndex: "orderId",
-      key: "orderId",
-      className: "text-sm text-black",
-    },
-    {
-      title: "Enrollment",
-      dataIndex: "enrollment",
-      key: "enrollment",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            value={formData.enrollment}
-            onChange={(e) => handleChange("enrollment", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Brand Name",
-      dataIndex: "brandName",
-      key: "brandName",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            style={{ width: "100px" }}
-            value={formData.brandName}
-            onChange={(e) => handleChange("brandName", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Party Name",
-      dataIndex: "partyName",
-      key: "partyName",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            style={{ width: "100px" }}
-            value={formData.partyName}
-            onChange={(e) => handleChange("partyName", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Shipping Address",
-      dataIndex: "shippingAddress",
-      key: "shippingAddress",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            style={{ width: "120px" }}
-            value={formData.shippingAddress}
-            onChange={(e) => handleChange("shippingAddress", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    // {
-    //   title: "Manager Name",
-    //   dataIndex: "managerName",
-    //   key: "managerName",
-    // },
-    {
-      title: "SKU",
-      dataIndex: "sku",
-      key: "sku",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            style={{ width: "100px" }}
-            value={formData.sku}
-            onChange={(e) => handleChange("sku", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            style={{ width: "100px" }}
-            value={formData.size}
-            onChange={(e) => handleChange("size", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            type="number"
-            value={formData.quantity}
-            onChange={(e) => handleChange("quantity", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id ? (
-          <Input
-            style={{ width: "100px" }}
-            type="number"
-            value={formData.price}
-            onChange={(e) => handleChange("price", e.target.value)}
-          />
-        ) : (
-          text
-        ),
-    },
-    {
-      title: "Total Price",
-      dataIndex: "totalPrice",
-      key: "totalPrice",
-      className: "text-sm text-black",
-
-      render: (text, record) =>
-        editingKey === record._id
-          ? formData.totalPrice
-          : record.price * record.quantity,
-    },
-    {
-      title: "Total Paid Amount",
-      dataIndex: "paymentStage",
-      key: "totalPaidAmount",
-      className: "text-sm text-black",
-
-      render: (paymentStage) => getTotalPaidAmount(paymentStage),
-    },
-    {
-      title: "Remaining Amount",
-      key: "remainingAmount",
-      className: "text-sm text-black",
-      render: (record) => {
-        const remainingAmount = getRemainingAmount(record);
-        if (remainingAmount <= 0) {
-          return (
-            <span style={{ color: "green", fontWeight: "bold" }}>
-              Payment Completed
-            </span>
-          );
-        }
-        return <span>{remainingAmount}</span>;
-      },
-    },
-    {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      key: "dueDate",
-      className: "text-sm text-black",
-      width: 100,
-      render: (dueDate, record) =>
-        editingKey === record._id ? (
-          <DatePicker
-            style={{ width: "100px" }}
-            value={formData.dueDate ? moment(formData.dueDate) : null}
-            onChange={(date, dateString) => handleChange("dueDate", date)}
-          />
-        ) : dueDate ? (
-          moment(dueDate).format("YYYY-MM-DD")
-        ) : (
-          "N/A"
-        ),
-    },
-    {
-      title: "Action",
-      key: "action",
-      className: "text-sm text-black",
-
-      render: (text, record) => {
-        if (editingKey === record._id) {
-          return (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <Button
-                type="primary"
-                onClick={() => handleSubmitEdit(record)}
-                icon={<SaveOutlined />}
-                style={{ flexGrow: 1, marginRight: 8 }} // Flex and margin to align buttons
-              >
-                Save
-              </Button>
-            </div>
-          );
-        }
-
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Button
-              type="primary"
-              onClick={() => handleEdit(record)}
-              icon={<EditOutlined />}
-              style={{ flexGrow: 1, marginRight: 8 }} // Flex and margin to align buttons
-            >
-              Edit
-            </Button>
-            <Popconfirm
-              title="Are you sure to delete?"
-              onConfirm={() => handleDelete(record)}
-            >
-              <Button
-                style={{
-                  background: "red",
-                  color: "white",
-                  flexGrow: 1,
-                  marginRight: 8,
-                }} // Flex and margin
-                danger
-                icon={<DeleteOutlined />}
-              >
-                Delete
-              </Button>
-            </Popconfirm>
-            <Button
-              type="default"
-              onClick={() => handleShowStages(record.paymentStage)} // Show payment stages
-              className="text-sm text-black"
-              style={{ flexGrow: 1 }} // Flex to align with other buttons
-            >
-              Show Payment Stages
-            </Button>
-          </div>
-        );
-      },
-    },
-  ];
   const formColumns = [
     {
       title: "Enrollment",
@@ -481,80 +147,122 @@ const BulkOrder = () => {
       ),
     },
     {
-      title: "Party Name",
-      key: "partyName",
+      title: "Order Type",
+      key: "orderType",
       render: () => (
-        <Input
-          value={formData.partyName}
-          onChange={(e) => handleChange("partyName", e.target.value)}
-        />
+        <Select
+          value={formData.orderType}
+          onChange={(value) => handleChange("orderType", value)}
+          className="w-32"
+        >
+          <Option value="FBA.IN">FBA.IN</Option>
+          <Option value="FBA.COM">FBA.COM</Option>
+          <Option value="RE-ORDER">RE-ORDER</Option>
+          <Option value="FRENCHISE">FRENCHISE</Option>
+        </Select>
       ),
     },
     {
-      title: "Shipping Address",
-      key: "shippingAddress",
+      title: "Payment Status",
+      key: "paymentStatus",
       render: () => (
-        <Input
-          value={formData.shippingAddress}
-          onChange={(e) => handleChange("shippingAddress", e.target.value)}
-        />
+        <Select
+          value={formData.paymentStatus}
+          onChange={(value) => handleChange("paymentStatus", value)}
+          className="w-24"
+        >
+          <Option value="YES">Pending</Option>
+          <Option value="NO">Completed</Option>
+        </Select>
       ),
     },
     {
-      title: "SKU",
-      key: "sku",
+      title: "Remark",
+      key: "remark",
       render: () => (
         <Input
-          value={formData.sku}
-          onChange={(e) => handleChange("sku", e.target.value)}
+          value={formData.remark}
+          onChange={(e) => handleChange("remark", e.target.value)}
         />
       ),
     },
+  ];
+
+  const orderColumns = [
     {
-      title: "Size",
-      key: "size",
-      render: () => (
-        <Input
-          value={formData.size}
-          onChange={(e) => handleChange("size", e.target.value)}
-        />
-      ),
+      title: "Date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date) => moment(date).format("DD-MM-YYYY"),
+    },
+    { title: "Enrollment", dataIndex: "enrollment", key: "enrollment" },
+    { title: "Manager", dataIndex: "manager", key: "manager" },
+    { title: "Brand Name", dataIndex: "brandName", key: "brandName" },
+    { title: "Order Type", dataIndex: "orderType", key: "orderType" },
+    { title: "Remark", dataIndex: "remark", key: "remark" },
+    {
+      title: "Box Label",
+      dataIndex: "boxLabel",
+      key: "boxLabel",
+      render: (boxLabel) =>
+        boxLabel ? (
+          <span>{boxLabel}</span>
+        ) : (
+          <span className="text-gray-500">N/A</span>
+        ),
     },
     {
-      title: "Quantity",
-      key: "quantity",
-      render: () => (
-        <Input
-          type="number"
-          value={formData.quantity}
-          onChange={(e) => handleChange("quantity", e.target.value)}
-        />
-      ),
+      title: "FNSKU",
+      dataIndex: "fnsku",
+      key: "fnsku",
+      render: (fnsku) =>
+        fnsku ? (
+          <span>{fnsku}</span>
+        ) : (
+          <span className="text-gray-500">N/A</span>
+        ),
     },
     {
-      title: "Price",
-      key: "price",
-      render: () => (
-        <Input
-          type="number"
-          value={formData.price}
-          onChange={(e) => handleChange("price", e.target.value)}
-        />
-      ),
+      title: "Pickup Date",
+      dataIndex: "pickupDate",
+      key: "pickupDate",
+      render: (pickupDate) =>
+        pickupDate ? (
+          <span>{moment(pickupDate).format("DD-MM-YYYY")}</span>
+        ) : (
+          <span className="text-gray-500">N/A</span>
+        ),
     },
     {
-      title: "Total Price",
-      key: "totalPrice",
-      render: () => <Input value={formData.totalPrice} disabled />,
-    },
-    {
-      title: "Due Date",
-      key: "dueDate",
-      render: () => (
-        <DatePicker
-          value={formData.dueDate ? moment(formData.dueDate) : null}
-          onChange={(date, dateString) => handleChange("dueDate", dateString)}
-        />
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <div className="flex gap-2">
+          <Button
+            onClick={() => navigate(`/bulkorder/${record.orderId}`)}
+            className="bg-blue-500 text-white hover:bg-blue-600"
+          >
+            View More
+          </Button>
+          <Button
+            onClick={() => openModal("boxLabel", record.orderId)}
+            className="bg-blue-500 text-white hover:bg-blue-600"
+          >
+            Box Label
+          </Button>
+          <Button
+            onClick={() => openModal("fnsku", record.orderId)}
+            className="bg-green-500 text-white hover:bg-green-600"
+          >
+            FNSKU
+          </Button>
+          <Button
+            onClick={() => openModal("pickupDate", record.orderId)}
+            className="bg-yellow-500 text-white hover:bg-yellow-600"
+          >
+            Pickup Date
+          </Button>
+        </div>
       ),
     },
   ];
@@ -562,56 +270,46 @@ const BulkOrder = () => {
   return (
     <ManagerLayout>
       <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
-        <h1 className="text-2xl pt-4 font-bold text-white">Bulk Order's</h1>
-      </div>{" "}
-      <form id="user-form" onSubmit={handleSubmit}>
+        <h1 className="text-2xl pt-4 font-bold text-white">Bulk Order</h1>
+      </div>
+      <form id="bulk-order-form" onSubmit={handleSubmit}>
         <Table
-          dataSource={[formData]} // Show form fields in the table format
+          dataSource={[formData]}
           columns={formColumns}
           pagination={false}
           rowKey={() => "form-key"}
-          className="min-w-full bg-white shadow-md rounded-lg overflow-hidden"
-          scroll={{ x: 1500 }}
         />
         <div className="max-w-full flex justify-between mt-6 mb-6">
-          <Button
-            type="primary"
-            icon={<SaveOutlined />}
-            htmlType="submit"
-            className="bg-green-500 hover:bg-green-600"
-          >
-            Save
+          <Button type="primary" icon={<SaveOutlined />} htmlType="submit">
+            Create Order
           </Button>
         </div>
       </form>
-      <h1 className="text-xl font-bold">All orders</h1>
       <Table
+        className="cursor-pointer"
         dataSource={orders}
-        columns={columns}
-        rowKey="_id"
-        pagination={{ pageSize: 5 }}
+        columns={orderColumns}
+        rowKey="orderId"
         scroll={{ x: 1500 }}
       />
       <Modal
-        title="Payment Stages"
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setIsModalVisible(false)}>
-            Close
-          </Button>,
-        ]}
+        title={`Update ${modalType}`}
+        visible={modalVisible}
+        onOk={handleModalSubmit}
+        onCancel={() => setModalVisible(false)}
       >
-        {paymentStages.length > 0 ? (
-          <ul>
-            {paymentStages.map((stage, index) => (
-              <li key={index}>
-                Stage: {stage.stage}, Amount: {stage.amount}
-              </li>
-            ))}
-          </ul>
+        {modalType === "pickupDate" ? (
+          <DatePicker
+            onChange={(date) =>
+              setModalValue(date ? date.format("YYYY-MM-DD") : "")
+            }
+          />
         ) : (
-          <p>No payment stages available</p>
+          <Input
+            value={modalValue}
+            onChange={(e) => setModalValue(e.target.value)}
+            placeholder={`Enter ${modalType}`}
+          />
         )}
       </Modal>
     </ManagerLayout>
