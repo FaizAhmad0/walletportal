@@ -2,8 +2,9 @@ const BulkOrder = require("../models/BulkOrder");
 
 module.exports = async (req, res) => {
   try {
+    const { orderId } = req.body;
     // Find the order by ID and update the "shipped" status to true
-    const order = await BulkOrder.findOne({});
+    const order = await BulkOrder.findOne({ _id: orderId });
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });

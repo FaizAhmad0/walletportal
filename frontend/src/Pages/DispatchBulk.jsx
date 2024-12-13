@@ -113,10 +113,15 @@ const DispatchBulk = () => {
 
   // Handle "Shipped" button click
   const handleShippedClick = async (orderId) => {
+    console.log(orderId);
     try {
-      await axios.post(`${backendUrl}/orders/shippedbulkorder`, orderId, {
-        headers: { Authorization: localStorage.getItem("token") },
-      });
+      await axios.post(
+        `${backendUrl}/orders/shippedbulkorder`,
+        { orderId },
+        {
+          headers: { Authorization: localStorage.getItem("token") },
+        }
+      );
       message.success("Order marked as shipped!");
       fetchOrders(); // Refresh orders list after updating status
     } catch (error) {
