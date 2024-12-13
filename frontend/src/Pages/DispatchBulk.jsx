@@ -8,6 +8,7 @@ import {
   Select,
   DatePicker,
   message,
+  Space,
 } from "antd";
 import moment from "moment";
 import axios from "axios";
@@ -19,9 +20,11 @@ const { Option } = Select;
 
 const DispatchBulk = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null);
   const [form] = Form.useForm();
+  const [searchQuery, setSearchQuery] = useState(""); // Search query state
 
   const fetchOrders = async () => {
     const manager = localStorage.getItem("name");
@@ -34,9 +37,7 @@ const DispatchBulk = () => {
       );
 
       // Filter orders where shipped is false
-      const unshippedOrders = response.data.orders.filter(
-        (order) => order.shipped === false
-      );
+      const unshippedOrders = response.data.orders;
 
       // Sort the filtered orders by createdAt date
       const sortedOrders = unshippedOrders.sort((a, b) => {
@@ -45,6 +46,7 @@ const DispatchBulk = () => {
 
       // Store the filtered and sorted orders
       setOrders(sortedOrders);
+      setFilteredOrders(sortedOrders); // Initially show all orders
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -66,6 +68,7 @@ const DispatchBulk = () => {
           ? moment(selectedOrder.stockReadyDate)
           : null,
         shippingAddress: selectedOrder.shippingAddress || "",
+        shippingCompany: selectedOrder.shippingCompany || "",
         shippingType: selectedOrder.shippingType || null,
         trackingId: selectedOrder.trackingId || "",
       });
@@ -129,7 +132,7 @@ const DispatchBulk = () => {
       dataIndex: "createdAt",
       key: "createdAt",
       width: 300,
-      render: (date) => (date ? moment(date).format("DD-MM-YYYY") : "N/A"),
+      render: (date) => (date ? moment(date).format("DD/MM/YYYY") : "N/A"),
     },
     {
       title: "Enrollment",
@@ -156,6 +159,27 @@ const DispatchBulk = () => {
       width: 150,
     },
     {
+      title: "Box Label",
+      dataIndex: "boxLabel",
+      key: "boxLabel",
+      width: 150,
+      render: (boxLabel) => (boxLabel ? boxLabel : "N/A"),
+    },
+    {
+      title: "FNSKU",
+      dataIndex: "fnsku",
+      key: "fnsku",
+      width: 150,
+      render: (fnsku) => (fnsku ? fnsku : "N/A"),
+    },
+    {
+      title: "Pickup Date",
+      dataIndex: "pickupDate",
+      key: "pickupDate",
+      width: 150,
+      render: (date) => (date ? moment(date).format("DD/MM/YYYY") : "N/A"),
+    },
+    {
       title: "Stock Status",
       dataIndex: "stockStatus",
       key: "stockStatus",
@@ -167,7 +191,7 @@ const DispatchBulk = () => {
       dataIndex: "stockReadyDate",
       key: "stockReadyDate",
       width: 180,
-      render: (date) => (date ? moment(date).format("DD-MM-YYYY") : "N/A"),
+      render: (date) => (date ? moment(date).format("DD/MM/YYYY") : "N/A"),
     },
     {
       title: "Shipping Address",
@@ -184,12 +208,20 @@ const DispatchBulk = () => {
       render: (type) => (type ? type : "N/A"),
     },
     {
+      title: "Shipping Co.",
+      dataIndex: "shippingCompany",
+      key: "shippingCompany",
+      width: 200,
+      render: (id) => (id ? id : "N/A"),
+    },
+    {
       title: "Tracking ID",
       dataIndex: "trackingId",
       key: "trackingId",
       width: 200,
       render: (id) => (id ? id : "N/A"),
     },
+
     {
       title: "Actions",
       key: "actions",
@@ -209,23 +241,82 @@ const DispatchBulk = () => {
           >
             Add Details
           </Button>
-          <Button type="primary" onClick={() => handleShippedClick(record._id)}>
-            Shipped
-          </Button>
+          {record.shipped === true ? (
+            <Button
+              disabled
+              className="bg-green-600 text-white"
+              onClick={() => handleShippedClick(record._id)}
+            >
+              Shipped
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              onClick={() => handleShippedClick(record._id)}
+            >
+              Shipped
+            </Button>
+          )}
         </div>
       ),
     },
   ];
+
+  // Filter orders based on status (total, pending, shipped)
+  const handleFilterChange = (filterType) => {
+    if (filterType === "total") {
+      setFilteredOrders(orders);
+    } else if (filterType === "pending") {
+      setFilteredOrders(orders.filter((order) => order.shipped === false));
+    } else if (filterType === "shipped") {
+      setFilteredOrders(orders.filter((order) => order.shipped === true));
+    }
+  };
+
+  // Handle search query change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    if (e.target.value === "") {
+      setFilteredOrders(orders); // Reset to show all orders if the search query is empty
+    } else {
+      const filtered = orders.filter((order) =>
+        Object.values(order).some((value) =>
+          value.toString().toLowerCase().includes(e.target.value.toLowerCase())
+        )
+      );
+      setFilteredOrders(filtered);
+    }
+  };
 
   return (
     <DispatchLayout>
       <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
         <h1 className="text-2xl pt-4 font-bold text-white">Bulk Order</h1>
       </div>
+      <div style={{ marginBottom: 16, marginTop: 16 }}>
+        <Input
+          placeholder="Search orders"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{ width: 300, marginRight: 16 }}
+        />
+        <Space>
+          <Button onClick={() => handleFilterChange("total")}>
+            Total Orders
+          </Button>
+          <Button onClick={() => handleFilterChange("pending")}>
+            Pending Orders
+          </Button>
+          <Button onClick={() => handleFilterChange("shipped")}>Shipped</Button>
+        </Space>
+      </div>
       <Table
         columns={orderColumns}
         bordered
-        dataSource={orders.map((order) => ({ ...order, key: order._id }))}
+        dataSource={filteredOrders.map((order) => ({
+          ...order,
+          key: order._id,
+        }))}
         pagination={{ pageSize: 10 }}
         scroll={{ x: 1500 }}
       />
@@ -270,6 +361,15 @@ const DispatchBulk = () => {
               <Option value="logistics">Logistics</Option>
               <Option value="amazon">Amazon</Option>
             </Select>
+          </Form.Item>
+          <Form.Item
+            name="shippingCompany"
+            label="Shipping Company"
+            rules={[
+              { required: true, message: "Please enter shipping company!" },
+            ]}
+          >
+            <Input placeholder="Enter shipping company" />
           </Form.Item>
           <Form.Item
             name="trackingId"

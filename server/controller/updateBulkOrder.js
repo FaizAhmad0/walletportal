@@ -9,6 +9,7 @@ module.exports = async (req, res) => {
       shippingAddress,
       shippingType,
       trackingId,
+      shippingCompany,
     } = req.body;
     console.log(req.body);
 
@@ -18,7 +19,8 @@ module.exports = async (req, res) => {
       !stockStatus ||
       !shippingAddress ||
       !shippingType ||
-      !trackingId
+      !trackingId ||
+      !shippingCompany
     ) {
       return res.status(400).json({ error: "All fields are required." });
     }
@@ -35,6 +37,7 @@ module.exports = async (req, res) => {
     order.shippingAddress = shippingAddress;
     order.shippingType = shippingType;
     order.trackingId = trackingId;
+    order.shippingCompany = shippingCompany;
 
     await order.save();
 

@@ -14,9 +14,11 @@ import axios from "axios";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import ManagerLayout from "../Layout/ManagerLayout";
+import EditIcon from "@mui/icons-material/Edit";
 import "antd/dist/reset.css";
 
 const { Option } = Select;
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const BulkOrder = () => {
@@ -204,33 +206,91 @@ const BulkOrder = () => {
       title: "Box Label",
       dataIndex: "boxLabel",
       key: "boxLabel",
-      render: (boxLabel) =>
+      render: (boxLabel, record) =>
         boxLabel ? (
-          <span>{boxLabel}</span>
+          <span>
+            {boxLabel}
+            <EditIcon
+              fontSize="small"
+              onClick={() => openModal("boxLabel", record.orderId)}
+              className="text-blue-600"
+            />
+            {/* <Button
+              onClick={() => openModal("boxLabel", record.orderId)}
+              className=" text-blue-500 hover:bg-blue-600"
+            ></Button>{" "} */}
+          </span>
         ) : (
-          <span className="text-gray-500">N/A</span>
+          <span className="text-gray-500">
+            <Button
+              onClick={() => openModal("boxLabel", record.orderId)}
+              className="bg-blue-500 text-white hover:bg-blue-600"
+            >
+              Box Label
+            </Button>
+          </span>
         ),
     },
     {
       title: "FNSKU",
       dataIndex: "fnsku",
       key: "fnsku",
-      render: (fnsku) =>
+      render: (fnsku, record) =>
         fnsku ? (
-          <span>{fnsku}</span>
+          <span>
+            {fnsku}{" "}
+            <EditIcon
+              fontSize="small"
+              onClick={() => openModal("fnsku", record.orderId)}
+              className="text-blue-600"
+            />
+            {/* <Button
+              onClick={() => openModal("fnsku", record.orderId)}
+              className="bg-green-500 text-white hover:bg-green-600"
+            >
+              FNSKU
+            </Button> */}
+          </span>
         ) : (
-          <span className="text-gray-500">N/A</span>
+          <span className="text-gray-500">
+            <Button
+              onClick={() => openModal("fnsku", record.orderId)}
+              className="bg-green-500 text-white hover:bg-green-600"
+            >
+              FNSKU
+            </Button>
+          </span>
         ),
     },
     {
       title: "Pickup Date",
       dataIndex: "pickupDate",
       key: "pickupDate",
-      render: (pickupDate) =>
+      render: (pickupDate, record) =>
         pickupDate ? (
-          <span>{moment(pickupDate).format("DD-MM-YYYY")}</span>
+          <span>
+            {moment(pickupDate).format("DD-MM-YYYY")}{" "}
+            <EditIcon
+              fontSize="small"
+              onClick={() => openModal("pickupDate", record.orderId)}
+              className="text-blue-600"
+            />
+            {/* <Button
+              onClick={() => openModal("pickupDate", record.orderId)}
+              className="bg-yellow-500 text-white hover:bg-yellow-600"
+            >
+              Pickup Date
+            </Button> */}
+          </span>
         ) : (
-          <span className="text-gray-500">N/A</span>
+          <span className="text-gray-500">
+            <Button
+              onClick={() => openModal("pickupDate", record.orderId)}
+              className="bg-yellow-500 text-white hover:bg-yellow-600"
+            >
+              Pickup Date
+            </Button>
+          </span>
         ),
     },
     {
@@ -244,7 +304,7 @@ const BulkOrder = () => {
           >
             View More
           </Button>
-          <Button
+          {/* <Button
             onClick={() => openModal("boxLabel", record.orderId)}
             className="bg-blue-500 text-white hover:bg-blue-600"
           >
@@ -261,7 +321,7 @@ const BulkOrder = () => {
             className="bg-yellow-500 text-white hover:bg-yellow-600"
           >
             Pickup Date
-          </Button>
+          </Button> */}
         </div>
       ),
     },
@@ -305,11 +365,15 @@ const BulkOrder = () => {
             }
           />
         ) : (
-          <Input
+          <Select
             value={modalValue}
-            onChange={(e) => setModalValue(e.target.value)}
-            placeholder={`Enter ${modalType}`}
-          />
+            onChange={(value) => setModalValue(value)}
+            style={{ width: 200 }}
+            placeholder={`Select ${modalType}`}
+          >
+            <Select.Option value="Yes">Yes</Select.Option>
+            <Select.Option value="No">No</Select.Option>
+          </Select>
         )}
       </Modal>
     </ManagerLayout>

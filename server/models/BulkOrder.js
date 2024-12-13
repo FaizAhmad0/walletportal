@@ -73,6 +73,12 @@ const bulkOrderSchema = new Schema(
     stockStatus: {
       type: String,
     },
+    stockStatus: {
+      type: String,
+    },
+    shippingCompany: {
+      type: String,
+    },
     stockReadyDate: {
       type: Date,
     },
