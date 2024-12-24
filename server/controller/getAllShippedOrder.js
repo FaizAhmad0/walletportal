@@ -1,6 +1,7 @@
 const User = require("../models/User");
 
 module.exports = async (req, res) => {
+  console.log("working");
   try {
     // Fetch users with at least one archived order
     const usersWithArchivedOrders = await User.find({
