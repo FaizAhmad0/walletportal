@@ -39,10 +39,10 @@ const AuditReport = () => {
 
         // Count the occurrences of each product
         order.items.forEach((item) => {
-          if (productCount[item.name]) {
-            productCount[item.name] += 1;
+          if (productCount[item.sku]) {
+            productCount[item.sku] += 1; // Count using sku
           } else {
-            productCount[item.name] = 1;
+            productCount[item.sku] = 1; // Initialize count using sku
           }
         });
 
@@ -50,7 +50,10 @@ const AuditReport = () => {
         if (userCount[user.enrollment]) {
           userCount[user.enrollment].count += 1; // Increment the count
         } else {
-          userCount[user.enrollment] = { name: user.name, count: 1 }; // Initialize count
+          userCount[user.enrollment] = {
+            enrollment: user.enrollment,
+            count: 1,
+          }; // Initialize count
         }
       });
     });
@@ -59,7 +62,7 @@ const AuditReport = () => {
     const sortedProducts = Object.entries(productCount)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
-      .map(([name, count]) => ({ name, count }));
+      .map(([sku, count]) => ({ sku, count })); // Changed to show sku
 
     // Sort users by order count and get the top 5
     const sortedUsers = Object.values(userCount)
@@ -316,7 +319,7 @@ const AuditReport = () => {
                 renderItem={(item) => (
                   <List.Item>
                     <div>
-                      {item.name}: {item.count} sold
+                      <strong>{item.sku}</strong>: {item.count} sold
                     </div>
                   </List.Item>
                 )}
@@ -340,7 +343,7 @@ const AuditReport = () => {
                 renderItem={(item) => (
                   <List.Item>
                     <div>
-                      {item.name}: {item.gms.toFixed(2)}
+                      <strong>{item.name}</strong>: {item.gms.toFixed(2)}
                     </div>
                   </List.Item>
                 )}
@@ -364,7 +367,7 @@ const AuditReport = () => {
                 renderItem={(item) => (
                   <List.Item>
                     <div>
-                      {item.name}: {item.count} orders
+                      <strong>{item.enrollment}</strong>: {item.count} orders
                     </div>
                   </List.Item>
                 )}

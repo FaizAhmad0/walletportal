@@ -52,7 +52,15 @@ const InvoicePage = () => {
       ) || 0
     );
   };
-
+  const calculateGst = () => {
+    return (
+      orderDetails.items?.reduce(
+        (total, item) => total + (parseFloat(item.gstRate) || 0),
+        0
+      ) || 0
+    );
+  };
+  const gstRate = calculateGst();
   const totalAmount = calculateTotal();
   const totalShipping = calculateTotalShipping(); // Calculate total shipping from all items
 
@@ -206,7 +214,7 @@ const InvoicePage = () => {
               </Table.Summary.Row>
               <Table.Summary.Row>
                 <Table.Summary.Cell colSpan={5} align="right">
-                  <Text strong>Payable Amount including GST:</Text>
+                  <Text strong>Payable Amount including GST ({gstRate}%):</Text>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell>
                   <Text strong>₹{orderDetails?.finalAmount}</Text>

@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Table, message, Radio, Input } from "antd";
+import { Modal, Button, Table, message, Radio, Input, DatePicker } from "antd";
 import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween"; // Import the isBetween plugin
 import ManagerLayout from "../Layout/ManagerLayout";
 import axios from "axios";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+dayjs.extend(isBetween); // Extend dayjs with the isBetween plugin
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -14,6 +17,8 @@ const OrderHistory = () => {
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [filter, setFilter] = useState("all");
   const [searchInput, setSearchInput] = useState("");
+  const [startDateFilter, setStartDateFilter] = useState(null);
+  const [endDateFilter, setEndDateFilter] = useState(null);
 
   const getOrders = async () => {
     const name = localStorage.getItem("name");
@@ -109,10 +114,19 @@ const OrderHistory = () => {
       return true;
     })
     .filter((item) => {
+      const createdAtDate = dayjs(item.createdAt);
+      const startDate = dayjs(startDateFilter); // Assuming startDateFilter is your start date state
+      const endDate = dayjs(endDateFilter); // Assuming endDateFilter is your end date state
+
       return (
-        item.enrollment.toLowerCase().includes(searchInput.toLowerCase()) ||
-        item.amazonOrderId.toLowerCase().includes(searchInput.toLowerCase()) ||
-        item.trackingId.toLowerCase().includes(searchInput.toLowerCase())
+        (startDate.isValid() && endDate.isValid()
+          ? createdAtDate.isBetween(startDate, endDate, null, "[]") // Inclusive range
+          : true) &&
+        (item.enrollment.toLowerCase().includes(searchInput.toLowerCase()) ||
+          item.amazonOrderId
+            .toLowerCase()
+            .includes(searchInput.toLowerCase()) ||
+          item.trackingId.toLowerCase().includes(searchInput.toLowerCase()))
       );
     })
     .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)));
@@ -272,7 +286,7 @@ const OrderHistory = () => {
         <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
           <h1 className="text-2xl pt-4 font-bold text-white">All Orders</h1>
         </div>
-        <div className="mb-6 flex justify-between items-center">
+        <div className="flex justify-between items-center">
           <Radio.Group
             onChange={handleFilterChange}
             buttonStyle="solid"
@@ -311,6 +325,19 @@ const OrderHistory = () => {
           <h2 className="text-lg font-bold bg-blue-50 text-blue-800 py-1 mt-3 px-4 rounded-md">
             Total Orders: {filteredDataSource?.length}
           </h2>
+        </div>
+        <div className=" mb-2 flex">
+          <DatePicker
+            onChange={(date) => setStartDateFilter(date)}
+            placeholder="Start Date"
+            format="DD/MM/YYYY"
+            className="mr-2"
+          />
+          <DatePicker
+            onChange={(date) => setEndDateFilter(date)}
+            placeholder="End Date"
+            format="DD/MM/YYYY"
+          />
         </div>
         <div className="overflow-x-auto bg-gray-50 rounded-md shadow-sm">
           <Table

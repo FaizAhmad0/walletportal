@@ -27,7 +27,7 @@ function Navbar() {
       <div className="nav-container">
         <div className="nav-logo" onClick={() => scrollToSection("home")}>
           <img
-            style={{ height: "80px", width: "110px" }}
+            style={{ height: "80px", width: "110px", padding: "5px" }}
             src="https://support.saumiccraft.com/wp-content/uploads/2023/05/logo-saumic-new.png"
             alt=""
           />

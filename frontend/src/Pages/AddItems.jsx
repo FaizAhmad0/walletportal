@@ -20,7 +20,7 @@ const AddItems = () => {
       quantity: "",
       gstRate: 0, // New field for gstRate
       amazonOrderId: "",
-      brandName:"",
+      brandName: "",
       pincode: "",
       trackingId: "",
       shippingPartner: "",
@@ -125,7 +125,6 @@ const AddItems = () => {
 
     setItems(updatedItems);
   };
-
   const calculateFinalAmount = () => {
     const subtotal = items.reduce(
       (total, item) => total + parseFloat(item.totalPrice || 0),
@@ -142,20 +141,30 @@ const AddItems = () => {
     let igst = 0;
     let shippingGst = 0;
 
-    // Calculate GST for shipping
-    shippingGst = (totalShipping * 18) / 100; // 18% GST on shipping
+    // Calculate GST for shipping based on item.gstRate
+    shippingGst = items.reduce(
+      (total, item) =>
+        total +
+        (parseFloat(item.shippingPrice || 0) * parseFloat(item.gstRate || 0)) /
+          100,
+      0
+    );
 
     if (userData.state === "Rajsthan") {
       gst = items.reduce(
         (total, item) =>
-          total + (parseFloat(item.totalPrice || 0) * item.gstRate) / 200,
+          total +
+          (parseFloat(item.totalPrice || 0) * parseFloat(item.gstRate || 0)) /
+            200,
         0
       ); // 9% CGST + 9% SGST
       scst = gst; // SGST same as CGST
     } else {
       igst = items.reduce(
         (total, item) =>
-          total + (parseFloat(item.totalPrice || 0) * item.gstRate) / 100,
+          total +
+          (parseFloat(item.totalPrice || 0) * parseFloat(item.gstRate || 0)) /
+            100,
         0
       ); // 18% IGST
     }
@@ -164,6 +173,45 @@ const AddItems = () => {
       subtotal + gst + scst + igst + totalShipping + shippingGst;
     return totalAmount.toFixed(2);
   };
+
+  // const calculateFinalAmount = () => {
+  //   const subtotal = items.reduce(
+  //     (total, item) => total + parseFloat(item.totalPrice || 0),
+  //     0
+  //   );
+
+  //   const totalShipping = items.reduce(
+  //     (total, item) => total + parseFloat(item.shippingPrice || 0),
+  //     0
+  //   );
+
+  //   let gst = 0;
+  //   let scst = 0;
+  //   let igst = 0;
+  //   let shippingGst = 0;
+
+  //   // Calculate GST for shipping
+  //   shippingGst = (totalShipping * 18) / 100; // 18% GST on shipping
+
+  //   if (userData.state === "Rajsthan") {
+  //     gst = items.reduce(
+  //       (total, item) =>
+  //         total + (parseFloat(item.totalPrice || 0) * item.gstRate) / 200,
+  //       0
+  //     ); // 9% CGST + 9% SGST
+  //     scst = gst; // SGST same as CGST
+  //   } else {
+  //     igst = items.reduce(
+  //       (total, item) =>
+  //         total + (parseFloat(item.totalPrice || 0) * item.gstRate) / 100,
+  //       0
+  //     ); // 18% IGST
+  //   }
+
+  //   const totalAmount =
+  //     subtotal + gst + scst + igst + totalShipping + shippingGst;
+  //   return totalAmount.toFixed(2);
+  // };
 
   const handleAddRow = () => {
     setItems([
@@ -176,7 +224,7 @@ const AddItems = () => {
         gstRate: 0, // New gstRate field
         amazonOrderId: "",
         pincode: "",
-        brandName:"",
+        brandName: "",
         trackingId: "",
         shippingPartner: "",
         shippingPrice: "",
