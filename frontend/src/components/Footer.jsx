@@ -78,7 +78,7 @@ const Footer = () => {
         <p>
           © Copyright <strong>Saumic craft</strong>. All Rights Reserved
           <br />
-          Designed by saumic@craft
+          Powered by <span className="text-red-700 text-lg">&hearts;</span> MFA
         </p>
       </div>
     </div>
