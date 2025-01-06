@@ -12,7 +12,6 @@ const { RangePicker } = DatePicker;
 const AccountantDash = () => {
   const [orders, setOrders] = useState([]);
   const [dateRange, setDateRange] = useState([null, null]);
-  console.log(dateRange);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("");
   const [timeFilter, setTimeFilter] = useState(""); // Initialize with empty string for no filter
@@ -122,8 +121,9 @@ const AccountantDash = () => {
 
         // Format items to include separate GST fields
         const itemsWithGST = items.map(
-          ({ IGST, CGST, SGST, shippingPrice, ...itemRest }) => ({
+          ({ IGST, CGST, SGST, finaltotal, shippingPrice, ...itemRest }) => ({
             ...itemRest,
+            finaltotal,
             shippingPrice, // Keep the shippingPrice field in its place
             shippingGstRate: 18, // Add shippingGstRate field next to shippingPrice
             IGST,
@@ -341,11 +341,16 @@ const AccountantDash = () => {
           paymentStatus: order.paymentStatus,
           items: order.items.map((item) => {
             const gstRate = parseFloat(item.gstRate || 0);
-            const totalPrice = parseFloat(item.totalPrice || 0);
+            let totalPrice = parseFloat(item.totalPrice || 0);
             const shippingPrice = parseFloat(item.shippingPrice || 0);
+            const finaltotal = totalPrice + shippingPrice;
+
+            // console.log("shipping price " + shippingPrice);
+            // console.log("total price " + totalPrice);
+            // console.log("finaltotal price: " + finaltotal);
 
             const itemGST = (totalPrice * gstRate) / 100;
-            const shippingGST = (shippingPrice * 18) / 100;
+            const shippingGST = (shippingPrice * gstRate) / 100;
             const totalGST = itemGST + shippingGST;
 
             let gstData = {};
@@ -463,13 +468,6 @@ const AccountantDash = () => {
 };
 
 export default AccountantDash;
-
-
-
-
-
-
-
 
 // import React, { useEffect, useState } from "react";
 // import AccountantLayout from "../Layout/AccountantLayout";
