@@ -84,49 +84,80 @@ mongoose
 // // Call the function to fetch the data
 // fetchOrdersWithInvalidGST();
 
-const fetchOrderByAmazonOrderId = async (amazonOrderId) => {
+const fetchByEnrollment = async (id) => {
   try {
-    const order = await User.aggregate([
-      { $unwind: "$orders" },
-      { $unwind: "$orders.items" },
-      {
-        $match: {
-          "orders.items.amazonOrderId": amazonOrderId,
-        },
-      },
-      {
-        $project: {
-          _id: 0, // Exclude internal MongoDB ID
-          name: 1, // Include user details
-          email: 1,
-          enrollment: 1,
-          userCreatedAt: "$createdAt",
-          order: {
-            orderId: "$orders.orderId",
-            items: "$orders.items",
-            finalAmount: "$orders.finalAmount",
-            paymentStatus: "$orders.paymentStatus",
-            createdAt: "$orders.createdAt",
-          },
-        },
-      },
-    ]);
+    const users = await User.find({ enrollment: id });
 
-    if (order.length > 0) {
-      console.log(
-        "Order with Amazon Order ID:",
-        JSON.stringify(order[0], null, 2)
-      );
+    if (users.length > 0) {
+      users.forEach((user) => {
+        if (Array.isArray(user.transactions)) {
+          // Filter transactions with credit: true and calculate their sum
+          const creditedTotal = user.transactions
+            .filter((transaction) => transaction.debit) // Filter only credited transactions
+            .reduce((sum, transaction) => {
+              const amount = parseFloat(transaction.amount); // Convert amount to a number
+              return sum + (isNaN(amount) ? 0 : amount); // Add amount if it's valid
+            }, 0);
+
+          console.log(
+            `Total Credited Amount for User ${user.name}: ${creditedTotal}`
+          );
+        } else {
+          console.log("No transactions found for this user.");
+        }
+      });
     } else {
-      console.log("No order found with the specified Amazon Order ID.");
+      console.log("User not found.");
     }
   } catch (error) {
-    console.error("Error fetching order by Amazon Order ID:", error);
+    console.error("Error occurred:", error);
   }
 };
 
-// Call the function
-fetchOrderByAmazonOrderId("408-8170367-7810747");
+fetchByEnrollment("AZ1797");
+// const fetchOrderByAmazonOrderId = async (amazonOrderId) => {
+//   try {
+//     const order = await User.aggregate([
+//       { $unwind: "$orders" },
+//       { $unwind: "$orders.items" },
+//       {
+//         $match: {
+//           "orders.items.amazonOrderId": amazonOrderId,
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 0, // Exclude internal MongoDB ID
+//           name: 1, // Include user details
+//           email: 1,
+//           enrollment: 1,
+//           userCreatedAt: "$createdAt",
+//           order: {
+//             orderId: "$orders.orderId",
+//             items: "$orders.items",
+//             finalAmount: "$orders.finalAmount",
+//             paymentStatus: "$orders.paymentStatus",
+//             createdAt: "$orders.createdAt",
+//           },
+//         },
+//       },
+//     ]);
+
+//     if (order.length > 0) {
+//       console.log(
+//         "Order with Amazon Order ID:",
+//         JSON.stringify(order[0], null, 2)
+//       );
+//     } else {
+//       console.log("No order found with the specified Amazon Order ID.");
+//     }
+//   } catch (error) {
+//     console.error("Error fetching order by Amazon Order ID:", error);
+//   }
+// };
+
+// // Call the function
+// fetchOrderByAmazonOrderId("408-8170367-7810747");
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

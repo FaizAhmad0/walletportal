@@ -214,6 +214,19 @@ const InvoicePage = () => {
               </Table.Summary.Row>
               <Table.Summary.Row>
                 <Table.Summary.Cell colSpan={5} align="right">
+                  <Text strong>Tax Amount :</Text>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell>
+                  <Text strong>
+                    ₹
+                    {(((totalAmount + totalShipping) * gstRate) / 100).toFixed(
+                      2
+                    )}
+                  </Text>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+              <Table.Summary.Row>
+                <Table.Summary.Cell colSpan={5} align="right">
                   <Text strong>Payable Amount including GST ({gstRate}%):</Text>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell>
