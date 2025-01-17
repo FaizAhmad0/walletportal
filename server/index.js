@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const User = require("./routes/User");
 const login = require("./routes/Login");
+const verifyotp = require("./routes/Verify")
 const Products = require("./routes/Products");
 const Order = require("./routes/Order");
 const Wallet = require("./routes/Wallet");
@@ -48,6 +49,7 @@ mongoose
 
 app.use("/user", User);
 app.use("/login", login);
+app.use("/verifyOtp",verifyotp);
 app.use("/products", Products);
 app.use("/orders", Order);
 app.use("/wallet", Wallet);

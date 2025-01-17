@@ -20,6 +20,28 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+// const updateAdmin = async () => {
+//   try {
+//     const admin = await User.findOne({ role: "accountant" }); // Fetch a single document
+//     if (!admin) {
+//       console.log("No accountant found");
+//       return;
+//     }
+//     console.log(admin);
+
+//     // Update fields
+//     admin.enrollment = "Account";
+//     admin.mobile = 9773354051;
+
+//     await admin.save(); // Save the changes
+//     console.log("Accountant updated successfully");
+//   } catch (error) {
+//     console.error("Error updating accountant:", error);
+//   }
+// };
+// updateAdmin();
+
+
 // Save all users from data.js to the database
 // const saveAllUsers = async () => {
 //   try {
@@ -84,37 +106,37 @@ mongoose
 // // Call the function to fetch the data
 // fetchOrdersWithInvalidGST();
 
-const fetchByEnrollment = async (id) => {
-  try {
-    const users = await User.find({ enrollment: id });
+// const fetchByEnrollment = async (id) => {
+//   try {
+//     const users = await User.find({ enrollment: id });
 
-    if (users.length > 0) {
-      users.forEach((user) => {
-        if (Array.isArray(user.transactions)) {
-          // Filter transactions with credit: true and calculate their sum
-          const creditedTotal = user.transactions
-            .filter((transaction) => transaction.debit) // Filter only credited transactions
-            .reduce((sum, transaction) => {
-              const amount = parseFloat(transaction.amount); // Convert amount to a number
-              return sum + (isNaN(amount) ? 0 : amount); // Add amount if it's valid
-            }, 0);
+//     if (users.length > 0) {
+//       users.forEach((user) => {
+//         if (Array.isArray(user.transactions)) {
+//           // Filter transactions with credit: true and calculate their sum
+//           const creditedTotal = user.transactions
+//             .filter((transaction) => transaction.debit) // Filter only credited transactions
+//             .reduce((sum, transaction) => {
+//               const amount = parseFloat(transaction.amount); // Convert amount to a number
+//               return sum + (isNaN(amount) ? 0 : amount); // Add amount if it's valid
+//             }, 0);
 
-          console.log(
-            `Total Credited Amount for User ${user.name}: ${creditedTotal}`
-          );
-        } else {
-          console.log("No transactions found for this user.");
-        }
-      });
-    } else {
-      console.log("User not found.");
-    }
-  } catch (error) {
-    console.error("Error occurred:", error);
-  }
-};
+//           console.log(
+//             `Total Credited Amount for User ${user.name}: ${creditedTotal}`
+//           );
+//         } else {
+//           console.log("No transactions found for this user.");
+//         }
+//       });
+//     } else {
+//       console.log("User not found.");
+//     }
+//   } catch (error) {
+//     console.error("Error occurred:", error);
+//   }
+// };
 
-fetchByEnrollment("AZ1797");
+// fetchByEnrollment("AZ1797");
 // const fetchOrderByAmazonOrderId = async (amazonOrderId) => {
 //   try {
 //     const order = await User.aggregate([

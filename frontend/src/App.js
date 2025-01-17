@@ -46,6 +46,7 @@ import DispatchAllTransaction from "./Pages/DispatchAllTransaction";
 import AllTransaction from "./Pages/AllTransaction";
 import BulkOrderDetails from "./Pages/BulkOrderDetails";
 import DispatchBulk from "./Pages/DispatchBulk";
+import Verify from "./Pages/Verify";
 function App() {
   return (
     <>
@@ -54,6 +55,7 @@ function App() {
           <Route path="/" exact element={<Home />} />
           <Route path="/login" exact element={<LoginForm />} />
           <Route path="/register-user" exact element={<RegisterUser />} />
+          <Route path="/verify" exact element={<Verify />} />
           <Route path="/user-order" exact element={<UserDash />} />
           <Route path="/wallet" exact element={<Wallet />} />
           <Route path="/tiar" exact element={<Tier />} />

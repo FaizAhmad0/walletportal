@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -6,12 +6,16 @@ import axios from "axios";
 import "aos/dist/aos.css";
 import AOS from "aos";
 import "./LoginForm.css";
+
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const LoginForm = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [requiresOtp, setRequiresOtp] = useState(false);
+  const [otpToken, setOtpToken] = useState({});
+  const [enrollment, setEnrollment] = useState("");
 
   useEffect(() => {
     AOS.init();
@@ -22,52 +26,55 @@ const LoginForm = () => {
     axios
       .post(`${backendUrl}/login`, values)
       .then((response) => {
-        messageApi.success(response.data.message);
-
-        form.resetFields();
-
-        localStorage.setItem("name", response.data.name);
-        localStorage.setItem("email", response.data.email);
-        localStorage.setItem("id", response.data.id);
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("role", response.data.role);
-        localStorage.setItem("enrollment", response.data.enrollment);
-        localStorage.removeItem("theme");
-
-        if (response.data.role === "user") {
-          navigate("/user-order", {
-            state: { message: response.data.message },
-          });
-        } else if (response.data.role === "manager") {
-          navigate("/manager-dash", {
-            state: { message: response.data.message },
-          });
-        } else if (response.data.role === "admin") {
-          navigate("/admin-dash", {
-            state: { message: response.data.message },
-          });
-        } else if (response.data.role === "dispatch") {
-          navigate("/dispatch-dash", {
-            state: { message: response.data.message },
-          });
-        } else if (response.data.role === "supervisor") {
-          navigate("/supervisor-dash", {
-            state: { message: response.data.message },
-          });
-        } else if (response.data.role === "shippingmanager") {
-          navigate("/shippingmanager-dash", {
-            state: { message: response.data.message },
-          });
-        } else if (response.data.role === "accountant") {
-          navigate("/accountant-dash", {
-            state: { message: response.data.message },
-          });
+        if (response.data.requiresOtp) {
+          messageApi.info(response.data.message);
+          setRequiresOtp(true);
+          setOtpToken(response.data);
+          setEnrollment(values.enrollment);
+        } else {
+          handleLoginSuccess(response.data);
         }
       })
       .catch((error) => {
         messageApi.error(error.response?.data?.message || "Login failed");
-        console.error("Failed to send data to backend:", error);
+        console.error("Login error:", error);
       });
+  };
+
+  const onOtpSubmit = (otpValues) => {
+    const { otp } = otpValues;
+    console.log("otp value is : ", otpValues);
+    axios
+      .post(`${backendUrl}/verifyOtp`, { enrollment, otp })
+      .then(() => {
+        handleLoginSuccess(otpToken); // Use stored token from initial response
+      })
+      .catch((error) => {
+        messageApi.error(
+          error.response?.data?.message || "OTP verification failed"
+        );
+        console.error("OTP verification error:", error);
+      });
+  };
+
+  const handleLoginSuccess = (data) => {
+    messageApi.success(data.message);
+
+    localStorage.setItem("name", data.name);
+    localStorage.setItem("email", data.email);
+    localStorage.setItem("id", data.id);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", data.role);
+    localStorage.setItem("enrollment", data.enrollment);
+    localStorage.removeItem("theme");
+
+    if (data.role === "user") navigate("/user-order");
+    else if (data.role === "manager") navigate("/manager-dash");
+    else if (data.role === "admin") navigate("/admin-dash");
+    else if (data.role === "dispatch") navigate("/dispatch-dash");
+    else if (data.role === "supervisor") navigate("/supervisor-dash");
+    else if (data.role === "shippingmanager") navigate("/shippingmanager-dash");
+    else if (data.role === "accountant") navigate("/accountant-dash");
   };
 
   return (
@@ -90,7 +97,7 @@ const LoginForm = () => {
           name="login_form"
           className="login-form"
           initialValues={{ remember: true }}
-          onFinish={onFinish}
+          onFinish={requiresOtp ? onOtpSubmit : onFinish}
         >
           <div className="login-logo">
             <img
@@ -98,20 +105,36 @@ const LoginForm = () => {
               alt="Logo"
             />
           </div>
-          <Form.Item
-            name="enrollment"
-            rules={[
-              { required: true, message: "Please input your enrollment!" },
-            ]}
-          >
-            <Input prefix={<UserOutlined />} placeholder="Enrollment" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
-          >
-            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
-          </Form.Item>
+          {!requiresOtp ? (
+            <>
+              <Form.Item
+                name="enrollment"
+                rules={[
+                  { required: true, message: "Please input your enrollment!" },
+                ]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="Enrollment" />
+              </Form.Item>
+              <Form.Item
+                name="password"
+                rules={[
+                  { required: true, message: "Please input your password!" },
+                ]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  placeholder="Password"
+                />
+              </Form.Item>
+            </>
+          ) : (
+            <Form.Item
+              name="otp"
+              rules={[{ required: true, message: "Please input the OTP!" }]}
+            >
+              <Input prefix={<LockOutlined />} placeholder="Enter OTP" />
+            </Form.Item>
+          )}
           <Form.Item>
             <Button
               type="primary"
@@ -119,7 +142,7 @@ const LoginForm = () => {
               htmlType="submit"
               className="login-form-button"
             >
-              Log in
+              {requiresOtp ? "Verify OTP" : "Log in"}
             </Button>
           </Form.Item>
         </Form>
