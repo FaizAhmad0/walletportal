@@ -20,27 +20,19 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// const updateAdmin = async () => {
-//   try {
-//     const admin = await User.findOne({ role: "accountant" }); // Fetch a single document
-//     if (!admin) {
-//       console.log("No accountant found");
-//       return;
-//     }
-//     console.log(admin);
-
-//     // Update fields
-//     admin.enrollment = "Account";
-//     admin.mobile = 9773354051;
-
-//     await admin.save(); // Save the changes
-//     console.log("Accountant updated successfully");
-//   } catch (error) {
-//     console.error("Error updating accountant:", error);
-//   }
-// };
-// updateAdmin();
-
+const updateAdmin = async () => {
+  try {
+    const admin = await User.find({}); // Fetch a single document
+    if (!admin) {
+      console.log("No accountant found");
+      return;
+    }
+    console.log(admin);
+  } catch (error) {
+    console.error("Error updating accountant:", error);
+  }
+};
+updateAdmin();
 
 // Save all users from data.js to the database
 // const saveAllUsers = async () => {

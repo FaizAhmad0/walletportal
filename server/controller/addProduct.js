@@ -2,7 +2,7 @@ const User = require("../models/User");
 const nodemailer = require("nodemailer");
 const doubletick = require("@api/doubletick"); // Make sure you have this installed and correctly configured.
 
-doubletick.auth("key_49uMaEQ635"); // Replace this with your actual API key
+doubletick.auth("key_nFcFMAxjiz"); // Replace this with your actual API key
 
 module.exports = async (req, res) => {
   try {
@@ -49,6 +49,23 @@ module.exports = async (req, res) => {
       }
     });
 
+    const trackingId =
+      items
+        .filter((item) => item.trackingId)
+        .map((item) => item.trackingId)
+        .join(", ") || "N/A";
+
+    const shippingPartner =
+      items
+        .filter((item) => item.shippingPartner)
+        .map((item) => item.shippingPartner)
+        .join(", ") || "N/A";
+
+    const amazonOrderId =
+      items
+        .filter((item) => item.amazonOrderId)
+        .map((item) => item.amazonOrderId)
+        .join(", ") || "N/A";
     // Send WhatsApp message using Double Tick API
     const whatsappMessage = {
       messages: [
@@ -59,29 +76,27 @@ module.exports = async (req, res) => {
               buttons: [
                 {
                   type: "URL",
-                  url: "https://example.com",
-                  title: "View Order",
-                }, // Update this URL as necessary
+                  url: `https://example.com/track?orderId=12345`, // Use a real or dynamic orderId
+                  title: "Track Delivery",
+                },
               ],
             },
-            templateName: "hello", // Make sure the template exists on Double Tick
+            templateName: "hello", // Ensure this matches the exact name in your WhatsApp template
           },
-          from: "Double Tick",
-          //from: process.env.WHATSAPP_FROM_NUMBER,
-          // Sender's WhatsApp number (should be in your environment variables)
-          to: user.mobile,
+          from: "Saumic Craft", // Sender's name
+          to: user.mobile, // Recipient's mobile number
         },
       ],
     };
 
-    // doubletick
-    //   .outgoingMessagesWhatsappTemplate(whatsappMessage)
-    //   .then(({ data }) => {
-    //     console.log("WhatsApp message sent:", data);
-    //   })
-    //   .catch((err) => {
-    //     console.error("Error sending WhatsApp message:", err);
-    //   });
+    doubletick
+      .outgoingMessagesWhatsappTemplate(whatsappMessage)
+      .then(({ data }) => {
+        console.log("WhatsApp message sent:", data);
+      })
+      .catch((err) => {
+        console.error("Error sending WhatsApp message:", err);
+      });
 
     res.status(200).json({
       message:

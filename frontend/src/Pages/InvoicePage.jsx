@@ -214,7 +214,7 @@ const InvoicePage = () => {
               </Table.Summary.Row>
               <Table.Summary.Row>
                 <Table.Summary.Cell colSpan={5} align="right">
-                  <Text strong>Tax Amount :</Text>
+                  <Text strong>Tax Amount ({gstRate}% GST):</Text>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell>
                   <Text strong>

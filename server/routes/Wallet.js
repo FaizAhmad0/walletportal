@@ -13,7 +13,7 @@ router.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? "https://wallet.saumiccraft.in"
+        ? "https://wallet.saumiccraft.com"
         : "http://localhost:3000",
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
@@ -58,7 +58,7 @@ router.post("/add-balance", async (req, res) => {
         phone: user.mobile,
         redirect_url:
           process.env.NODE_ENV === "production"
-            ? "https://wallet.saumiccraft.in/payment-status"
+            ? "https://wallet.saumiccraft.com/payment-status"
             : "http://localhost:3000/payment-status",
       },
       {
