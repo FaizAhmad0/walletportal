@@ -81,6 +81,15 @@ declare class SDK {
      */
     exportChatsToExcel(body: types.ExportChatsToExcelBodyParam): Promise<FetchResponse<201, types.ExportChatsToExcelResponse201>>;
     /**
+     * Retrieve chat messages sent by the specified WhatsApp Business Account (WABA) number,
+     * with optional date filtering.
+     *
+     * @summary Get chat messages for a customer of WABA number
+     * @throws FetchError<400, types.GetChatMessagesResponse400> Incorrect payload
+     * @throws FetchError<401, types.GetChatMessagesResponse401> Unauthorized
+     */
+    getChatMessages(metadata: types.GetChatMessagesMetadataParam): Promise<FetchResponse<200, types.GetChatMessagesResponse200>>;
+    /**
      * Send Whatsapp Video Message
      *
      * @summary Send Whatsapp Video Message
@@ -339,6 +348,49 @@ declare class SDK {
      * @throws FetchError<403, types.UploadMediaResponse403> File Type not supported.
      */
     uploadMedia(body?: types.UploadMediaBodyParam): Promise<FetchResponse<201, types.UploadMediaResponse201>>;
+    /**
+     * Register New Webhook
+     *
+     * @summary Register New Webhook
+     * @throws FetchError<400, types.RegisterWebhookResponse400> Incorrect payload
+     * @throws FetchError<401, types.RegisterWebhookResponse401> Unauthorized
+     */
+    registerWebhook(body: types.RegisterWebhookBodyParam): Promise<FetchResponse<201, types.RegisterWebhookResponse201>>;
+    /**
+     * Get Webhooks
+     *
+     * @summary Get Webhooks
+     * @throws FetchError<400, types.GetWebhooksResponse400> Incorrect payload
+     * @throws FetchError<401, types.GetWebhooksResponse401> Unauthorized
+     */
+    getWebhooks(metadata?: types.GetWebhooksMetadataParam): Promise<FetchResponse<201, types.GetWebhooksResponse201>>;
+    /**
+     * Delete Webhooks
+     *
+     * @summary Delete Webhooks
+     * @throws FetchError<400, types.DeleteWebhooksResponse400> Incorrect payload
+     * @throws FetchError<401, types.DeleteWebhooksResponse401> Unauthorized
+     */
+    deleteWebhooks(body: types.DeleteWebhooksBodyParam): Promise<FetchResponse<201, types.DeleteWebhooksResponse201>>;
+    /**
+     * Edit Webhooks
+     *
+     * @summary Edit Webhooks
+     * @throws FetchError<400, types.EditWebhooksResponse400> Incorrect payload
+     * @throws FetchError<401, types.EditWebhooksResponse401> Unauthorized
+     */
+    editWebhooks(body: types.EditWebhooksBodyParam, metadata: types.EditWebhooksMetadataParam): Promise<FetchResponse<201, types.EditWebhooksResponse201>>;
+    /**
+     *  Assign team member to customer
+     *
+     * @summary Assign team member to customer
+     * @throws FetchError<400, types.AssignTeamMemberToCustomerResponse400> Incorrect payload
+     * @throws FetchError<401, types.AssignTeamMemberToCustomerResponse401> Unauthorized
+     * @throws FetchError<403, types.AssignTeamMemberToCustomerResponse403> Access forbidden
+     * @throws FetchError<404, types.AssignTeamMemberToCustomerResponse404> Resource not found
+     * @throws FetchError<422, types.AssignTeamMemberToCustomerResponse422> Unprocessable Entity
+     */
+    assignTeamMemberToCustomer(body: types.AssignTeamMemberToCustomerBodyParam): Promise<FetchResponse<number, unknown>>;
 }
 declare const createSDK: SDK;
 export = createSDK;

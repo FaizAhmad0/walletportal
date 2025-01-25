@@ -104,6 +104,17 @@ var SDK = /** @class */ (function () {
         return this.core.fetch('/export-chats', 'post', body);
     };
     /**
+     * Retrieve chat messages sent by the specified WhatsApp Business Account (WABA) number,
+     * with optional date filtering.
+     *
+     * @summary Get chat messages for a customer of WABA number
+     * @throws FetchError<400, types.GetChatMessagesResponse400> Incorrect payload
+     * @throws FetchError<401, types.GetChatMessagesResponse401> Unauthorized
+     */
+    SDK.prototype.getChatMessages = function (metadata) {
+        return this.core.fetch('/chat-messages', 'get', metadata);
+    };
+    /**
      * Send Whatsapp Video Message
      *
      * @summary Send Whatsapp Video Message
@@ -425,6 +436,59 @@ var SDK = /** @class */ (function () {
      */
     SDK.prototype.uploadMedia = function (body) {
         return this.core.fetch('/media/upload', 'post', body);
+    };
+    /**
+     * Register New Webhook
+     *
+     * @summary Register New Webhook
+     * @throws FetchError<400, types.RegisterWebhookResponse400> Incorrect payload
+     * @throws FetchError<401, types.RegisterWebhookResponse401> Unauthorized
+     */
+    SDK.prototype.registerWebhook = function (body) {
+        return this.core.fetch('/v2/webhook/register', 'post', body);
+    };
+    /**
+     * Get Webhooks
+     *
+     * @summary Get Webhooks
+     * @throws FetchError<400, types.GetWebhooksResponse400> Incorrect payload
+     * @throws FetchError<401, types.GetWebhooksResponse401> Unauthorized
+     */
+    SDK.prototype.getWebhooks = function (metadata) {
+        return this.core.fetch('/v2/webhooks', 'get', metadata);
+    };
+    /**
+     * Delete Webhooks
+     *
+     * @summary Delete Webhooks
+     * @throws FetchError<400, types.DeleteWebhooksResponse400> Incorrect payload
+     * @throws FetchError<401, types.DeleteWebhooksResponse401> Unauthorized
+     */
+    SDK.prototype.deleteWebhooks = function (body) {
+        return this.core.fetch('/v2/webhook/deregister', 'delete', body);
+    };
+    /**
+     * Edit Webhooks
+     *
+     * @summary Edit Webhooks
+     * @throws FetchError<400, types.EditWebhooksResponse400> Incorrect payload
+     * @throws FetchError<401, types.EditWebhooksResponse401> Unauthorized
+     */
+    SDK.prototype.editWebhooks = function (body, metadata) {
+        return this.core.fetch('/v2/webhook/{webhookId}', 'post', body, metadata);
+    };
+    /**
+     *  Assign team member to customer
+     *
+     * @summary Assign team member to customer
+     * @throws FetchError<400, types.AssignTeamMemberToCustomerResponse400> Incorrect payload
+     * @throws FetchError<401, types.AssignTeamMemberToCustomerResponse401> Unauthorized
+     * @throws FetchError<403, types.AssignTeamMemberToCustomerResponse403> Access forbidden
+     * @throws FetchError<404, types.AssignTeamMemberToCustomerResponse404> Resource not found
+     * @throws FetchError<422, types.AssignTeamMemberToCustomerResponse422> Unprocessable Entity
+     */
+    SDK.prototype.assignTeamMemberToCustomer = function (body) {
+        return this.core.fetch('/customer/assign', 'post', body);
     };
     return SDK;
 }());

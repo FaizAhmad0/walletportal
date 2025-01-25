@@ -289,6 +289,134 @@ declare const AssignTeamMemberToChat: {
         };
     };
 };
+declare const AssignTeamMemberToCustomer: {
+    readonly body: {
+        readonly type: "object";
+        readonly properties: {
+            readonly customerPhoneNumber: {
+                readonly description: "Phone number of customer";
+                readonly type: "string";
+                readonly minLength: 7;
+                readonly maxLength: 15;
+                readonly format: "phone";
+                readonly examples: readonly ["917838849957"];
+            };
+            readonly assignedUserPhoneNumber: {
+                readonly description: "Phone number of user";
+                readonly type: "string";
+                readonly minLength: 7;
+                readonly maxLength: 15;
+                readonly format: "phone";
+                readonly examples: readonly ["917838849957"];
+            };
+            readonly wabaNumber: {
+                readonly type: "string";
+                readonly description: "Integration Waba Number with country code";
+                readonly minLength: 7;
+                readonly maxLength: 15;
+                readonly format: "phone";
+                readonly examples: readonly ["919876543210"];
+            };
+        };
+        readonly required: readonly ["customerPhoneNumber", "assignedUserPhoneNumber", "wabaNumber"];
+        readonly $schema: "http://json-schema.org/draft-04/schema#";
+    };
+    readonly response: {
+        readonly "400": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [400];
+                };
+                readonly message: {
+                    readonly type: "array";
+                    readonly items: {
+                        readonly type: "string";
+                        readonly examples: readonly ["phoneNumber must be a string"];
+                    };
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Bad Request"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "401": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [401];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Invalid public api key"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "403": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [403];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Team member +1234567890 does not have access to WhatsApp API Number +9876543210"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Forbidden"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "404": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [404];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["wabaNumber not found"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Not Found"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "422": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [422];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["User is not a member of the team"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unprocessable Entity"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+    };
+};
 declare const BlockUnblockCustomer: {
     readonly body: {
         readonly type: "object";
@@ -1015,6 +1143,11 @@ declare const CustomerRemoveTagsCustomFields: {
                 };
                 readonly examples: readonly ["custom field 1", "custom field 2"];
             };
+            readonly wabaNumber: {
+                readonly type: "string";
+                readonly description: "Integration Waba Number with country code";
+                readonly examples: readonly ["919876543210"];
+            };
         };
         readonly required: readonly ["phone", "tags", "customFields"];
         readonly $schema: "http://json-schema.org/draft-04/schema#";
@@ -1205,6 +1338,63 @@ declare const DeleteTemplate: {
                     readonly examples: readonly [401];
                 };
                 readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+    };
+};
+declare const DeleteWebhooks: {
+    readonly body: {
+        readonly type: "object";
+        readonly properties: {
+            readonly webhookId: {
+                readonly type: "string";
+                readonly description: "The unique identifier of the webhook to be deregistered";
+            };
+        };
+        readonly required: readonly ["webhookId"];
+        readonly $schema: "http://json-schema.org/draft-04/schema#";
+    };
+    readonly response: {
+        readonly "201": {
+            readonly type: "object";
+            readonly properties: {};
+            readonly description: "Empty response body indicating successful creation";
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "400": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [400];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Bad Request"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Error Text"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "401": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [401];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+                readonly error: {
                     readonly type: "string";
                     readonly examples: readonly ["Unauthorized"];
                 };
@@ -1415,6 +1605,202 @@ declare const EditTemplate: {
         };
     };
 };
+declare const EditWebhooks: {
+    readonly body: {
+        readonly type: "object";
+        readonly properties: {
+            readonly url: {
+                readonly type: "string";
+                readonly format: "uri";
+                readonly description: "URL of the webhook";
+                readonly examples: readonly ["https://example.com/webhook"];
+            };
+            readonly method: {
+                readonly type: "string";
+                readonly description: "HTTP method used for the webhook";
+                readonly enum: readonly ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"];
+                readonly examples: readonly ["POST"];
+            };
+            readonly headers: {
+                readonly type: "object";
+                readonly description: "Custom headers to be sent with the webhook";
+                readonly additionalProperties: true;
+            };
+            readonly body: {
+                readonly type: "object";
+                readonly description: "Payload to be sent with the webhook";
+                readonly additionalProperties: true;
+            };
+            readonly query: {
+                readonly type: "object";
+                readonly description: "Query parameters to be included in the webhook URL";
+                readonly additionalProperties: true;
+            };
+            readonly bodyFormat: {
+                readonly type: "string";
+                readonly description: "Format of the body content";
+                readonly enum: readonly ["JSON", "FORM_DATA"];
+                readonly examples: readonly ["JSON"];
+            };
+            readonly authorization: {
+                readonly type: "object";
+                readonly description: "Authorization details for the webhook";
+                readonly properties: {
+                    readonly type: {
+                        readonly type: "string";
+                        readonly description: "The type of authorization used for the webhook";
+                        readonly enum: readonly ["BASIC", "BEARER"];
+                        readonly examples: readonly ["BEARER"];
+                    };
+                    readonly payload: {
+                        readonly type: "string";
+                        readonly description: "The authorization payload, such as a token or credentials";
+                        readonly examples: readonly ["some-secure-token"];
+                    };
+                };
+                readonly required: readonly ["type", "payload"];
+            };
+            readonly webhookEvents: {
+                readonly type: "array";
+                readonly description: "Events that trigger the webhook";
+                readonly items: {
+                    readonly type: "string";
+                    readonly enum: readonly ["MESSAGE_RECEIVED", "MESSAGE_STATUS_UPDATE", "CHAT_ASSIGNED_TO_AGENT", "CHAT_UNASSIGNED", "UPDATE_CUSTOMER_CUSTOM_FIELD", "WIDGET_LEAD_RECEIVED", "VERIFIED_WIDGET_LEAD_RECEIVED", "NEW_LEAD", "RAW_CLOUD_API_WEBHOOK", "CLOSE_CONVERSATION", "TEMPLATE_UPDATE", "ADD_TAG", "REMOVE_TAG", "CALL_TO_WHATSAPP_MESSAGE_RECEIVED", "CONVERSATION_OPENED", "CUSTOMER_BUSINESS_CHAT_OPEN"];
+                };
+                readonly examples: readonly ["MESSAGE_RECEIVED", "CLOSE_CONVERSATION"];
+            };
+            readonly retryOnTimeout: {
+                readonly type: "boolean";
+                readonly description: "Retry the webhook call on timeout";
+            };
+            readonly name: {
+                readonly type: "string";
+                readonly description: "Name of the webhook";
+            };
+            readonly wabaNumbers: {
+                readonly type: "array";
+                readonly description: "List of WABA numbers associated with the webhook";
+                readonly items: {
+                    readonly type: "string";
+                    readonly minLength: 10;
+                    readonly maxLength: 15;
+                    readonly format: "phone";
+                    readonly examples: readonly ["+919999999999"];
+                };
+            };
+        };
+        readonly required: readonly ["url", "method", "webhookEvents", "name", "wabaNumbers"];
+        readonly $schema: "http://json-schema.org/draft-04/schema#";
+    };
+    readonly metadata: {
+        readonly allOf: readonly [{
+            readonly type: "object";
+            readonly properties: {
+                readonly webhookId: {
+                    readonly type: "string";
+                    readonly $schema: "http://json-schema.org/draft-04/schema#";
+                    readonly description: "The webhook ID";
+                };
+            };
+            readonly required: readonly ["webhookId"];
+        }];
+    };
+    readonly response: {
+        readonly "201": {
+            readonly type: "object";
+            readonly properties: {
+                readonly validWebhooks: {
+                    readonly type: "array";
+                    readonly description: "A list of valid webhooks";
+                    readonly items: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly wabaNumber: {
+                                readonly type: "string";
+                                readonly description: "The WABA (WhatsApp Business Account) number associated with the webhook";
+                                readonly examples: readonly ["+919999999999"];
+                            };
+                            readonly webhookEventType: {
+                                readonly type: "string";
+                                readonly description: "The type of event that triggers the webhook\n\n`MESSAGE_RECEIVED` `MESSAGE_STATUS_UPDATE` `CHAT_ASSIGNED_TO_AGENT` `CHAT_UNASSIGNED` `UPDATE_CUSTOMER_CUSTOM_FIELD` `WIDGET_LEAD_RECEIVED` `VERIFIED_WIDGET_LEAD_RECEIVED` `NEW_LEAD` `RAW_CLOUD_API_WEBHOOK` `CLOSE_CONVERSATION` `TEMPLATE_UPDATE` `ADD_TAG` `REMOVE_TAG` `CALL_TO_WHATSAPP_MESSAGE_RECEIVED` `CONVERSATION_OPENED` `CUSTOMER_BUSINESS_CHAT_OPEN`";
+                                readonly enum: readonly ["MESSAGE_RECEIVED", "MESSAGE_STATUS_UPDATE", "CHAT_ASSIGNED_TO_AGENT", "CHAT_UNASSIGNED", "UPDATE_CUSTOMER_CUSTOM_FIELD", "WIDGET_LEAD_RECEIVED", "VERIFIED_WIDGET_LEAD_RECEIVED", "NEW_LEAD", "RAW_CLOUD_API_WEBHOOK", "CLOSE_CONVERSATION", "TEMPLATE_UPDATE", "ADD_TAG", "REMOVE_TAG", "CALL_TO_WHATSAPP_MESSAGE_RECEIVED", "CONVERSATION_OPENED", "CUSTOMER_BUSINESS_CHAT_OPEN"];
+                                readonly examples: readonly ["MESSAGE_RECEIVED"];
+                            };
+                        };
+                        readonly required: readonly ["wabaNumber", "webhookEventType"];
+                    };
+                };
+                readonly invalidWebhooks: {
+                    readonly type: "array";
+                    readonly description: "A list of invalid webhooks";
+                    readonly items: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly wabaNumber: {
+                                readonly type: "string";
+                                readonly description: "The WABA (WhatsApp Business Account) number associated with the webhook";
+                                readonly examples: readonly ["+919999999999"];
+                            };
+                            readonly webhookEventType: {
+                                readonly type: "string";
+                                readonly description: "The type of event that triggers the webhook\n\n`MESSAGE_RECEIVED` `MESSAGE_STATUS_UPDATE` `CHAT_ASSIGNED_TO_AGENT` `CHAT_UNASSIGNED` `UPDATE_CUSTOMER_CUSTOM_FIELD` `WIDGET_LEAD_RECEIVED` `VERIFIED_WIDGET_LEAD_RECEIVED` `NEW_LEAD` `RAW_CLOUD_API_WEBHOOK` `CLOSE_CONVERSATION` `TEMPLATE_UPDATE` `ADD_TAG` `REMOVE_TAG` `CALL_TO_WHATSAPP_MESSAGE_RECEIVED` `CONVERSATION_OPENED` `CUSTOMER_BUSINESS_CHAT_OPEN`";
+                                readonly enum: readonly ["MESSAGE_RECEIVED", "MESSAGE_STATUS_UPDATE", "CHAT_ASSIGNED_TO_AGENT", "CHAT_UNASSIGNED", "UPDATE_CUSTOMER_CUSTOM_FIELD", "WIDGET_LEAD_RECEIVED", "VERIFIED_WIDGET_LEAD_RECEIVED", "NEW_LEAD", "RAW_CLOUD_API_WEBHOOK", "CLOSE_CONVERSATION", "TEMPLATE_UPDATE", "ADD_TAG", "REMOVE_TAG", "CALL_TO_WHATSAPP_MESSAGE_RECEIVED", "CONVERSATION_OPENED", "CUSTOMER_BUSINESS_CHAT_OPEN"];
+                                readonly examples: readonly ["MESSAGE_RECEIVED"];
+                            };
+                        };
+                        readonly required: readonly ["wabaNumber", "webhookEventType"];
+                    };
+                };
+                readonly invalidWabaNumbers: {
+                    readonly type: "array";
+                    readonly description: "A list of invalid WABA numbers";
+                    readonly items: {
+                        readonly type: "string";
+                        readonly examples: readonly ["+918888888880"];
+                    };
+                };
+            };
+            readonly required: readonly ["validWebhooks", "invalidWebhooks", "invalidWabaNumbers"];
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "400": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [400];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Bad Request"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Error Text"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "401": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [401];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+    };
+};
 declare const ExportChatsToExcel: {
     readonly body: {
         readonly type: "object";
@@ -1577,6 +1963,125 @@ declare const GetAllRoles: {
                 readonly message: {
                     readonly type: "string";
                     readonly examples: readonly ["Roles not found"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+    };
+};
+declare const GetChatMessages: {
+    readonly metadata: {
+        readonly allOf: readonly [{
+            readonly type: "object";
+            readonly properties: {
+                readonly wabaNumber: {
+                    readonly type: "string";
+                    readonly examples: readonly ["11234567890"];
+                    readonly $schema: "http://json-schema.org/draft-04/schema#";
+                    readonly description: "The WhatsApp Business Account (WABA) number";
+                };
+                readonly customerNumber: {
+                    readonly type: "string";
+                    readonly examples: readonly ["911234567890"];
+                    readonly $schema: "http://json-schema.org/draft-04/schema#";
+                    readonly description: "Customer's phone number";
+                };
+                readonly startDate: {
+                    readonly type: "string";
+                    readonly examples: readonly ["01-01-2024"];
+                    readonly $schema: "http://json-schema.org/draft-04/schema#";
+                    readonly description: "The start date for the chat messages (DD-MM-YYYY)";
+                };
+                readonly endDate: {
+                    readonly type: "string";
+                    readonly examples: readonly ["31-12-2024"];
+                    readonly $schema: "http://json-schema.org/draft-04/schema#";
+                    readonly description: "The end date for the chat messages (DD-MM-YYYY)";
+                };
+            };
+            readonly required: readonly ["wabaNumber", "customerNumber"];
+        }];
+    };
+    readonly response: {
+        readonly "200": {
+            readonly type: "object";
+            readonly properties: {
+                readonly success: {
+                    readonly type: "boolean";
+                    readonly examples: readonly [true];
+                };
+                readonly messages: {
+                    readonly type: "array";
+                    readonly items: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly messageId: {
+                                readonly type: "string";
+                                readonly examples: readonly ["1234567890"];
+                            };
+                            readonly sender: {
+                                readonly type: "string";
+                                readonly examples: readonly ["19876543210"];
+                            };
+                            readonly recipient: {
+                                readonly type: "string";
+                                readonly examples: readonly ["919876543210"];
+                            };
+                            readonly message: {
+                                readonly type: "string";
+                                readonly examples: readonly ["Hello, how can I help you?"];
+                            };
+                            readonly mediaUrl: {
+                                readonly type: "string";
+                                readonly examples: readonly ["https://example.com/media/abc.jpg"];
+                            };
+                            readonly timestamp: {
+                                readonly type: "string";
+                                readonly format: "date-time";
+                                readonly examples: readonly ["2024-01-01T10:00:00Z"];
+                            };
+                            readonly status: {
+                                readonly type: "string";
+                                readonly examples: readonly ["delivered"];
+                            };
+                        };
+                    };
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "400": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [400];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Bad Request"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Error Text"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "401": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [401];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Invalid public api key"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
                 };
             };
             readonly $schema: "http://json-schema.org/draft-04/schema#";
@@ -2156,6 +2661,119 @@ declare const GetWalletBalanaceForOrg: {
                     readonly type: "number";
                     readonly description: "The wallet balance";
                     readonly examples: readonly ["3000"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+    };
+};
+declare const GetWebhooks: {
+    readonly metadata: {
+        readonly allOf: readonly [{
+            readonly type: "object";
+            readonly properties: {
+                readonly sortBy: {
+                    readonly type: "string";
+                    readonly description: "Sort by";
+                    readonly enum: readonly ["name", "url", "createdBy", "integrationCount"];
+                    readonly examples: readonly ["name"];
+                    readonly $schema: "http://json-schema.org/draft-04/schema#";
+                };
+                readonly sortDirection: {
+                    readonly type: "string";
+                    readonly description: "Sort direction";
+                    readonly enum: readonly ["ASC", "DESC"];
+                    readonly examples: readonly ["DESC"];
+                    readonly $schema: "http://json-schema.org/draft-04/schema#";
+                };
+            };
+            readonly required: readonly [];
+        }];
+    };
+    readonly response: {
+        readonly "201": {
+            readonly type: "object";
+            readonly properties: {
+                readonly webhookId: {
+                    readonly type: "string";
+                    readonly description: "The unique identifier of the webhook";
+                    readonly examples: readonly ["abc123"];
+                };
+                readonly url: {
+                    readonly type: "string";
+                    readonly format: "uri";
+                    readonly description: "The URL of the webhook";
+                    readonly examples: readonly ["https://example.com/webhook"];
+                };
+                readonly eventTypes: {
+                    readonly type: "array";
+                    readonly description: "A list of event types that the webhook listens to";
+                    readonly items: {
+                        readonly type: "string";
+                        readonly examples: readonly ["MESSAGE_RECEIVED"];
+                    };
+                    readonly examples: readonly ["MESSAGE_RECEIVED", "MESSAGE_SENT"];
+                };
+                readonly wabaNumbers: {
+                    readonly type: "array";
+                    readonly description: "A list of WABA Numbers associated with the webhook";
+                    readonly items: {
+                        readonly type: "string";
+                        readonly examples: readonly ["+919999999999"];
+                    };
+                    readonly examples: readonly ["+919999999999", "+918888888888"];
+                };
+                readonly integrationCount: {
+                    readonly type: "integer";
+                    readonly description: "The count of integrations associated with the webhook";
+                    readonly examples: readonly [2];
+                };
+                readonly createdBy: {
+                    readonly type: "string";
+                    readonly description: "The user who created the webhook";
+                    readonly examples: readonly ["admin"];
+                };
+                readonly name: {
+                    readonly type: "string";
+                    readonly description: "The name of the webhook";
+                    readonly examples: readonly ["My Webhook"];
+                };
+            };
+            readonly required: readonly ["webhookId", "url", "eventTypes", "wabaNumbers", "integrationCount", "createdBy", "name"];
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "400": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [400];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Bad Request"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Error Text"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "401": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [401];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
                 };
             };
             readonly $schema: "http://json-schema.org/draft-04/schema#";
@@ -3271,6 +3889,189 @@ declare const OutgoingMessagesWhatsappVideo: {
         };
     };
 };
+declare const RegisterWebhook: {
+    readonly body: {
+        readonly type: "object";
+        readonly properties: {
+            readonly url: {
+                readonly type: "string";
+                readonly format: "uri";
+                readonly description: "URL of the webhook";
+                readonly examples: readonly ["https://example.com/webhook"];
+            };
+            readonly method: {
+                readonly type: "string";
+                readonly description: "HTTP method used for the webhook";
+                readonly enum: readonly ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"];
+                readonly examples: readonly ["POST"];
+            };
+            readonly headers: {
+                readonly type: "object";
+                readonly description: "Custom headers to be sent with the webhook";
+                readonly additionalProperties: true;
+            };
+            readonly body: {
+                readonly type: "object";
+                readonly description: "Payload to be sent with the webhook";
+                readonly additionalProperties: true;
+            };
+            readonly query: {
+                readonly type: "object";
+                readonly description: "Query parameters to be included in the webhook URL";
+                readonly additionalProperties: true;
+            };
+            readonly bodyFormat: {
+                readonly type: "string";
+                readonly description: "Format of the body content";
+                readonly enum: readonly ["JSON", "FORM_DATA"];
+                readonly examples: readonly ["JSON"];
+            };
+            readonly authorization: {
+                readonly type: "object";
+                readonly description: "Authorization details for the webhook";
+                readonly properties: {
+                    readonly type: {
+                        readonly type: "string";
+                        readonly description: "The type of authorization used for the webhook";
+                        readonly enum: readonly ["BASIC", "BEARER"];
+                        readonly examples: readonly ["BEARER"];
+                    };
+                    readonly payload: {
+                        readonly type: "string";
+                        readonly description: "The authorization payload, such as a token or credentials";
+                        readonly examples: readonly ["some-secure-token"];
+                    };
+                };
+                readonly required: readonly ["type", "payload"];
+            };
+            readonly webhookEvents: {
+                readonly type: "array";
+                readonly description: "Events that trigger the webhook";
+                readonly items: {
+                    readonly type: "string";
+                    readonly enum: readonly ["MESSAGE_RECEIVED", "MESSAGE_STATUS_UPDATE", "CHAT_ASSIGNED_TO_AGENT", "CHAT_UNASSIGNED", "UPDATE_CUSTOMER_CUSTOM_FIELD", "WIDGET_LEAD_RECEIVED", "VERIFIED_WIDGET_LEAD_RECEIVED", "NEW_LEAD", "RAW_CLOUD_API_WEBHOOK", "CLOSE_CONVERSATION", "TEMPLATE_UPDATE", "ADD_TAG", "REMOVE_TAG", "CALL_TO_WHATSAPP_MESSAGE_RECEIVED", "CONVERSATION_OPENED", "CUSTOMER_BUSINESS_CHAT_OPEN"];
+                };
+                readonly examples: readonly ["MESSAGE_RECEIVED", "CLOSE_CONVERSATION"];
+            };
+            readonly retryOnTimeout: {
+                readonly type: "boolean";
+                readonly description: "Retry the webhook call on timeout";
+            };
+            readonly name: {
+                readonly type: "string";
+                readonly description: "Name of the webhook";
+            };
+            readonly wabaNumbers: {
+                readonly type: "array";
+                readonly description: "List of WABA numbers associated with the webhook";
+                readonly items: {
+                    readonly type: "string";
+                    readonly minLength: 10;
+                    readonly maxLength: 15;
+                    readonly format: "phone";
+                    readonly examples: readonly ["+919999999999"];
+                };
+            };
+        };
+        readonly required: readonly ["url", "method", "webhookEvents", "name", "wabaNumbers"];
+        readonly $schema: "http://json-schema.org/draft-04/schema#";
+    };
+    readonly response: {
+        readonly "201": {
+            readonly type: "object";
+            readonly properties: {
+                readonly validWebhooks: {
+                    readonly type: "array";
+                    readonly description: "A list of valid webhooks";
+                    readonly items: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly wabaNumber: {
+                                readonly type: "string";
+                                readonly description: "The WABA (WhatsApp Business Account) number associated with the webhook";
+                                readonly examples: readonly ["+919999999999"];
+                            };
+                            readonly webhookEventType: {
+                                readonly type: "string";
+                                readonly description: "The type of event that triggers the webhook\n\n`MESSAGE_RECEIVED` `MESSAGE_STATUS_UPDATE` `CHAT_ASSIGNED_TO_AGENT` `CHAT_UNASSIGNED` `UPDATE_CUSTOMER_CUSTOM_FIELD` `WIDGET_LEAD_RECEIVED` `VERIFIED_WIDGET_LEAD_RECEIVED` `NEW_LEAD` `RAW_CLOUD_API_WEBHOOK` `CLOSE_CONVERSATION` `TEMPLATE_UPDATE` `ADD_TAG` `REMOVE_TAG` `CALL_TO_WHATSAPP_MESSAGE_RECEIVED` `CONVERSATION_OPENED` `CUSTOMER_BUSINESS_CHAT_OPEN`";
+                                readonly enum: readonly ["MESSAGE_RECEIVED", "MESSAGE_STATUS_UPDATE", "CHAT_ASSIGNED_TO_AGENT", "CHAT_UNASSIGNED", "UPDATE_CUSTOMER_CUSTOM_FIELD", "WIDGET_LEAD_RECEIVED", "VERIFIED_WIDGET_LEAD_RECEIVED", "NEW_LEAD", "RAW_CLOUD_API_WEBHOOK", "CLOSE_CONVERSATION", "TEMPLATE_UPDATE", "ADD_TAG", "REMOVE_TAG", "CALL_TO_WHATSAPP_MESSAGE_RECEIVED", "CONVERSATION_OPENED", "CUSTOMER_BUSINESS_CHAT_OPEN"];
+                                readonly examples: readonly ["MESSAGE_RECEIVED"];
+                            };
+                        };
+                        readonly required: readonly ["wabaNumber", "webhookEventType"];
+                    };
+                };
+                readonly invalidWebhooks: {
+                    readonly type: "array";
+                    readonly description: "A list of invalid webhooks";
+                    readonly items: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly wabaNumber: {
+                                readonly type: "string";
+                                readonly description: "The WABA (WhatsApp Business Account) number associated with the webhook";
+                                readonly examples: readonly ["+919999999999"];
+                            };
+                            readonly webhookEventType: {
+                                readonly type: "string";
+                                readonly description: "The type of event that triggers the webhook\n\n`MESSAGE_RECEIVED` `MESSAGE_STATUS_UPDATE` `CHAT_ASSIGNED_TO_AGENT` `CHAT_UNASSIGNED` `UPDATE_CUSTOMER_CUSTOM_FIELD` `WIDGET_LEAD_RECEIVED` `VERIFIED_WIDGET_LEAD_RECEIVED` `NEW_LEAD` `RAW_CLOUD_API_WEBHOOK` `CLOSE_CONVERSATION` `TEMPLATE_UPDATE` `ADD_TAG` `REMOVE_TAG` `CALL_TO_WHATSAPP_MESSAGE_RECEIVED` `CONVERSATION_OPENED` `CUSTOMER_BUSINESS_CHAT_OPEN`";
+                                readonly enum: readonly ["MESSAGE_RECEIVED", "MESSAGE_STATUS_UPDATE", "CHAT_ASSIGNED_TO_AGENT", "CHAT_UNASSIGNED", "UPDATE_CUSTOMER_CUSTOM_FIELD", "WIDGET_LEAD_RECEIVED", "VERIFIED_WIDGET_LEAD_RECEIVED", "NEW_LEAD", "RAW_CLOUD_API_WEBHOOK", "CLOSE_CONVERSATION", "TEMPLATE_UPDATE", "ADD_TAG", "REMOVE_TAG", "CALL_TO_WHATSAPP_MESSAGE_RECEIVED", "CONVERSATION_OPENED", "CUSTOMER_BUSINESS_CHAT_OPEN"];
+                                readonly examples: readonly ["MESSAGE_RECEIVED"];
+                            };
+                        };
+                        readonly required: readonly ["wabaNumber", "webhookEventType"];
+                    };
+                };
+                readonly invalidWabaNumbers: {
+                    readonly type: "array";
+                    readonly description: "A list of invalid WABA numbers";
+                    readonly items: {
+                        readonly type: "string";
+                        readonly examples: readonly ["+918888888880"];
+                    };
+                };
+            };
+            readonly required: readonly ["validWebhooks", "invalidWebhooks", "invalidWabaNumbers"];
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "400": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [400];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Bad Request"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Error Text"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+        readonly "401": {
+            readonly type: "object";
+            readonly properties: {
+                readonly statusCode: {
+                    readonly type: "number";
+                    readonly examples: readonly [401];
+                };
+                readonly message: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+                readonly error: {
+                    readonly type: "string";
+                    readonly examples: readonly ["Unauthorized"];
+                };
+            };
+            readonly $schema: "http://json-schema.org/draft-04/schema#";
+        };
+    };
+};
 declare const RemoveTeamMember: {
     readonly body: {
         readonly type: "object";
@@ -3799,4 +4600,4 @@ declare const UploadMedia: {
         };
     };
 };
-export { AddMemberUnderReportingManager, AddMembersToGroup, AssignTeamMemberToChat, BlockUnblockCustomer, ChangeReportingManager, CheckRevertedOnTime, CreateGroup, CreateTemplate, CustomerAssignTagsCustomFields, CustomerRemoveTagsCustomFields, DeleteGroups, DeleteTemplate, EditTemplate, ExportChatsToExcel, GetAllRoles, GetCustomerDetails, GetPaginatedGroupsV2, GetTeam, GetTemplates, GetWalletBalanaceForOrg, LogoutTeamMember, OutgoingMessagesWhatsappAudio, OutgoingMessagesWhatsappDocument, OutgoingMessagesWhatsappImage, OutgoingMessagesWhatsappInteractive, OutgoingMessagesWhatsappInteractiveList, OutgoingMessagesWhatsappLocation, OutgoingMessagesWhatsappTemplate, OutgoingMessagesWhatsappText, OutgoingMessagesWhatsappVideo, RemoveTeamMember, SendBroadcastMessage, UnassignTeamMemberFromChat, UnblockUnblockCustomer, UploadMedia };
+export { AddMemberUnderReportingManager, AddMembersToGroup, AssignTeamMemberToChat, AssignTeamMemberToCustomer, BlockUnblockCustomer, ChangeReportingManager, CheckRevertedOnTime, CreateGroup, CreateTemplate, CustomerAssignTagsCustomFields, CustomerRemoveTagsCustomFields, DeleteGroups, DeleteTemplate, DeleteWebhooks, EditTemplate, EditWebhooks, ExportChatsToExcel, GetAllRoles, GetChatMessages, GetCustomerDetails, GetPaginatedGroupsV2, GetTeam, GetTemplates, GetWalletBalanaceForOrg, GetWebhooks, LogoutTeamMember, OutgoingMessagesWhatsappAudio, OutgoingMessagesWhatsappDocument, OutgoingMessagesWhatsappImage, OutgoingMessagesWhatsappInteractive, OutgoingMessagesWhatsappInteractiveList, OutgoingMessagesWhatsappLocation, OutgoingMessagesWhatsappTemplate, OutgoingMessagesWhatsappText, OutgoingMessagesWhatsappVideo, RegisterWebhook, RemoveTeamMember, SendBroadcastMessage, UnassignTeamMemberFromChat, UnblockUnblockCustomer, UploadMedia };

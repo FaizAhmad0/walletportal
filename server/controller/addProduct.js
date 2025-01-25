@@ -81,7 +81,7 @@ module.exports = async (req, res) => {
                 },
               ],
             },
-            templateName: "hello", // Ensure this matches the exact name in your WhatsApp template
+            templateName: "order_hold_v2", // Ensure this matches the exact name in your WhatsApp template
           },
           from: "Saumic Craft", // Sender's name
           to: user.mobile, // Recipient's mobile number
