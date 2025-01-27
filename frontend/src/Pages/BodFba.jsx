@@ -1,232 +1,192 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Input, Button, message } from "antd"; // Ant Design for modal and input
 import UserLayout from "../Layout/UserLayout";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import { Table, Button, Modal, message } from "antd";
 
 const BodFba = () => {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [orders, setOrders] = useState([]);
-  const [sortConfig, setSortConfig] = useState({
-    key: "createdAt",
-    direction: "descending", // Default to descending
-  });
+  const [bulkOrders, setBulkOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [userData, setUserData] = useState("");
-  console.log(userData);
-  const [amount, setAmount] = useState("");
 
-  const getOrders = async () => {
-    const user = localStorage.getItem("enrollment");
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+  // Fetch bulk orders for the specific enrollment
+  const fetchBulkOrders = async () => {
     try {
-      const response = await axios.get(
-        `${backendUrl}/orders/getuserbulk/${user}`,
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const enrollment = localStorage.getItem("enrollment");
+
+      if (!token) {
+        message.error("Authentication token is missing.");
+        return;
+      }
+
+      if (!enrollment) {
+        message.error("Enrollment ID is missing.");
+        return;
+      }
+
+      const response = await axios.post(
+        `${backendUrl}/user/getBulkOrders`,
+        { enrollment },
         {
-          headers: { Authorization: localStorage.getItem("token") },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      setOrders(response.data.orders);
+
+      setBulkOrders(response.data.orders || []);
     } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
-  const getUser = async () => {
-    const id = localStorage.getItem("id");
-    try {
-      const response = await axios.get(`${backendUrl}/user/${id}`, {
-        headers: { Authorization: localStorage.getItem("token") },
-      });
-      setUserData(response.data.user);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+      message.error("Failed to fetch bulk orders. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Trigger the fetchBulkOrders function on component mount
   useEffect(() => {
-    getOrders();
-    getUser();
+    fetchBulkOrders();
   }, []);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleSort = (key) => {
-    const direction =
-      sortConfig.direction === "ascending" ? "descending" : "ascending";
-    setSortConfig({ key, direction });
-  };
-
-  const handlePayNowClick = (orderId) => {
-    setSelectedOrderId(orderId);
+  // Show the modal with order details
+  const showModal = (order) => {
+    setSelectedOrder(order);
     setIsModalVisible(true);
   };
 
-  const handleModalOk = async () => {
-    try {
-      const response = await axios.post(
-        `${backendUrl}/orders/bulkorder/pay`,
-        {
-          orderId: selectedOrderId,
-          amount,
-          enrollment: localStorage.getItem("enrollment"),
-        },
-        {
-          headers: { Authorization: localStorage.getItem("token") },
-        }
-      );
-      setIsModalVisible(false);
-
-      message.success("Payment successfully completed!");
-      setAmount("");
-      getOrders(); // Refresh orders after payment
-    } catch (error) {
-      console.error("Payment failed:", error);
-    }
-  };
-
-  const handleModalCancel = () => {
+  // Hide the modal
+  const handleCancel = () => {
     setIsModalVisible(false);
-    setAmount("");
+    setSelectedOrder(null);
   };
 
-  // Function to calculate the total paid amount from the paymentStage array
-  const getTotalPaidAmount = (paymentStage) => {
-    return paymentStage.reduce((acc, stage) => acc + stage.amount, 0);
-  };
-
-  const sortedData = [...orders].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === "ascending" ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === "ascending" ? 1 : -1;
-    }
-    return 0;
-  });
-
-  const filteredData = sortedData.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  // Define table columns for Ant Design Table
+  const columns = [
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => new Date(text).toLocaleString(),
+    },
+    {
+      title: "Order Type",
+      dataIndex: "orderType",
+      key: "orderType",
+    },
+    {
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (shipped) => (shipped ? "Done" : "No"),
+    },
+    {
+      title: "Shipped",
+      dataIndex: "shipped",
+      key: "shipped",
+      render: (shipped) => (shipped ? "Done" : "No"),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          onClick={() => showModal(record)}
+          className="bg-blue-500 hover:bg-blue-600 text-white"
+        >
+          View SKU Details
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <UserLayout>
-      <div className="max-w-full mx-auto bg-white shadow-md rounded-md">
-        <div className="w-full mb-3 pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
+      <div className="p-4">
+        <div className="w-full pb-2 px-4 bg-gradient-to-r mb-3 from-blue-500 to-red-300 shadow-lg rounded-lg">
           <h1 className="text-2xl pt-4 font-bold text-white">Bulk Orders</h1>
+          {/* <FaMedal className="ml-3 text-yellow-500" /> */}
         </div>{" "}
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="p-2 border border-gray-300 rounded"
-            value={searchTerm}
-            onChange={handleSearch}
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <Table
+            bordered
+            className="bg-white shadow-md rounded-lg"
+            dataSource={bulkOrders}
+            columns={columns}
+            rowKey="_id"
+            pagination={{ pageSize: 5 }}
           />
-        </div>
-        <div className="overflow-x-auto">
-          <div className="inline-block min-w-full shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table className="min-w-full bg-white">
-              <thead className="bg-blue-50">
-                <tr>
-                  {[
-                    "Order Id",
-                    "Shipping Address",
-                    "Total Price",
-                    "Remaining Amount",
-                    "Date of Order",
-                    "Date of Shipping",
-                    "Status", // Column for Pay Now or Payment Completed
-                  ].map((header) => (
-                    <th
-                      key={header}
-                      className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
-                      onClick={() =>
-                        handleSort(header.toLowerCase().replace(/ /g, "_"))
-                      }
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((item, index) => {
-                  const totalPaidAmount = getTotalPaidAmount(item.paymentStage);
-                  const remainingAmount = item.totalPrice - totalPaidAmount;
-
-                  return (
-                    <tr key={index} className="hover:bg-gray-100">
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                        {item.orderId}
-                      </td>
-
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                        {item.shippingAddress}
-                      </td>
-
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                        {item.totalPrice}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                        {remainingAmount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                        {new Date(item.dueDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                        {totalPaidAmount >= item.totalPrice ? (
-                          <span className="text-green-500 font-bold">
-                            Payment Completed
-                          </span>
-                        ) : remainingAmount <= userData.amount ? (
-                          <Button
-                            type="primary"
-                            onClick={() => handlePayNowClick(item.orderId)}
-                          >
-                            Pay Now
-                          </Button>
-                        ) : (
-                          <Button
-                            type="primary"
-                            onClick={() => {
-                              navigate("/wallet");
-                            }}
-                          >
-                            Recharge Now
-                          </Button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        )}
       </div>
 
+      {/* Modal to display order details */}
       <Modal
-        title="Pay Now"
+        title="Order Details"
         visible={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
+        onCancel={handleCancel}
+        footer={[
+          <Button
+            key="close"
+            onClick={handleCancel}
+            className="bg-red-500 text-white hover:bg-red-600"
+          >
+            Close
+          </Button>,
+        ]}
+        centered
+        bodyStyle={{
+          padding: "20px",
+          maxHeight: "60vh",
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        className="custom-modal"
       >
-        <Input
-          type="number"
-          placeholder="Enter amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
+        {selectedOrder && (
+          <div className="space-y-4">
+            <h3 className="font-bold mt-4">SKU Details:</h3>
+            <ul className="space-y-2">
+              {selectedOrder.sku.map((skuItem, index) => (
+                <li
+                  key={index}
+                  className="p-4 border rounded shadow-sm bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0"
+                >
+                  <div className="text-sm">
+                    <p>
+                      <strong>SKU:</strong> {skuItem.sku}
+                    </p>
+                    <p>
+                      <strong>Quantity:</strong> {skuItem.quantity}
+                    </p>
+                    <p>
+                      <strong>Rate:</strong> {skuItem.rate}
+                    </p>
+                    <p>
+                      <strong>Size:</strong> {skuItem.size}
+                    </p>
+                  </div>
+                  <div className="text-sm">
+                    <p>
+                      <strong>Total Payment:</strong> {skuItem.totalPayment}
+                    </p>
+                    <p>
+                      <strong>Where Received:</strong> {skuItem.whereReceived}
+                    </p>
+                    <p>
+                      <strong>Payment Date:</strong> {skuItem.paymentDate}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </Modal>
     </UserLayout>
   );
