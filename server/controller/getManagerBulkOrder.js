@@ -2,7 +2,7 @@ const BulkOrder = require("../models/BulkOrder");
 module.exports = async (req, res) => {
   try {
     const { manager } = req.params;
-    console.log(manager);
+    // console.log(manager);
     let orders;
     if (manager === "Dispatch") {
       orders = await BulkOrder.find({});

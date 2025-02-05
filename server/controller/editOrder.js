@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
     const user = await User.findOne({
       "orders.items._id": selectedOrderId,
     });
-    console.log(productAction);
+    // console.log(productAction);
 
     if (!user) {
       return res.status(404).json({ error: "User or item not found" });

@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
     }
 
     const { items, finalAmount } = req.body;
-    console.log(items);
+    // console.log(items);
     const flattenedItems = items.flat();
     user.gms += Number(finalAmount);
 

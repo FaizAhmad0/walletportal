@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
     const { managerName } = req.body;
 
     const clients = await User.find({ manager: managerName, role: "user" });
-    console.log(clients);
+    // console.log(clients);
 
     res.status(200).json({ clients });
   } catch (error) {
