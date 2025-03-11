@@ -91,7 +91,7 @@ const AllClients = () => {
 
   // Function to handle client details update
   const handleEditClient = async (values) => {
-    console.log(values);
+    // console.log(values);
     try {
       await axios.put(
         `${backendUrl}/user/update-client/${selectedClient._id}`,
@@ -101,12 +101,18 @@ const AllClients = () => {
       message.success("Client details updated successfully!");
       setIsEditModalVisible(false);
       getClients();
+      window.location.reload();
     } catch (error) {
       message.error("Error updating client details.");
       console.error("Error updating client details:", error);
     }
   };
 
+  const handleEditModalCancel = () => {
+    // setIsEditModalVisible(false);
+    setIsEditModalVisible(false);
+    window.location.reload();
+  };
   // Function to download CSV
   const downloadCSV = () => {
     const headers = [
@@ -320,7 +326,8 @@ const AllClients = () => {
         <Modal
           title="Edit Client"
           visible={isEditModalVisible}
-          onCancel={() => setIsEditModalVisible(false)}
+          // onCancel={() => setIsEditModalVisible(false)}
+          onCancel={handleEditModalCancel}
           footer={null}
           centered
         >

@@ -150,7 +150,7 @@ const AddItems = () => {
       0
     );
 
-    if (userData.state === "Rajsthan") {
+    if (userData && userData.state === "rajasthan") {
       gst = items.reduce(
         (total, item) =>
           total +
@@ -543,7 +543,7 @@ const AddItems = () => {
           </div>
 
           <div className="mt-4">
-            {userData.state === "Rajsthan" ? (
+            {userData && userData.state.toLowerCase() === "rajasthan" ? (
               <div>
                 {items.map((item, index) => {
                   const totalPrice = parseFloat(item.totalPrice || 0);

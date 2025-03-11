@@ -354,7 +354,7 @@ const AccountantDash = () => {
             const totalGST = itemGST + shippingGST;
 
             let gstData = {};
-            if (user.state === "Rajasthan") {
+            if (user.state.toLowerCase() === "rajasthan") {
               const halfGstRate = (totalGST / 2).toFixed(2);
               gstData = {
                 CGST: parseFloat(halfGstRate),
