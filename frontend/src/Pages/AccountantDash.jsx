@@ -17,7 +17,7 @@ const AccountantDash = () => {
   const [timeFilter, setTimeFilter] = useState(""); // Initialize with empty string for no filter
   const [searchQuery, setSearchQuery] = useState(""); // Add state for search
   const handleDateRangeChange = (dates) => {
-    setDateRange(dates); // Set the selected date range
+    setDateRange(dates || []);
   };
   // Fetch orders from backend
   const getOrders = async () => {
@@ -423,6 +423,7 @@ const AccountantDash = () => {
               onChange={handleDateRangeChange}
               format="DD/MM/YYYY"
               style={{ width: 300 }}
+              allowClear
             />
             <div>
               <Search
