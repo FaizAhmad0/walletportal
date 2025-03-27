@@ -4,7 +4,7 @@ module.exports = async (req, res) => {
   try {
     const id = req.params.id;
     const user = await User.findById(id);
-    console.log(user.name);
+    // console.log(user.name);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
         manager: user.name,
         role: "user",
       });
-      console.log(managerUsers.length);
+      // console.log(managerUsers.length);
 
       // Sum up the GMS of all users under this manager
       totalGms = managerUsers.reduce((sum, u) => sum + (u.gms || 0), 0);

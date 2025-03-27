@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
       trackingId,
       shippingCompany,
     } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     // Validate request data
     if (

@@ -137,7 +137,7 @@ const UserLayout = ({ children }) => {
             { key: "/tiar", icon: <SignalCellularAltIcon />, label: "Tiar" },
             { key: "/bod", icon: <LocalMallIcon />, label: "Bulk Order" },
             {
-              key: "https://support.saumiccraft.com",
+              key: "https://help.saumiccraft.com",
               icon: <SupportAgentIcon />,
               label: "Support",
             },

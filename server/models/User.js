@@ -167,6 +167,7 @@ const userSchema = new Schema(
         "manager",
         "dispatch",
         "shippingmanager",
+        "supervisor",
         "admin",
         "accountant",
       ],

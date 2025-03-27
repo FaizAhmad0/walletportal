@@ -22,23 +22,14 @@ mongoose
 
 const updateAdmin = async () => {
   try {
-    const admins = await User.find({ state: "RAJASTHAN" }); // Fetch all matching documents
+    const result = await User.updateMany(
+      { enrollment: "SP1" },
+      { $set: { role: "supervisor" } }
+    );
 
-    if (!admins.length) {
-      console.log("No admins found");
-      return;
-    }
-
-    // Loop through each admin and print their timestamps
-    admins.forEach((admin) => {
-
-      console.log(`Name : ${admin.name}, Enrollment : ${admin.enrollment}`);
-      console.log(`Created At: ${admin.createdAt}`);
-      console.log(`Updated At: ${admin.updatedAt}`);
-      console.log("--------------------");
-    });
+    console.log(`${result.modifiedCount} admins updated successfully`);
   } catch (error) {
-    console.error("Error fetching admins:", error);
+    console.error("Error updating admins:", error);
   }
 };
 

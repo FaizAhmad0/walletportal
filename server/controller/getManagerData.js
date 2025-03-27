@@ -4,7 +4,7 @@ module.exports = async (req, res) => {
   try {
     const manage = req.params.manager;
     const manager = await User.findOne({ name: manage });
-    console.log(manager);
+    // console.log(manager);
     res.status(200).json({ manager });
   } catch (error) {
     console.error("Error finding manager:", error);

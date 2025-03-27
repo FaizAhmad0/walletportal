@@ -1,7 +1,7 @@
 const User = require("../models/User");
 
 module.exports = async (req, res) => {
-  console.log("working");
+  // console.log("working");
   try {
     const { orderId, userId } = req.body;
 

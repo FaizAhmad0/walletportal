@@ -19,6 +19,37 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const { Option } = Select;
 
+const indianStates = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+];
+
 const RegisterUser = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -188,9 +219,15 @@ const RegisterUser = () => {
 
           <Form.Item
             name="state"
-            rules={[{ required: true, message: "Please enter your state" }]}
+            rules={[{ required: true, message: "Please select your state" }]}
           >
-            <Input prefix={<GlobalOutlined />} placeholder="Enter your state" />
+            <Select placeholder="Select your state">
+              {indianStates.map((state) => (
+                <Option key={state} value={state}>
+                  {state}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item

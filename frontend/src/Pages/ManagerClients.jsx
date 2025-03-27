@@ -1,9 +1,42 @@
 import React, { useEffect, useState } from "react";
 import ManagerLayout from "../Layout/ManagerLayout";
 import axios from "axios";
-import { Modal, Button, Input, message, Table, Form } from "antd";
+import { Modal,Select, Button, Input, message, Table, Form } from "antd";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+const { Option } = Select;
+
+const indianStates = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+];
 
 const ManagerClients = () => {
   const [clients, setClients] = useState([]);
@@ -378,13 +411,16 @@ const ManagerClients = () => {
               <Input className="text-black" />
             </Form.Item>
             <Form.Item
-              label="State"
               name="state"
-              rules={[
-                { required: true, message: "Please input the client state!" },
-              ]}
+              rules={[{ required: true, message: "Please select your state" }]}
             >
-              <Input className="text-black" />
+              <Select placeholder="Select your state">
+                {indianStates.map((state) => (
+                  <Option key={state} value={state}>
+                    {state}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">

@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 module.exports = async (req, res) => {
   const { date } = req.query; // Expecting a date in 'YYYY-MM-DD' format
-  console.log(date); // Log the date for debugging
+  // console.log(date); // Log the date for debugging
 
   try {
     // Parse the date to start and end of the day
