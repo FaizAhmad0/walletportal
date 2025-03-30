@@ -47,6 +47,13 @@ import AllTransaction from "./Pages/AllTransaction";
 import BulkOrderDetails from "./Pages/BulkOrderDetails";
 import DispatchBulk from "./Pages/DispatchBulk";
 import Verify from "./Pages/Verify";
+import SupervisorDash from "./Pages/SupervisorDash";
+import UserPrivateRoute from "./components/UserPrivateRoute";
+import DispatchPrivateRoute from "./components/DispatchPrivateRoute";
+import AdminPrivateRoute from "./components/AdminPrivateRoute";
+import ManagerPrivateRoute from "./components/ManagerPrivateRoute";
+import AccountantPrivateRoute from "./components/AccountantPrivateRoute";
+import NotFound from "./Pages/NotFound";
 function App() {
   return (
     <>
@@ -54,63 +61,93 @@ function App() {
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/login" exact element={<LoginForm />} />
-          <Route path="/register-user" exact element={<RegisterUser />} />
+
+          <Route element={<UserPrivateRoute />}>
+            <Route path="/user-order" exact element={<UserDash />} />
+            <Route path="/wallet" exact element={<Wallet />} />
+            <Route path="/tiar" exact element={<Tier />} />
+            <Route path="/bod" exact element={<BodFba />} />
+          </Route>
+
+          <Route element={<DispatchPrivateRoute />}>
+            <Route path="/dispatch-dash" exact element={<DispatchDash />} />
+            <Route path="/create-order" exact element={<CreateOrder />} />
+            <Route path="/products" exact element={<UploadProducts />} />
+            <Route
+              path="/dispatch-bulkorder"
+              exact
+              element={<DispatchBulk />}
+            />
+            <Route
+              path="/dispatch-order-report"
+              element={<DispatchOrdersReport />}
+            />
+            <Route path="/archive-orders" exact element={<ArchivedOrders />} />
+            <Route path="/shipped-orders" exact element={<ShippingOrder />} />
+            <Route
+              path="/all-transaction"
+              element={<DispatchAllTransaction />}
+            />
+            <Route
+              path="/details-reporting"
+              exact
+              element={<DetailsReporting />}
+            />
+          </Route>
+
+          <Route element={<AdminPrivateRoute />}>
+            <Route path="/admin-dash" exact element={<AdminDash />} />
+            <Route path="/create-manager" element={<RegisterManager />} />
+            <Route path="/register-user" exact element={<RegisterUser />} />
+            <Route path="/view-clients" exact element={<AllClients />} />
+            <Route path="/view-managers" exact element={<AllManagers />} />
+            <Route path="/view-all-orders" exact element={<AllOrders />} />
+            <Route
+              path="/admin-order-reports"
+              element={<AdminOrdersReport />}
+            />
+            <Route path="/wallet-action" exact element={<WalletAction />} />
+            <Route path="/all-transactions" element={<AllTransaction />} />
+            <Route path="/audit-report" element={<AuditReport />} />
+            <Route
+              path="/admin-details-reporting"
+              element={<AdminDetailsReporting />}
+            />
+            <Route path="/bulkOrders" exact element={<BulkOrders />} />
+          </Route>
+
+          <Route element={<ManagerPrivateRoute />}>
+            <Route path="/manager-dash" exact element={<ManagerDash />} />
+            <Route path="/clients" exact element={<ManagerClients />} />
+            <Route path="/add-user" element={<AddManagerClient />} />
+            <Route path="/order-history" exact element={<OrderHistory />} />
+            <Route path="/bulkorder/:orderId" element={<BulkOrderDetails />} />
+            <Route path="/manager-reports" exact element={<ManagerReport />} />
+          </Route>
+
+          <Route element={<AccountantPrivateRoute />}>
+            <Route path="/accountant-dash" element={<AccountantDash />} />
+          </Route>
+
           <Route path="/verify" exact element={<Verify />} />
-          <Route path="/user-order" exact element={<UserDash />} />
-          <Route path="/wallet" exact element={<Wallet />} />
-          <Route path="/tiar" exact element={<Tier />} />
-          <Route path="/bod" exact element={<BodFba />} />
-          <Route path="/dispatch-dash" exact element={<DispatchDash />} />
-          <Route path="/create-order" exact element={<CreateOrder />} />
           <Route path="/add-items/:enrollment" exact element={<AddItems />} />
-          <Route path="/products" exact element={<UploadProducts />} />
           <Route path="/success" exact element={<PaymentSuccess />} />
           <Route path="/payment-status" exact element={<PaymentStatus />} />
-          <Route path="/clients" exact element={<ManagerClients />} />
-          <Route path="/dispatch-bulkorder" exact element={<DispatchBulk />} />
-          <Route path="/archive-orders" exact element={<ArchivedOrders />} />
-          <Route path="/shipped-orders" exact element={<ShippingOrder />} />
-          <Route path="/bulkOrders" exact element={<BulkOrders />} />
-          <Route path="/bulkorder/:orderId" element={<BulkOrderDetails />} />
-          <Route
-            path="/details-reporting"
-            exact
-            element={<DetailsReporting />}
-          />
-          <Route path="/manager-dash" exact element={<ManagerDash />} />
-          <Route path="/order-history" exact element={<OrderHistory />} />
+
           <Route path="/bulkorder" exact element={<BulkOrder />} />
-          <Route path="/manager-reports" exact element={<ManagerReport />} />
-          <Route path="/admin-dash" exact element={<AdminDash />} />
-          <Route path="/view-clients" exact element={<AllClients />} />
-          <Route path="/view-managers" exact element={<AllManagers />} />
-          <Route path="/view-all-orders" exact element={<AllOrders />} />
-          <Route path="/wallet-action" exact element={<WalletAction />} />
           <Route path="/invoice" element={<InvoicePage />} />
-          <Route path="/add-user" element={<AddManagerClient />} />
-          <Route path="/create-manager" element={<RegisterManager />} />
           <Route path="/admin-report" element={<AdminReport />} />
-          <Route path="/admin-order-reports" element={<AdminOrdersReport />} />
           <Route path="/total-sale" element={<TotalSale />} />
           <Route path="/orders/:date" element={<SpecificDayOrder />} />
           <Route path="/shippingmanager-dash" element={<ShippingDash />} />
           <Route path="/shipped" element={<ShippedOrders />} />
-          <Route path="/audit-report" element={<AuditReport />} />
-          <Route path="/accountant-dash" element={<AccountantDash />} />
-          <Route path="/all-transaction" element={<DispatchAllTransaction />} />
-          <Route path="/all-transactions" element={<AllTransaction />} />
-          <Route
-            path="/dispatch-order-report"
-            element={<DispatchOrdersReport />}
-          />
+          <Route path="/supervisor-dash" element={<SupervisorDash />} />
           <Route
             path="/dispatch-wallet-action"
             element={<DispatchWalletAction />}
           />
-          <Route
-            path="/admin-details-reporting"
-            element={<AdminDetailsReporting />}
-          />
+
+          <Route path="/*" exact element={<NotFound />} />
         </Routes>
       </Router>
     </>

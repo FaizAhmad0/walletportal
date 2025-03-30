@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import DispatchLayout from "../Layout/DispatchLayout";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from "./Modal";
-import { message } from "antd";
+import { message, Button } from "antd";
 import axios from "axios";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -289,6 +289,13 @@ const AddItems = () => {
   return (
     <DispatchLayout>
       <main className="max-w-full mx-auto bg-white shadow-md rounded-md text-black">
+        <Button
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
+          Refresh
+        </Button>
         <h1 className="text-lg font-bold mb-6 text-center underline">
           Add Items for Order: {enrollment}
         </h1>
