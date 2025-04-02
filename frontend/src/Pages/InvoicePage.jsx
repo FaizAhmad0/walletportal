@@ -17,6 +17,7 @@ const InvoicePage = () => {
   const { orderId, customer } = location.state || {};
 
   const [orderDetails, setOrderDetails] = useState([]);
+  console.log(orderDetails);
 
   const getOrders = async () => {
     try {
@@ -53,13 +54,16 @@ const InvoicePage = () => {
     );
   };
   const calculateGst = () => {
-    return (
-      orderDetails.items?.reduce(
-        (total, item) => total + (parseFloat(item.gstRate) || 0),
-        0
-      ) || 0
+    if (!orderDetails.items || orderDetails.items.length === 0) return 0;
+
+    const totalGst = orderDetails.items.reduce(
+      (total, item) => total + (parseFloat(item.gstRate) || 0),
+      0
     );
+
+    return totalGst / orderDetails.items.length;
   };
+
   const gstRate = calculateGst();
   const totalAmount = calculateTotal();
   const totalShipping = calculateTotalShipping(); // Calculate total shipping from all items

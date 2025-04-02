@@ -290,6 +290,7 @@ const AddItems = () => {
     <DispatchLayout>
       <main className="max-w-full mx-auto bg-white shadow-md rounded-md text-black">
         <Button
+          type="primary"
           onClick={() => {
             window.location.reload();
           }}
