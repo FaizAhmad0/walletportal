@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ManagerLayout from "../Layout/ManagerLayout";
 import axios from "axios";
-import { Modal,Select, Button, Input, message, Table, Form } from "antd";
+import { Modal, Select, Button, Input, message, Table, Form } from "antd";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -36,6 +36,13 @@ const indianStates = [
   "Uttar Pradesh",
   "Uttarakhand",
   "West Bengal",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi (National Capital Territory of Delhi)",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry",
 ];
 
 const ManagerClients = () => {

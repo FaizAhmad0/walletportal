@@ -47,6 +47,13 @@ const indianStates = [
   "Uttar Pradesh",
   "Uttarakhand",
   "West Bengal",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi (National Capital Territory of Delhi)",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry",
 ];
 
 const RegisterUser = () => {

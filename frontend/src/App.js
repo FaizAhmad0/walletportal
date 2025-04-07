@@ -54,6 +54,7 @@ import AdminPrivateRoute from "./components/AdminPrivateRoute";
 import ManagerPrivateRoute from "./components/ManagerPrivateRoute";
 import AccountantPrivateRoute from "./components/AccountantPrivateRoute";
 import NotFound from "./Pages/NotFound";
+import AboutUs from "./Pages/AboutUs";
 function App() {
   return (
     <>
