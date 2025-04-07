@@ -159,6 +159,12 @@ const Home = () => {
     if (role === "shippingmanager") {
       navigate("/shippingmanager-dash");
     }
+    if (role === "accountant") {
+      navigate("/accountant-dash");
+    }
+    if (role === "supervisor") {
+      navigate("/supervisor-dash");
+    }
   }, [successMessage, location, navigate]);
 
   return (
