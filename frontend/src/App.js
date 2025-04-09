@@ -62,6 +62,7 @@ function App() {
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/login" exact element={<LoginForm />} />
+          <Route path="/aboutus" exact element={<AboutUs />} />
 
           <Route element={<UserPrivateRoute />}>
             <Route path="/user-order" exact element={<UserDash />} />
