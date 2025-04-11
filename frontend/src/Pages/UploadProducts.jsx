@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import DispatchLayout from "../Layout/DispatchLayout";
-import { Button, message } from "antd";
+import { Button, message, Input } from "antd";
 import * as XLSX from "xlsx";
 import axios from "axios";
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const { Search } = Input;
 
 const UploadProducts = () => {
   const [products, setProducts] = useState([]);
+  const [searchSKU, setSearchSKU] = useState("");
+
   const [file, setFile] = useState(null); // State to store selected file
   const [messageApi, contextHolder] = message.useMessage();
   const [newProduct, setNewProduct] = useState({
@@ -165,29 +168,44 @@ const UploadProducts = () => {
           Upload Products
         </h2>
 
-        <div className="mb-4">
-          <button
-            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-2"
-            onClick={handleDownloadSample}
-          >
-            Download Sample File
-          </button>
-          <label className="block text-gray-700 mb-2">
-            Bulk Upload Through Excel
-          </label>
-          <input
-            type="file"
-            accept=".xlsx, .xls"
-            onChange={handleFileUpload}
-            className="border border-gray-300 rounded-md py-2 px-4"
-          />
-          <Button
-            className="pt-4 pb-4 ml-4"
-            type="primary"
-            onClick={handleBulkUpload}
-          >
-            Upload
-          </Button>
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          {/* Left Side: Download Sample & Upload */}
+          <div className="flex-1">
+            <button
+              className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 mb-2"
+              onClick={handleDownloadSample}
+            >
+              Download Sample File
+            </button>
+            <label className="block text-gray-700 mb-2">
+              Bulk Upload Through Excel
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={handleFileUpload}
+                className="border border-gray-300 rounded-md py-2 px-4"
+              />
+              <Button type="primary" onClick={handleBulkUpload}>
+                Upload
+              </Button>
+            </div>
+          </div>
+
+          {/* Right Side: Search */}
+          <div className="flex-1 relative">
+            <label className="block text-gray-700 mb-1">Search by SKU</label>
+            <Search
+              placeholder="Enter SKU"
+              allowClear
+              enterButton="Search"
+              value={searchSKU}
+              onChange={(e) => setSearchSKU(e.target.value)}
+              onSearch={(value) => setSearchSKU(value)}
+              className="w-full sm:w-1/2"
+            />
+          </div>
         </div>
 
         {/* Single Add/Edit Product Form */}
@@ -297,28 +315,32 @@ const UploadProducts = () => {
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm text-black ">
-              {products.map((product, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-200 hover:bg-gray-100"
-                >
-                  <td className="py-3 px-4 text-left whitespace-nowrap">
-                    {product.sku}
-                  </td>
-                  <td className="py-3 px-4 text-left">{product.name}</td>
-                  <td className="py-3 px-4 text-left">{product.price}</td>
-                  <td className="py-3 px-4 text-left">{product.gstRate}</td>
-                  <td className="py-3 px-4 text-left">{product.hsn}</td>
-                  <td className="py-3 px-4 text-center">
-                    <button
-                      onClick={() => handleEditProduct(index)}
-                      className="text-blue-500 hover:text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-semibold px-4 py-2 rounded-lg transition duration-200 ease-in-out"
-                    >
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {products
+                .filter((product) =>
+                  product.sku.toLowerCase().includes(searchSKU.toLowerCase())
+                )
+                .map((product, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-200 hover:bg-gray-100"
+                  >
+                    <td className="py-3 px-4 text-left whitespace-nowrap">
+                      {product.sku}
+                    </td>
+                    <td className="py-3 px-4 text-left">{product.name}</td>
+                    <td className="py-3 px-4 text-left">{product.price}</td>
+                    <td className="py-3 px-4 text-left">{product.gstRate}</td>
+                    <td className="py-3 px-4 text-left">{product.hsn}</td>
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        onClick={() => handleEditProduct(index)}
+                        className="text-blue-500 hover:text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-semibold px-4 py-2 rounded-lg transition duration-200 ease-in-out"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
