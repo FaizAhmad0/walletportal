@@ -40,7 +40,7 @@ const PaymentStatus = () => {
             // Redirect after 1 second
             setTimeout(() => {
               navigate("/wallet");
-            }, 1000);
+            }, 100);
           } else {
             message.error("Payment Failed or Cancelled.");
             setStatus("failed");

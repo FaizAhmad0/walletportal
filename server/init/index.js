@@ -20,20 +20,41 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-const updateAdmin = async () => {
+const getUsers = async () => {
   try {
-    const result = await User.updateMany(
-      { enrollment: "SP1" },
-      { $set: { role: "supervisor" } }
-    );
+    const users = await User.find({ role: "user" });
 
-    console.log(`${result.modifiedCount} admins updated successfully`);
+    const cutoffDate = new Date("2025-01-01");
+
+    for (const user of users) {
+      const originalOrderCount = user.orders.length;
+
+      // Keep only orders created after Jan 1, 2025
+      const updatedOrders = user.orders.filter(
+        (order) => new Date(order.createdAt) >= cutoffDate
+      );
+
+      if (updatedOrders.length !== originalOrderCount) {
+        user.orders = updatedOrders;
+        await user.save();
+
+        console.log(
+          `Deleted ${
+            originalOrderCount - updatedOrders.length
+          } old orders for user: ${user.name} (${user.email})`
+        );
+      }
+    }
+
+    console.log("✅ Old orders deleted successfully.");
   } catch (error) {
-    console.error("Error updating admins:", error);
+    console.error("❌ Error deleting old orders:", error);
   }
 };
 
-updateAdmin();
+
+
+getUsers();
 
 // Save all users from data.js to the database
 // const saveAllUsers = async () => {
