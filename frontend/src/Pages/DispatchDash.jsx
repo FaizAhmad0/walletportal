@@ -43,7 +43,7 @@ const DispatchDash = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
 
-  const getOrders = async (page = 1, limit = 100) => {
+  const getOrders = async (page = 1, limit = 50) => {
     try {
       const response = await axios.get(
         `${backendUrl}/orders/getallorders?page=${page}&limit=${limit}`,
@@ -752,7 +752,7 @@ const DispatchDash = () => {
             rowClassName={getRowClassName}
             pagination={{
               current: currentPage,
-              pageSize: 100, // Set to 100 orders per page
+              pageSize: 50, // Set to 100 orders per page
               total: totalOrders,
               onChange: (page) => getOrders(page),
             }}

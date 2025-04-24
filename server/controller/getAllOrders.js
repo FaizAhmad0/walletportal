@@ -3,7 +3,7 @@ const User = require("../models/User");
 module.exports = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100; // Set limit to 100 to show 100 orders per page
+    const limit = parseInt(req.query.limit) || 50; // Set limit to 100 to show 100 orders per page
     const skip = (page - 1) * limit;
 
     const orders = await User.find({}).skip(skip).limit(limit).lean();
