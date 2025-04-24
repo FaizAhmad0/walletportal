@@ -28,8 +28,8 @@ const ShippingDash = () => {
   const handleShippingPartnerFilter = (value) => {
     setShippingPartnerFilter(value);
   };
-  const [orders, setOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
+  // const [orders, setOrders] = useState([]);
+  // const [filteredOrders, setFilteredOrders] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState([]);
   const [selectedOrderAmount, setSelectedOrderAmount] = useState(0);
@@ -42,15 +42,35 @@ const ShippingDash = () => {
   const role = localStorage.getItem("role");
 
   // Fetch orders from backend
-  const getOrders = async () => {
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+
+  const getOrders = async (page = 1, limit = 100) => {
     try {
-      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      });
-      setOrders(response.data.orders);
-      setFilteredOrders(response.data.orders);
+      const response = await axios.get(
+        `${backendUrl}/orders/getallorders?page=${page}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+
+      console.log("orders:", response.data.orders); // ✅ after assignment
+      console.log("filteredOrders:", response.data.orders); // ✅ same here
+
+      // Sort orders in descending order by createdAt
+      const sortedOrders = response.data.orders.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      // Set the sorted orders to state
+      setOrders(sortedOrders);
+      setFilteredOrders(sortedOrders);
+      setTotalOrders(response.data.total);
+      setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching orders:", error);
       message.error("Failed to fetch orders. Please try again.");
@@ -614,9 +634,15 @@ const ShippingDash = () => {
             columns={columns}
             dataSource={dataSource}
             rowClassName={getRowClassName}
-            pagination={{ pageSize: 10 }}
+            pagination={{
+              current: currentPage,
+              pageSize: 100, // Set to 100 orders per page
+              total: totalOrders,
+              onChange: (page) => getOrders(page),
+            }}
             rowKey={(record) => record._id}
             scroll={{ x: "max-content" }}
+            className="shadow-lg rounded-lg"
           />
         </div>
         <Modal
