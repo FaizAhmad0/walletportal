@@ -426,7 +426,7 @@ const ShippingDash = () => {
   const dataSource = filteredOrders
     .flatMap((user) =>
       user.orders
-        .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
+        // .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
         .map((order) => ({
           key: order._id,
           name: user.name,

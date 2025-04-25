@@ -410,6 +410,35 @@ const DispatchDash = () => {
       },
     },
     {
+      title: <span className="text-sm text-black">Shipped</span>,
+      dataIndex: "shipped",
+      key: "shipped",
+      render: (shipped) => (
+        <span
+          className={`font-medium text-sm ${
+            shipped ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {shipped ? "Shipped" : "Not Shipped"}
+        </span>
+      ),
+    },
+    {
+      title: <span className="text-sm text-black">Archived</span>,
+      dataIndex: "archive",
+      key: "archive",
+      render: (archive) => (
+        <span
+          className={`font-medium text-sm ${
+            archive ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {archive ? "Archived" : "Not Archived"}
+        </span>
+      ),
+    },
+
+    {
       title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (_, record) => (
@@ -504,7 +533,7 @@ const DispatchDash = () => {
   const dataSource = filteredOrders
     .flatMap((user) =>
       user.orders
-        .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
+        // .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -521,6 +550,8 @@ const DispatchDash = () => {
           pincode: order.items[0]?.pincode || "N/A",
           address: user.address,
           finalAmount: order.finalAmount,
+          archive: order.archive,
+          shipped: order.shipped,
           paymentStatus: order.paymentStatus,
           items: order.items,
           _id: order._id,
