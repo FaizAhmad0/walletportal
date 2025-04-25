@@ -292,6 +292,35 @@ const ShippingDash = () => {
       },
     },
     {
+      title: <span className="text-sm text-black">Shipped</span>,
+      dataIndex: "shipped",
+      key: "shipped",
+      render: (shipped) => (
+        <span
+          className={`font-medium text-sm ${
+            shipped ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {shipped ? "Shipped" : "Not Shipped"}
+        </span>
+      ),
+    },
+    {
+      title: <span className="text-sm text-black">Archived</span>,
+      dataIndex: "archive",
+      key: "archive",
+      render: (archive) => (
+        <span
+          className={`font-medium text-sm ${
+            archive ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {archive ? "Archived" : "Not Archived"}
+        </span>
+      ),
+    },
+
+    {
       title: <span className="text-sm text-black">Action</span>,
       key: "action",
       render: (_, record) => (
@@ -434,6 +463,8 @@ const ShippingDash = () => {
           enrollment: user.enrollment,
           amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
           manager: user.manager,
+          archive: order.archive,
+          shipped: order.shipped,
           shippingPartner: order.items[0]?.shippingPartner || "N/A",
           trackingId: order.items[0]?.trackingId || "N/A",
           sku: order.items[0]?.sku || "N/A",
