@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import DispatchLayout from "../Layout/DispatchLayout";
 import { Link } from "react-router-dom";
-import { Modal, Button, Table, message, Select, Radio, Input } from "antd";
+import {
+  Modal,
+  Button,
+  Table,
+  message,
+  Select,
+  Skeleton,
+  Radio,
+  Input,
+} from "antd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ArchiveIcon from "@mui/icons-material/Archive";
@@ -42,11 +52,17 @@ const DispatchDash = () => {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
+  // const [filteredOrders, setFilteredOrders] = useState([]);
+  const limit = 50; // fetch 50 users at a time
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const getOrders = async (page = 1, limit = 50) => {
+  const getOrders = async (pageNo = 1) => {
     try {
+      setLoading(true);
       const response = await axios.get(
-        `${backendUrl}/orders/getallorders?page=${page}&limit=${limit}`,
+        `${backendUrl}/orders/getallorders?page=${pageNo}&limit=${limit}`,
         {
           headers: {
             Authorization: localStorage.getItem("token"),
@@ -54,24 +70,27 @@ const DispatchDash = () => {
         }
       );
 
-      console.log("orders:", response.data.orders); // ✅ after assignment
-      console.log("filteredOrders:", response.data.orders); // ✅ same here
+      const newUsers = response.data.orders;
+      console.log(newUsers);
 
-      // Sort orders in descending order by createdAt
-      const sortedOrders = response.data.orders.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      if (newUsers.length === 0) {
+        setHasMore(false);
+      } else {
+        setFilteredOrders((prev) => [...prev, ...newUsers]);
+      }
 
-      // Set the sorted orders to state
-      setOrders(sortedOrders);
-      setFilteredOrders(sortedOrders);
-      setTotalOrders(response.data.total);
-      setCurrentPage(page);
+      setPage(pageNo + 1);
     } catch (error) {
       console.error("Error fetching orders:", error);
       message.error("Failed to fetch orders. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    getOrders(1);
+  }, []);
 
   const handleShippedClick = async (orderItems, finalAmount, orderId) => {
     console.log(orderId, finalAmount);
@@ -409,34 +428,6 @@ const DispatchDash = () => {
         );
       },
     },
-    {
-      title: <span className="text-sm text-black">Shipped</span>,
-      dataIndex: "shipped",
-      key: "shipped",
-      render: (shipped) => (
-        <span
-          className={`font-medium text-sm ${
-            shipped ? "text-green-600" : "text-red-500"
-          }`}
-        >
-          {shipped ? "Shipped" : "Not Shipped"}
-        </span>
-      ),
-    },
-    {
-      title: <span className="text-sm text-black">Archived</span>,
-      dataIndex: "archive",
-      key: "archive",
-      render: (archive) => (
-        <span
-          className={`font-medium text-sm ${
-            archive ? "text-green-600" : "text-red-500"
-          }`}
-        >
-          {archive ? "Archived" : "Not Archived"}
-        </span>
-      ),
-    },
 
     {
       title: <span className="text-sm text-black">Action</span>,
@@ -533,7 +524,7 @@ const DispatchDash = () => {
   const dataSource = filteredOrders
     .flatMap((user) =>
       user.orders
-        // .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
+        .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -542,7 +533,6 @@ const DispatchDash = () => {
           enrollment: user.enrollment,
           amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
           brandName: order.items[0]?.brandName || "N/A",
-
           manager: user.manager,
           shippingPartner: order.items[0]?.shippingPartner || "N/A",
           trackingId: order.items[0]?.trackingId || "N/A",
@@ -775,22 +765,53 @@ const DispatchDash = () => {
           </h2>
         </div>
         {/* Orders Table */}
-        <div className="overflow-x-auto mb-16 text-sm text-black">
-          <Table
-            bordered
-            columns={columns}
-            dataSource={dataSource}
-            rowClassName={getRowClassName}
-            pagination={{
-              current: currentPage,
-              pageSize: 50, // Set to 100 orders per page
-              total: totalOrders,
-              onChange: (page) => getOrders(page),
-            }}
-            rowKey={(record) => record._id}
-            scroll={{ x: "max-content" }}
-            className="shadow-lg rounded-lg"
-          />
+        <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
+          <InfiniteScroll
+            dataLength={dataSource.length}
+            next={() => getOrders(page)}
+            hasMore={hasMore}
+            loader={
+              <div style={{ padding: "20px" }}>
+                {/* Simulate 4 skeleton table rows */}
+                {[...Array(4)].map((_, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      padding: "10px 0",
+                      borderBottom: "1px solid #f0f0f0",
+                      gap: "10px",
+                    }}
+                  >
+                    {/* You can repeat Skeleton.Input depending on your table columns */}
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 150 }} active />
+                    <Skeleton.Input style={{ width: 120 }} active />
+                    <Skeleton.Input style={{ width: 200 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                  </div>
+                ))}
+              </div>
+            }
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>No more orders to show.</b>
+              </p>
+            }
+            scrollableTarget="scrollableDiv"
+          >
+            <Table
+              bordered
+              columns={columns}
+              dataSource={dataSource}
+              rowClassName={getRowClassName}
+              rowKey={(record) => record._id}
+              scroll={{ x: "max-content" }}
+              pagination={false} // NO pagination
+              className="shadow-lg rounded-lg"
+            />
+          </InfiniteScroll>
         </div>
       </div>
 
