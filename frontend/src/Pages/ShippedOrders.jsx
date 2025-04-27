@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Table, Radio, Input, DatePicker } from "antd";
+import { Table, Radio, Input, DatePicker, message, Skeleton } from "antd";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
 import moment from "moment";
 import dayjs from "dayjs";
 import ShippingLayout from "../Layout/ShippingLayout";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const { Search } = Input; // Destructure Search from Input
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -15,25 +16,62 @@ const ShippedOrders = () => {
   const [searchText, setSearchText] = useState("");
   const [customDate, setCustomDate] = useState(null); // Add state for custom date
 
-  const getOrders = async () => {
+  const limit = 50; // fetch 50 users at a time
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
+  const getOrders = async (pageNo = 1) => {
     try {
+      setLoading(true);
       const response = await axios.get(
-        `${backendUrl}/orders/getallshippedorder`,
+        `${backendUrl}/orders/getallorders?page=${pageNo}&limit=${limit}`,
         {
           headers: {
             Authorization: localStorage.getItem("token"),
           },
         }
       );
-      setOrders(response.data.orders);
+
+      const newUsers = response.data.orders;
+      console.log(newUsers);
+
+      if (newUsers.length === 0) {
+        setHasMore(false);
+      } else {
+        setFilteredOrders((prev) => [...prev, ...newUsers]);
+      }
+
+      setPage(pageNo + 1);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      message.error("Failed to fetch orders. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    getOrders();
+    getOrders(1);
   }, []);
+  const getRowClassName = (record) => {
+    const allUnavailable = record.items.some(
+      (item) => item.productAction !== "Available"
+    );
+    const isPaymentPending = !record.paymentStatus;
+
+    if (allUnavailable && isPaymentPending) {
+      return "bg-red-100"; // Light red
+    } else if (allUnavailable) {
+      return "bg-yellow-100"; // Light yellow
+    } else if (isPaymentPending) {
+      return "bg-pink-100"; // Light pink
+    } else {
+      return ""; // Default row color
+    }
+  };
 
   const filterOrdersByDate = (order) => {
     const orderDate = moment(order.createdAt);
@@ -59,10 +97,10 @@ const ShippedOrders = () => {
     }
   };
 
-  const filteredOrders = orders
+  const dataSource = filteredOrders
     .flatMap((user) =>
       user.orders
-        .filter((order) => order.shipped === true && filterOrdersByDate(order))
+        .filter((order) => order.archive === false && order.shipped != false) // Only include non-archived orders
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -70,6 +108,8 @@ const ShippedOrders = () => {
           enrollment: user.enrollment,
           amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
           manager: user.manager,
+          archive: order.archive,
+          shipped: order.shipped,
           shippingPartner: order.items[0]?.shippingPartner || "N/A",
           trackingId: order.items[0]?.trackingId || "N/A",
           sku: order.items[0]?.sku || "N/A",
@@ -82,18 +122,6 @@ const ShippedOrders = () => {
           createdAt: order.createdAt,
         }))
     )
-    .filter((order) => {
-      const searchString = searchText.toLowerCase();
-      return (
-        String(order.name).toLowerCase().includes(searchString) ||
-        String(order.orderId).toLowerCase().includes(searchString) ||
-        String(order.amazonOrderId).toLowerCase().includes(searchString) ||
-        String(order.manager).toLowerCase().includes(searchString) ||
-        String(order.shippingPartner).toLowerCase().includes(searchString) ||
-        String(order.sku).toLowerCase().includes(searchString) ||
-        String(order.pincode).toLowerCase().includes(searchString)
-      );
-    })
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const columns = [
@@ -245,13 +273,54 @@ const ShippedOrders = () => {
             Total Orders: {filteredOrders.length}
           </h2>
         </div>
-        <Table
-          bordered
-          columns={columns}
-          dataSource={filteredOrders}
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: "max-content" }}
-        />
+        <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
+          <InfiniteScroll
+            dataLength={dataSource.length}
+            next={() => getOrders(page)}
+            hasMore={hasMore}
+            loader={
+              <div style={{ padding: "20px" }}>
+                {/* Simulate 4 skeleton table rows */}
+                {[...Array(4)].map((_, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      padding: "10px 0",
+                      borderBottom: "1px solid #f0f0f0",
+                      gap: "10px",
+                    }}
+                  >
+                    {/* You can repeat Skeleton.Input depending on your table columns */}
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 150 }} active />
+                    <Skeleton.Input style={{ width: 120 }} active />
+                    <Skeleton.Input style={{ width: 200 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                  </div>
+                ))}
+              </div>
+            }
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>No more orders to show.</b>
+              </p>
+            }
+            scrollableTarget="scrollableDiv"
+          >
+            <Table
+              bordered
+              columns={columns}
+              dataSource={dataSource}
+              rowClassName={getRowClassName}
+              rowKey={(record) => record._id}
+              scroll={{ x: "max-content" }}
+              pagination={false} // NO pagination
+              className="shadow-lg rounded-lg"
+            />
+          </InfiniteScroll>
+        </div>
       </div>
     </ShippingLayout>
   );

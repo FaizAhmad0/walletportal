@@ -31,6 +31,7 @@ const DispatchDash = () => {
   const handleShippingPartnerFilter = (value) => {
     setShippingPartnerFilter(value);
   };
+
   const [productStatusFilter, setProductStatusFilter] = useState(null);
   const handleProductStatusFilter = (value) => {
     setProductStatusFilter(value);
@@ -49,6 +50,7 @@ const DispatchDash = () => {
   const [searchQuery, setSearchQuery] = useState(""); // Add state for search
 
   const [orders, setOrders] = useState([]);
+  console.log(orders);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -77,6 +79,7 @@ const DispatchDash = () => {
         setHasMore(false);
       } else {
         setFilteredOrders((prev) => [...prev, ...newUsers]);
+        setOrders((prev) => [...prev, ...newUsers]);
       }
 
       setPage(pageNo + 1);
@@ -91,6 +94,16 @@ const DispatchDash = () => {
   useEffect(() => {
     getOrders(1);
   }, []);
+  
+  useEffect(() => {
+    filterOrders();
+  }, [
+    searchQuery,
+    paymentStatusFilter,
+    shippingPartnerFilter,
+    timeFilter,
+    orders,
+  ]);
 
   const handleShippedClick = async (orderItems, finalAmount, orderId) => {
     console.log(orderId, finalAmount);
@@ -178,7 +191,7 @@ const DispatchDash = () => {
   const filterOrders = () => {
     let filtered = [...orders];
 
-    // Apply Payment Status Filter
+    // Payment Status Filter
     if (paymentStatusFilter !== "") {
       const isPaid = paymentStatusFilter === "true";
       filtered = filtered
@@ -189,7 +202,7 @@ const DispatchDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Apply Shipping Partner Filter
+    // Shipping Partner Filter
     if (shippingPartnerFilter !== "") {
       filtered = filtered
         .map((user) => ({
@@ -201,7 +214,7 @@ const DispatchDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Apply Time Filter
+    // Time Filter
     if (timeFilter !== "") {
       const now = moment();
       const yesterday = moment().subtract(1, "day");
@@ -230,28 +243,30 @@ const DispatchDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Apply Search Filter
+    // Search Filter
     if (searchQuery.trim() !== "") {
       filtered = filtered
         .map((user) => ({
           ...user,
           orders: user.orders.filter((order) => {
             const orderId = order.orderId?.toString().toLowerCase() || "";
-            const sku = order.sku?.toString().toLowerCase() || "";
+            const sku = order.items?.[0]?.sku?.toString().toLowerCase() || "";
             const enrollment = user.enrollment?.toString().toLowerCase() || "";
             const manager = user.manager?.toString().toLowerCase() || "";
             const amazonOrderId =
-              order.items[0]?.amazonOrderId?.toString().toLowerCase() || "N/A";
+              order.items?.[0]?.amazonOrderId?.toString().toLowerCase() || "";
             const trackingId =
-              order.items[0]?.trackingId?.toString().toLowerCase() || "N/A";
+              order.items?.[0]?.trackingId?.toString().toLowerCase() || "";
+
+            const query = searchQuery.toLowerCase();
 
             return (
-              orderId.includes(searchQuery.toLowerCase()) ||
-              enrollment.includes(searchQuery.toLowerCase()) ||
-              manager.includes(searchQuery.toLowerCase()) ||
-              amazonOrderId.includes(searchQuery.toLowerCase()) ||
-              trackingId.includes(searchQuery.toLowerCase()) ||
-              sku.includes(searchQuery.toLowerCase())
+              orderId.includes(query) ||
+              sku.includes(query) ||
+              enrollment.includes(query) ||
+              manager.includes(query) ||
+              amazonOrderId.includes(query) ||
+              trackingId.includes(query)
             );
           }),
         }))
@@ -555,6 +570,7 @@ const DispatchDash = () => {
     filterOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentStatusFilter, timeFilter, searchQuery, orders]);
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ShippingLayout from "../Layout/ShippingLayout";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 import { Link } from "react-router-dom";
 import {
   Modal,
@@ -10,6 +12,7 @@ import {
   Radio,
   Input,
   Tooltip,
+  Skeleton,
 } from "antd";
 import dayjs from "dayjs";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -47,10 +50,16 @@ const ShippingDash = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
 
-  const getOrders = async (page = 1, limit = 50) => {
+  const limit = 50; // fetch 50 users at a time
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const getOrders = async (pageNo = 1) => {
     try {
+      setLoading(true);
       const response = await axios.get(
-        `${backendUrl}/orders/getallorders?page=${page}&limit=${limit}`,
+        `${backendUrl}/orders/getallorders?page=${pageNo}&limit=${limit}`,
         {
           headers: {
             Authorization: localStorage.getItem("token"),
@@ -58,28 +67,39 @@ const ShippingDash = () => {
         }
       );
 
-      console.log("orders:", response.data.orders); // ✅ after assignment
-      console.log("filteredOrders:", response.data.orders); // ✅ same here
+      const newUsers = response.data.orders;
+      console.log(newUsers);
 
-      // Sort orders in descending order by createdAt
-      const sortedOrders = response.data.orders.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+      if (newUsers.length === 0) {
+        setHasMore(false);
+      } else {
+        setFilteredOrders((prev) => [...prev, ...newUsers]);
+        setOrders((prev) => [...prev, ...newUsers]);
+      }
 
-      // Set the sorted orders to state
-      setOrders(sortedOrders);
-      setFilteredOrders(sortedOrders);
-      setTotalOrders(response.data.total);
-      setCurrentPage(page);
+      setPage(pageNo + 1);
     } catch (error) {
       console.error("Error fetching orders:", error);
       message.error("Failed to fetch orders. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    getOrders();
+    getOrders(1);
   }, []);
+
+  useEffect(() => {
+    filterOrders();
+  }, [
+    searchQuery,
+    paymentStatusFilter,
+    shippingPartnerFilter,
+    timeFilter,
+    orders,
+  ]);
+
   const handleSaveClick = async () => {
     try {
       console.log(editValues);
@@ -104,7 +124,7 @@ const ShippingDash = () => {
   const filterOrders = () => {
     let filtered = [...orders];
 
-    // Apply Payment Status Filter
+    // Payment Status Filter
     if (paymentStatusFilter !== "") {
       const isPaid = paymentStatusFilter === "true";
       filtered = filtered
@@ -114,6 +134,8 @@ const ShippingDash = () => {
         }))
         .filter((user) => user.orders.length > 0);
     }
+
+    // Shipping Partner Filter
     if (shippingPartnerFilter !== "") {
       filtered = filtered
         .map((user) => ({
@@ -125,10 +147,10 @@ const ShippingDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Apply Time Filter
+    // Time Filter
     if (timeFilter !== "") {
       const now = moment();
-      const yesterday = moment().subtract(1, "day"); // Define yesterday once
+      const yesterday = moment().subtract(1, "day");
 
       filtered = filtered
         .map((user) => ({
@@ -139,7 +161,7 @@ const ShippingDash = () => {
               case "today":
                 return orderDate.isSame(now, "day");
               case "yesterday":
-                return orderDate.isSame(yesterday, "day"); // Compare to yesterday
+                return orderDate.isSame(yesterday, "day");
               case "week":
                 return orderDate.isSame(now, "week");
               case "month":
@@ -154,29 +176,34 @@ const ShippingDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Apply Search Filter
-    // Apply Search Filter
+    // Search Filter
     if (searchQuery.trim() !== "") {
       filtered = filtered
         .map((user) => ({
           ...user,
           orders: user.orders.filter((order) => {
             const orderId = order.orderId?.toString().toLowerCase() || "";
+            const sku = order.items?.[0]?.sku?.toString().toLowerCase() || "";
             const enrollment = user.enrollment?.toString().toLowerCase() || "";
+            const manager = user.manager?.toString().toLowerCase() || "";
             const amazonOrderId =
-              order.items[0]?.amazonOrderId?.toString().toLowerCase() || "N/A";
+              order.items?.[0]?.amazonOrderId?.toString().toLowerCase() || "";
             const trackingId =
-              order.items[0]?.trackingId?.toString().toLowerCase() || "N/A";
+              order.items?.[0]?.trackingId?.toString().toLowerCase() || "";
+
+            const query = searchQuery.toLowerCase();
 
             return (
-              orderId.includes(searchQuery.toLowerCase()) ||
-              enrollment.includes(searchQuery.toLowerCase()) ||
-              amazonOrderId.includes(searchQuery.toLowerCase()) ||
-              trackingId.includes(searchQuery.toLowerCase()) // Add trackingId to search logic
+              orderId.includes(query) ||
+              sku.includes(query) ||
+              enrollment.includes(query) ||
+              manager.includes(query) ||
+              amazonOrderId.includes(query) ||
+              trackingId.includes(query)
             );
           }),
         }))
-        .filter((user) => user.orders.length > 0); // Ensure to filter out users with no orders left after filtering
+        .filter((user) => user.orders.length > 0);
     }
 
     setFilteredOrders(filtered);
@@ -290,34 +317,6 @@ const ShippingDash = () => {
           <span className="text-sm text-black text-red-500">Unavailable</span>
         );
       },
-    },
-    {
-      title: <span className="text-sm text-black">Shipped</span>,
-      dataIndex: "shipped",
-      key: "shipped",
-      render: (shipped) => (
-        <span
-          className={`font-medium text-sm ${
-            shipped ? "text-green-600" : "text-red-500"
-          }`}
-        >
-          {shipped ? "Shipped" : "Not Shipped"}
-        </span>
-      ),
-    },
-    {
-      title: <span className="text-sm text-black">Archived</span>,
-      dataIndex: "archive",
-      key: "archive",
-      render: (archive) => (
-        <span
-          className={`font-medium text-sm ${
-            archive ? "text-green-600" : "text-red-500"
-          }`}
-        >
-          {archive ? "Archived" : "Not Archived"}
-        </span>
-      ),
     },
 
     {
@@ -455,7 +454,7 @@ const ShippingDash = () => {
   const dataSource = filteredOrders
     .flatMap((user) =>
       user.orders
-        // .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
+        .filter((order) => order.archive === false && order.shipped === false) // Only include non-archived orders
         .map((order) => ({
           key: order._id,
           name: user.name,
@@ -659,22 +658,53 @@ const ShippingDash = () => {
           </div>
         </div>
         {/* Orders Table */}
-        <div className="overflow-x-auto mb-16 text-sm text-black">
-          <Table
-            bordered
-            columns={columns}
-            dataSource={dataSource}
-            rowClassName={getRowClassName}
-            pagination={{
-              current: currentPage,
-              pageSize: 50, // Set to 100 orders per page
-              total: totalOrders,
-              onChange: (page) => getOrders(page),
-            }}
-            rowKey={(record) => record._id}
-            scroll={{ x: "max-content" }}
-            className="shadow-lg rounded-lg"
-          />
+        <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
+          <InfiniteScroll
+            dataLength={dataSource.length}
+            next={() => getOrders(page)}
+            hasMore={hasMore}
+            loader={
+              <div style={{ padding: "20px" }}>
+                {/* Simulate 4 skeleton table rows */}
+                {[...Array(4)].map((_, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      padding: "10px 0",
+                      borderBottom: "1px solid #f0f0f0",
+                      gap: "10px",
+                    }}
+                  >
+                    {/* You can repeat Skeleton.Input depending on your table columns */}
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 150 }} active />
+                    <Skeleton.Input style={{ width: 120 }} active />
+                    <Skeleton.Input style={{ width: 200 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                  </div>
+                ))}
+              </div>
+            }
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>No more orders to show.</b>
+              </p>
+            }
+            scrollableTarget="scrollableDiv"
+          >
+            <Table
+              bordered
+              columns={columns}
+              dataSource={dataSource}
+              rowClassName={getRowClassName}
+              rowKey={(record) => record._id}
+              scroll={{ x: "max-content" }}
+              pagination={false} // NO pagination
+              className="shadow-lg rounded-lg"
+            />
+          </InfiniteScroll>
         </div>
         <Modal
           title="Order Details"

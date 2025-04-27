@@ -53,6 +53,7 @@ const itemSchema = new Schema({
     required: true,
   },
   amazonOrderId: {
+    unique: true,
     type: String,
     required: true,
   },
