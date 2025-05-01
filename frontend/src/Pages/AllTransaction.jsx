@@ -1,211 +1,189 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../Layout/AdminLayout";
-import { Table, message, Input, Button, Skeleton } from "antd";
-import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
-import * as XLSX from "xlsx";
+import {
+  Table,
+  Typography,
+  Spin,
+  Alert,
+  DatePicker,
+  Button,
+  Space,
+} from "antd";
+import dayjs from "dayjs";
+
+const { Title } = Typography;
+const { RangePicker } = DatePicker;
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AllTransaction = () => {
   const [transactions, setTransactions] = useState([]);
-  const [dataSource, setDataSource] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
-  const [filterDate, setFilterDate] = useState("");
-  const limit = 50; // fetch 50 users at a time
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  const getTransactions = async () => {
-    try {
-      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      });
-
-      const flattenedTransactions = response.data.orders
-        .flatMap((user) =>
-          user.transactions.map((transaction) => ({
-            key: transaction._id,
-            userName: user.name,
-            enrollment: user.enrollment,
-            userEmail: user.email,
-            amount: transaction.amount,
-            credit: transaction.credit,
-            debit: transaction.debit,
-            description: transaction.description,
-            createdAt: transaction.createdAt,
-          }))
-        )
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-      setTransactions(response.data.orders); // if needed elsewhere
-      setDataSource(flattenedTransactions); // main table or chart source
-      setFilteredTransactions(flattenedTransactions); // for filtering/search
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      message.error("Failed to fetch transactions. Please try again.");
-    }
-  };
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [dateRange, setDateRange] = useState(null);
 
   useEffect(() => {
-    getTransactions();
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/orders/transactions`);
+        const sorted = (response.data.transactions || []).sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setTransactions(sorted);
+        setFilteredTransactions(sorted);
+      } catch (err) {
+        console.error("Failed to fetch transactions", err);
+        setError("Failed to load transactions.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
   }, []);
 
-  const handleSearch = (date) => {
-    setFilterDate(date);
-
-    if (date) {
-      const filtered = dataSource.filter((transaction) => {
-        const transactionDate = new Date(transaction.createdAt)
-          .toISOString()
-          .split("T")[0];
-        return transactionDate === date;
-      });
-      setFilteredTransactions(filtered);
-    } else {
-      setFilteredTransactions(dataSource);
+  const handleDateFilter = (dates) => {
+    setDateRange(dates);
+    if (!dates || dates.length === 0) {
+      setFilteredTransactions(transactions);
+      return;
     }
+
+    const [start, end] = dates;
+    const filtered = transactions.filter((txn) => {
+      const txnDate = dayjs(txn.createdAt);
+      return (
+        txnDate.isAfter(start.startOf("day")) &&
+        txnDate.isBefore(end.endOf("day"))
+      );
+    });
+    setFilteredTransactions(filtered);
   };
 
-  const handleDownload = () => {
-    const exportData = filteredTransactions.map((transaction) => ({
-      Enrollment: transaction.enrollment,
-      UserName: transaction.userName,
-      Amount: transaction.amount,
-      Credit: transaction.credit ? "Yes" : "No",
-      Debit: transaction.debit ? "Yes" : "No",
-      Description: transaction.description,
-      Date: new Date(transaction.createdAt).toLocaleDateString(),
-    }));
+  const downloadCSV = () => {
+    const data = (dateRange ? filteredTransactions : transactions).map(
+      (txn, index) => ({
+        "#": index + 1,
+        "User Name": txn.userName || "N/A",
+        "User Email": txn.userEmail || "N/A",
+        Amount: txn.amount,
+        Credit: txn.credit ? "Yes" : "No",
+        Debit: txn.debit ? "Yes" : "No",
+        Type: txn.credit ? "Credit" : "Debit",
+        Description: txn.description,
+        Date: new Date(txn.createdAt).toLocaleString(),
+      })
+    );
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+    const csvRows = [];
+    const headers = Object.keys(data[0]).join(",");
+    csvRows.push(headers);
 
-    XLSX.writeFile(workbook, "transactions.xlsx");
+    data.forEach((row) => {
+      const values = Object.values(row)
+        .map((val) => `"${val}"`) // escape values
+        .join(",");
+      csvRows.push(values);
+    });
+
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "transactions.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const columns = [
     {
-      title: "Enrollment",
-      dataIndex: "enrollment",
-      key: "enrollment",
-      render: (text) => <span style={{ color: "black" }}>{text}</span>,
+      title: "#",
+      dataIndex: "index",
+      key: "index",
+      render: (_, __, index) => index + 1,
     },
     {
-      title: "User",
+      title: "User Name",
       dataIndex: "userName",
       key: "userName",
-      render: (text) => <span style={{ color: "black" }}>{text}</span>,
     },
     {
-      title: "Amount",
+      title: "User Email",
+      dataIndex: "userEmail",
+      key: "userEmail",
+    },
+    {
+      title: "Amount (₹)",
       dataIndex: "amount",
       key: "amount",
-      render: (text) => <span style={{ color: "black" }}>{text}</span>,
     },
     {
-      title: "Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (text) => (
-        <span style={{ color: "black" }}>
-          {new Date(text).toLocaleDateString()}
-        </span>
-      ),
-    },
-    {
-      title: "Debit",
-      key: "debit",
-      render: (_, record) =>
-        record.debit ? (
-          <span style={{ color: "red" }}>{record.amount}</span>
-        ) : null,
+      title: "Type",
+      key: "type",
+      render: (record) =>
+        record.credit ? (
+          <span className="text-green-600 font-semibold">Credit</span>
+        ) : (
+          <span className="text-red-600 font-semibold">Debit</span>
+        ),
     },
     {
       title: "Credit",
+      dataIndex: "credit",
       key: "credit",
-      render: (_, record) =>
-        record.credit ? (
-          <span style={{ color: "green" }}>{record.amount}</span>
-        ) : null,
+      render: (credit) => (credit ? "Yes" : "No"),
+    },
+    {
+      title: "Debit",
+      dataIndex: "debit",
+      key: "debit",
+      render: (debit) => (debit ? "Yes" : "No"),
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      render: (text) => <span style={{ color: "black" }}>{text}</span>,
+    },
+    {
+      title: "Date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date) => new Date(date).toLocaleString(),
     },
   ];
 
   return (
     <AdminLayout>
-      <div className="w-full pb-2 px-4 mb-3 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
-        <h1 className="text-2xl pt-4 font-bold text-white">All Transactions</h1>
-      </div>
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <Input.Search
-          type="date"
-          value={filterDate}
-          onChange={(e) => setFilterDate(e.target.value)}
-          onSearch={handleSearch}
-          placeholder="Filter by date"
-          style={{ width: 250 }}
-          enterButton="Search"
-        />
-        <Button type="primary" onClick={handleDownload}>
-          Download as Excel
-        </Button>
-      </div>
-      <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
-        <InfiniteScroll
-          dataLength={dataSource.length}
-          next={() => getTransactions(page)}
-          hasMore={hasMore}
-          loader={
-            <div style={{ padding: "20px" }}>
-              {/* Simulate 4 skeleton table rows */}
-              {[...Array(4)].map((_, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    padding: "10px 0",
-                    borderBottom: "1px solid #f0f0f0",
-                    gap: "10px",
-                  }}
-                >
-                  {/* You can repeat Skeleton.Input depending on your table columns */}
-                  <Skeleton.Input style={{ width: 100 }} active />
-                  <Skeleton.Input style={{ width: 150 }} active />
-                  <Skeleton.Input style={{ width: 120 }} active />
-                  <Skeleton.Input style={{ width: 200 }} active />
-                  <Skeleton.Input style={{ width: 100 }} active />
-                  <Skeleton.Input style={{ width: 100 }} active />
-                </div>
-              ))}
-            </div>
-          }
-          endMessage={
-            <p style={{ textAlign: "center" }}>
-              <b>No more orders to show.</b>
-            </p>
-          }
-          scrollableTarget="scrollableDiv"
-        >
-          <Table
-            bordered
-            columns={columns}
-            dataSource={dataSource}
-            rowKey={(record) => record._id}
-            scroll={{ x: "max-content" }}
-            pagination={false} // NO pagination
-            className="shadow-lg rounded-lg"
+      <div className="p-4">
+        <Title level={3}>All Transactions</Title>
+
+        <Space className="mb-4" wrap>
+          <RangePicker
+            onChange={handleDateFilter}
+            allowClear
+            format="YYYY-MM-DD"
           />
-        </InfiniteScroll>
+          <Button type="primary" onClick={downloadCSV}>
+            Download CSV
+          </Button>
+        </Space>
+
+        {loading ? (
+          <Spin size="large" />
+        ) : error ? (
+          <Alert type="error" message={error} />
+        ) : (
+          <Table
+            dataSource={filteredTransactions}
+            columns={columns}
+            rowKey={(record, index) => index}
+            pagination={{ pageSize: 50 }}
+            scroll={{ x: true }}
+          />
+        )}
       </div>
     </AdminLayout>
   );

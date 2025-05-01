@@ -41,6 +41,7 @@ router.get("/getallbulk", getAllBulkOrder);
 router.post("/bulkorder/pay", payBulkOrder);
 router.get("/getOrdersByDate", getOrderByDate);
 router.get("/alltransactions", getAllTransaction);
+router.get("/transactions", getAllTransaction);
 router.post("/orderAction", UnarchiveOrder);
 router.get("/getallorders", getAllOrders);
 router.post("/unshipped", markUnshipped);
