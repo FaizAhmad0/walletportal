@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import CachedIcon from "@mui/icons-material/Cached";
 import UserLayout from "../Layout/UserLayout";
 import axios from "axios";
 import { Input, message } from "antd";
@@ -77,7 +78,7 @@ const Wallet = () => {
         window.open(response.data.paymentURL, "_blank");
       }
       getUserData();
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Error adding balance:", error);
       message.error("Error adding balance, please try again.");
@@ -114,8 +115,16 @@ const Wallet = () => {
         <div className="bg-purple-600 text-white p-4 rounded-lg flex justify-between items-center mb-6 mt-10">
           <div>
             <h3 className="text-lg font-bold">Wallet Balance</h3>
+            <CachedIcon
+              className="cursor-pointer"
+              onClick={() => {
+                window.location.reload();
+              }}
+            />
             {userData?.user?.amount !== undefined && (
-              <MoneyCounter amount={userData.user.amount} />
+              <>
+                <MoneyCounter amount={userData.user.amount} />
+              </>
             )}
             <button
               onClick={scrollToTransactions}
