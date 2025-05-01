@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Table, message, Radio, Input } from "antd";
+import { Modal, Button, Table, message, Radio, Input, Skeleton } from "antd";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import AdminLayout from "../Layout/AdminLayout";
 import axios from "axios";
@@ -20,55 +22,46 @@ const AllOrders = () => {
   const [filter, setFilter] = useState("all");
   const [searchInput, setSearchInput] = useState(""); // Search state
 
-  const getOrders = async () => {
+  const limit = 50; // fetch 50 users at a time
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
+  const getOrders = async (pageNo = 1) => {
     try {
-      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      setLoading(true);
+      const response = await axios.get(
+        `${backendUrl}/orders/getallorders?page=${pageNo}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
 
-      const allUsers = response.data.orders;
+      const newUsers = response.data.orders;
+      console.log(newUsers);
 
-      // Get filtered orders based on the selected filter
-      const filteredOrders = allUsers
-        .map((user) => {
-          const filteredUserOrders = user.orders.filter((order) => {
-            const orderDate = dayjs(order.createdAt);
-            const now = dayjs();
-            const yesterday = now.subtract(1, "day").startOf("day");
+      if (newUsers.length === 0) {
+        setHasMore(false);
+      } else {
+        setFilteredOrders((prev) => [...prev, ...newUsers]);
+        setOrders((prev) => [...prev, ...newUsers]);
+      }
 
-            // Date filtering logic
-            if (filter === "today") {
-              return orderDate.isSame(now, "day");
-            } else if (filter === "yesterday") {
-              return orderDate.isSame(yesterday, "day");
-            } else if (filter === "week") {
-              return orderDate.isSame(now, "week");
-            } else if (filter === "month") {
-              return orderDate.isSame(now, "month");
-            } else if (filter === "year") {
-              return orderDate.isSame(now, "year");
-            }
-            return true; // "all" filter should return all orders
-          });
-
-          return {
-            ...user,
-            orders: filteredUserOrders,
-          };
-        })
-        .filter((user) => user.orders.length > 0);
-
-      setOrders(filteredOrders);
+      setPage(pageNo + 1);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      message.error("Failed to fetch orders. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    getOrders();
-  }, [filter]);
+    getOrders(1);
+  }, []);
 
   const handleRowClick = (orderItems, finalAmount, orderId) => {
     setSelectedOrderItems(orderItems);
@@ -318,17 +311,53 @@ const AllOrders = () => {
           </div>
         </div>
         {/* Orders Table */}
-        <div className="overflow-x-auto bg-gray-50 rounded-md shadow-sm">
-          <Table
-            bordered
-            style={{ cursor: "pointer" }}
-            columns={columns}
-            dataSource={filteredDataSource} // Use filtered data source here
-            rowClassName={getRowClassName}
-            pagination={{ pageSize: 10 }}
-            scroll={{ x: "max-content" }}
-            className="rounded-md"
-          />
+        <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
+          <InfiniteScroll
+            dataLength={filteredDataSource.length}
+            next={() => getOrders(page)}
+            hasMore={hasMore}
+            loader={
+              <div style={{ padding: "20px" }}>
+                {/* Simulate 4 skeleton table rows */}
+                {[...Array(4)].map((_, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      padding: "10px 0",
+                      borderBottom: "1px solid #f0f0f0",
+                      gap: "10px",
+                    }}
+                  >
+                    {/* You can repeat Skeleton.Input depending on your table columns */}
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 150 }} active />
+                    <Skeleton.Input style={{ width: 120 }} active />
+                    <Skeleton.Input style={{ width: 200 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                    <Skeleton.Input style={{ width: 100 }} active />
+                  </div>
+                ))}
+              </div>
+            }
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>No more orders to show.</b>
+              </p>
+            }
+            scrollableTarget="scrollableDiv"
+          >
+            <Table
+              bordered
+              columns={columns}
+              dataSource={filteredDataSource}
+              rowClassName={getRowClassName}
+              rowKey={(record) => record._id}
+              scroll={{ x: "max-content" }}
+              pagination={false} // NO pagination
+              className="shadow-lg rounded-lg"
+            />
+          </InfiniteScroll>
         </div>
       </div>
 

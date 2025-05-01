@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../Layout/AdminLayout";
-import { Table, message, Input, Button } from "antd";
+import { Table, message, Input, Button, Skeleton } from "antd";
+import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import * as XLSX from "xlsx";
 
@@ -11,8 +12,12 @@ const AllTransaction = () => {
   const [dataSource, setDataSource] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [filterDate, setFilterDate] = useState("");
+  const limit = 50; // fetch 50 users at a time
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const getTransaction = async () => {
+  const getTransactions = async () => {
     try {
       const response = await axios.get(`${backendUrl}/orders/getallorders`, {
         headers: {
@@ -36,9 +41,9 @@ const AllTransaction = () => {
         )
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-      setTransactions(response.data.orders);
-      setDataSource(flattenedTransactions);
-      setFilteredTransactions(flattenedTransactions);
+      setTransactions(response.data.orders); // if needed elsewhere
+      setDataSource(flattenedTransactions); // main table or chart source
+      setFilteredTransactions(flattenedTransactions); // for filtering/search
     } catch (error) {
       console.error("Error fetching transactions:", error);
       message.error("Failed to fetch transactions. Please try again.");
@@ -46,7 +51,7 @@ const AllTransaction = () => {
   };
 
   useEffect(() => {
-    getTransaction();
+    getTransactions();
   }, []);
 
   const handleSearch = (date) => {
@@ -155,13 +160,53 @@ const AllTransaction = () => {
           Download as Excel
         </Button>
       </div>
-      <Table
-        bordered
-        dataSource={filteredTransactions}
-        columns={columns}
-        rowKey={(record) => record.key}
-        pagination={{ pageSize: 10 }}
-      />
+      <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
+        <InfiniteScroll
+          dataLength={dataSource.length}
+          next={() => getTransactions(page)}
+          hasMore={hasMore}
+          loader={
+            <div style={{ padding: "20px" }}>
+              {/* Simulate 4 skeleton table rows */}
+              {[...Array(4)].map((_, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    padding: "10px 0",
+                    borderBottom: "1px solid #f0f0f0",
+                    gap: "10px",
+                  }}
+                >
+                  {/* You can repeat Skeleton.Input depending on your table columns */}
+                  <Skeleton.Input style={{ width: 100 }} active />
+                  <Skeleton.Input style={{ width: 150 }} active />
+                  <Skeleton.Input style={{ width: 120 }} active />
+                  <Skeleton.Input style={{ width: 200 }} active />
+                  <Skeleton.Input style={{ width: 100 }} active />
+                  <Skeleton.Input style={{ width: 100 }} active />
+                </div>
+              ))}
+            </div>
+          }
+          endMessage={
+            <p style={{ textAlign: "center" }}>
+              <b>No more orders to show.</b>
+            </p>
+          }
+          scrollableTarget="scrollableDiv"
+        >
+          <Table
+            bordered
+            columns={columns}
+            dataSource={dataSource}
+            rowKey={(record) => record._id}
+            scroll={{ x: "max-content" }}
+            pagination={false} // NO pagination
+            className="shadow-lg rounded-lg"
+          />
+        </InfiniteScroll>
+      </div>
     </AdminLayout>
   );
 };
