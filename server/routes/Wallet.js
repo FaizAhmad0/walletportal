@@ -82,6 +82,8 @@ router.post("/add-balance", async (req, res) => {
 router.post("/verify-payment", async (req, res) => {
   const { paymentRequestId, paymentId, userId } = req.body;
 
+  console.log(paymentId, paymentRequestId);
+
   try {
     const user = await User.findById(userId);
 
