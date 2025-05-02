@@ -116,6 +116,11 @@ const AllTransaction = () => {
       key: "userEmail",
     },
     {
+      title: "paymentId",
+      dataIndex: "paymentId",
+      key: "paymentId",
+    },
+    {
       title: "Amount (₹)",
       dataIndex: "amount",
       key: "amount",
