@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 module.exports = async (req, res) => {
   try {
-    const users = await User.find({}, "name email transactions"); // only fetch needed fields
+    const users = await User.find({}, "name paymentId email transactions"); // only fetch needed fields
 
     const allTransactions = [];
 
@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
           credit: transaction.credit,
           debit: transaction.debit,
           description: transaction.description,
+          paymentId: transaction.paymentId,
           createdAt: transaction.createdAt,
           updatedAt: transaction.updatedAt,
         });

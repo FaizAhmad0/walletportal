@@ -19,6 +19,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const AllTransaction = () => {
   const [transactions, setTransactions] = useState([]);
+  console.log(transactions);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
