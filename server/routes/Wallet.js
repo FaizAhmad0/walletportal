@@ -116,6 +116,7 @@ router.post("/verify-payment", async (req, res) => {
       const newTransaction = {
         amount: amount,
         credit: true,
+        paymentId: paymentId,
         description: "Added Balance",
       };
 
