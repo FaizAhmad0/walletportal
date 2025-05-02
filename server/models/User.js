@@ -20,6 +20,11 @@ const transactionSchema = new Schema(
       type: String,
       required: true,
     },
+    paymentId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
   },
   { timestamps: true }
 );

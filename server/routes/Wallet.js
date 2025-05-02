@@ -85,6 +85,17 @@ router.post("/verify-payment", async (req, res) => {
   try {
     const user = await User.findById(userId);
 
+    // start
+    const isDuplicate = user.transactions.some(
+      (txn) => txn.paymentId === paymentId
+    );
+
+    if (isDuplicate) {
+      return res
+        .status(200)
+        .json({ success: true, message: "Payment already recorded" });
+    } //end
+
     const response = await axios.get(
       `${INSTAMOJO_URL}/payment-requests/${paymentRequestId}`,
       {
