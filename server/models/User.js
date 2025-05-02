@@ -22,7 +22,7 @@ const transactionSchema = new Schema(
     },
     paymentId: {
       type: String,
-      required: true,
+      // required: true,
       unique: true,
     },
   },
