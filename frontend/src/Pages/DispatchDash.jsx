@@ -1,17 +1,7 @@
 import React, { useEffect, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
 import DispatchLayout from "../Layout/DispatchLayout";
 import { Link } from "react-router-dom";
-import {
-  Modal,
-  Button,
-  Table,
-  message,
-  Select,
-  Skeleton,
-  Radio,
-  Input,
-} from "antd";
+import { Modal, Button, Table, message, Select, Radio, Input } from "antd";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ArchiveIcon from "@mui/icons-material/Archive";
@@ -31,13 +21,12 @@ const DispatchDash = () => {
   const handleShippingPartnerFilter = (value) => {
     setShippingPartnerFilter(value);
   };
-
   const [productStatusFilter, setProductStatusFilter] = useState(null);
   const handleProductStatusFilter = (value) => {
     setProductStatusFilter(value);
   };
-  // const [orders, setOrders] = useState([]);
-  // const [filteredOrders, setFilteredOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState([]);
   const [selectedOrderAmount, setSelectedOrderAmount] = useState(0);
@@ -49,62 +38,21 @@ const DispatchDash = () => {
   const role = localStorage.getItem("role");
   const [searchQuery, setSearchQuery] = useState(""); // Add state for search
 
-  const [orders, setOrders] = useState([]);
-  console.log(orders);
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalOrders, setTotalOrders] = useState(0);
-  // const [filteredOrders, setFilteredOrders] = useState([]);
-  const limit = 50; // fetch 50 users at a time
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  const getOrders = async (pageNo = 1) => {
+  // Fetch orders from backend
+  const getOrders = async () => {
     try {
-      setLoading(true);
-      const response = await axios.get(
-        `${backendUrl}/orders/getallorders?page=${pageNo}&limit=${limit}`,
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-
-      const newUsers = response.data.orders;
-      console.log(newUsers);
-
-      if (newUsers.length === 0) {
-        setHasMore(false);
-      } else {
-        setFilteredOrders((prev) => [...prev, ...newUsers]);
-        setOrders((prev) => [...prev, ...newUsers]);
-      }
-
-      setPage(pageNo + 1);
+      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      setOrders(response.data.orders);
+      setFilteredOrders(response.data.orders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       message.error("Failed to fetch orders. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    getOrders(1);
-  }, []);
-  
-  useEffect(() => {
-    filterOrders();
-  }, [
-    searchQuery,
-    paymentStatusFilter,
-    shippingPartnerFilter,
-    timeFilter,
-    orders,
-  ]);
-
   const handleShippedClick = async (orderItems, finalAmount, orderId) => {
     console.log(orderId, finalAmount);
 
@@ -191,7 +139,7 @@ const DispatchDash = () => {
   const filterOrders = () => {
     let filtered = [...orders];
 
-    // Payment Status Filter
+    // Apply Payment Status Filter
     if (paymentStatusFilter !== "") {
       const isPaid = paymentStatusFilter === "true";
       filtered = filtered
@@ -202,7 +150,7 @@ const DispatchDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Shipping Partner Filter
+    // Apply Shipping Partner Filter
     if (shippingPartnerFilter !== "") {
       filtered = filtered
         .map((user) => ({
@@ -214,7 +162,7 @@ const DispatchDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Time Filter
+    // Apply Time Filter
     if (timeFilter !== "") {
       const now = moment();
       const yesterday = moment().subtract(1, "day");
@@ -243,30 +191,28 @@ const DispatchDash = () => {
         .filter((user) => user.orders.length > 0);
     }
 
-    // Search Filter
+    // Apply Search Filter
     if (searchQuery.trim() !== "") {
       filtered = filtered
         .map((user) => ({
           ...user,
           orders: user.orders.filter((order) => {
             const orderId = order.orderId?.toString().toLowerCase() || "";
-            const sku = order.items?.[0]?.sku?.toString().toLowerCase() || "";
+            const sku = order.sku?.toString().toLowerCase() || "";
             const enrollment = user.enrollment?.toString().toLowerCase() || "";
             const manager = user.manager?.toString().toLowerCase() || "";
             const amazonOrderId =
-              order.items?.[0]?.amazonOrderId?.toString().toLowerCase() || "";
+              order.items[0]?.amazonOrderId?.toString().toLowerCase() || "N/A";
             const trackingId =
-              order.items?.[0]?.trackingId?.toString().toLowerCase() || "";
-
-            const query = searchQuery.toLowerCase();
+              order.items[0]?.trackingId?.toString().toLowerCase() || "N/A";
 
             return (
-              orderId.includes(query) ||
-              sku.includes(query) ||
-              enrollment.includes(query) ||
-              manager.includes(query) ||
-              amazonOrderId.includes(query) ||
-              trackingId.includes(query)
+              orderId.includes(searchQuery.toLowerCase()) ||
+              enrollment.includes(searchQuery.toLowerCase()) ||
+              manager.includes(searchQuery.toLowerCase()) ||
+              amazonOrderId.includes(searchQuery.toLowerCase()) ||
+              trackingId.includes(searchQuery.toLowerCase()) ||
+              sku.includes(searchQuery.toLowerCase())
             );
           }),
         }))
@@ -443,7 +389,6 @@ const DispatchDash = () => {
         );
       },
     },
-
     {
       title: <span className="text-sm text-black">Action</span>,
       key: "action",
@@ -548,6 +493,7 @@ const DispatchDash = () => {
           enrollment: user.enrollment,
           amazonOrderId: order.items[0]?.amazonOrderId || "N/A",
           brandName: order.items[0]?.brandName || "N/A",
+
           manager: user.manager,
           shippingPartner: order.items[0]?.shippingPartner || "N/A",
           trackingId: order.items[0]?.trackingId || "N/A",
@@ -555,8 +501,6 @@ const DispatchDash = () => {
           pincode: order.items[0]?.pincode || "N/A",
           address: user.address,
           finalAmount: order.finalAmount,
-          archive: order.archive,
-          shipped: order.shipped,
           paymentStatus: order.paymentStatus,
           items: order.items,
           _id: order._id,
@@ -570,7 +514,6 @@ const DispatchDash = () => {
     filterOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentStatusFilter, timeFilter, searchQuery, orders]);
-
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -781,53 +724,17 @@ const DispatchDash = () => {
           </h2>
         </div>
         {/* Orders Table */}
-        <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
-          <InfiniteScroll
-            dataLength={dataSource.length}
-            next={() => getOrders(page)}
-            hasMore={hasMore}
-            loader={
-              <div style={{ padding: "20px" }}>
-                {/* Simulate 4 skeleton table rows */}
-                {[...Array(4)].map((_, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      padding: "10px 0",
-                      borderBottom: "1px solid #f0f0f0",
-                      gap: "10px",
-                    }}
-                  >
-                    {/* You can repeat Skeleton.Input depending on your table columns */}
-                    <Skeleton.Input style={{ width: 100 }} active />
-                    <Skeleton.Input style={{ width: 150 }} active />
-                    <Skeleton.Input style={{ width: 120 }} active />
-                    <Skeleton.Input style={{ width: 200 }} active />
-                    <Skeleton.Input style={{ width: 100 }} active />
-                    <Skeleton.Input style={{ width: 100 }} active />
-                  </div>
-                ))}
-              </div>
-            }
-            endMessage={
-              <p style={{ textAlign: "center" }}>
-                <b>No more orders to show.</b>
-              </p>
-            }
-            scrollableTarget="scrollableDiv"
-          >
-            <Table
-              bordered
-              columns={columns}
-              dataSource={dataSource}
-              rowClassName={getRowClassName}
-              rowKey={(record) => record._id}
-              scroll={{ x: "max-content" }}
-              pagination={false} // NO pagination
-              className="shadow-lg rounded-lg"
-            />
-          </InfiniteScroll>
+        <div className="overflow-x-auto mb-16 text-sm text-black">
+          <Table
+            bordered
+            columns={columns}
+            dataSource={dataSource}
+            rowClassName={getRowClassName}
+            pagination={{ pageSize: 20 }}
+            rowKey={(record) => record._id}
+            scroll={{ x: "max-content" }}
+            className="shadow-lg rounded-lg"
+          />
         </div>
       </div>
 

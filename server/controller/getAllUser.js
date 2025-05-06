@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   try {
     const users = await User.find(
       { role: "user" },
-      "enrollment name mobile address amount gst"
+      "enrollment name mobile address amount gst orders"
     );
 
     res.status(200).json({ users });

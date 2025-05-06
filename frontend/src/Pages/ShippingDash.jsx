@@ -658,53 +658,17 @@ const ShippingDash = () => {
           </div>
         </div>
         {/* Orders Table */}
-        <div id="scrollableDiv" style={{ height: "80vh", overflow: "auto" }}>
-          <InfiniteScroll
-            dataLength={dataSource.length}
-            next={() => getOrders(page)}
-            hasMore={hasMore}
-            loader={
-              <div style={{ padding: "20px" }}>
-                {/* Simulate 4 skeleton table rows */}
-                {[...Array(4)].map((_, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      padding: "10px 0",
-                      borderBottom: "1px solid #f0f0f0",
-                      gap: "10px",
-                    }}
-                  >
-                    {/* You can repeat Skeleton.Input depending on your table columns */}
-                    <Skeleton.Input style={{ width: 100 }} active />
-                    <Skeleton.Input style={{ width: 150 }} active />
-                    <Skeleton.Input style={{ width: 120 }} active />
-                    <Skeleton.Input style={{ width: 200 }} active />
-                    <Skeleton.Input style={{ width: 100 }} active />
-                    <Skeleton.Input style={{ width: 100 }} active />
-                  </div>
-                ))}
-              </div>
-            }
-            endMessage={
-              <p style={{ textAlign: "center" }}>
-                <b>No more orders to show.</b>
-              </p>
-            }
-            scrollableTarget="scrollableDiv"
-          >
-            <Table
-              bordered
-              columns={columns}
-              dataSource={dataSource}
-              rowClassName={getRowClassName}
-              rowKey={(record) => record._id}
-              scroll={{ x: "max-content" }}
-              pagination={false} // NO pagination
-              className="shadow-lg rounded-lg"
-            />
-          </InfiniteScroll>
+        <div className="overflow-x-auto mb-16 text-sm text-black">
+          <Table
+            bordered
+            columns={columns}
+            dataSource={dataSource}
+            rowClassName={getRowClassName}
+            pagination={{ pageSize: 20 }}
+            rowKey={(record) => record._id}
+            scroll={{ x: "max-content" }}
+            className="shadow-lg rounded-lg"
+          />
         </div>
         <Modal
           title="Order Details"
