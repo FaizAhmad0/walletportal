@@ -22,11 +22,14 @@ const AccountantDash = () => {
   // Fetch orders from backend
   const getOrders = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await axios.get(
+        `${backendUrl}/orders/getallaccountantorders`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
       setOrders(response.data.orders);
       setFilteredOrders(response.data.orders);
     } catch (error) {
@@ -440,14 +443,14 @@ const AccountantDash = () => {
                 Download Orders Data
               </Button>
             </div>
-            <h2
+            {/* <h2
               className="text-lg font-bold bg-blue-50 text-blue-800 py-1 mt-3 px-4 rounded-md"
               style={{
                 display: "inline-block",
               }}
             >
               Total Orders: {filteredOrders?.length}
-            </h2>
+            </h2> */}
           </div>
         </div>
 
@@ -458,7 +461,7 @@ const AccountantDash = () => {
             columns={columns}
             dataSource={dataSource}
             rowClassName={getRowClassName}
-            pagination={{ pageSize: 10 }}
+            pagination={{ pageSize: 20 }}
             rowKey={(record) => record._id}
             scroll={{ x: "max-content" }}
           />
