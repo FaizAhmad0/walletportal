@@ -516,7 +516,8 @@ const ShippingDash = () => {
       );
       message.success("Order shipped successfully!");
       setSearchQuery("");
-      getOrders();
+      // getOrders();
+      window.location.reload();
     } catch (error) {
       console.error("Error in order shipping:", error);
       message.error("Could not ship the order, Please try again");

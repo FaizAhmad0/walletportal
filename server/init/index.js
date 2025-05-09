@@ -20,41 +20,50 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-const getUsers = async () => {
+const getRecentPaidOrdersAndShip = async () => {
   try {
-    const users = await User.find({ role: "user" });
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
-    const cutoffDate = new Date("2025-01-01");
+    // Step 1: Find users with orders in the last 3 months
+    const users = await User.find({
+      "orders.createdAt": { $gte: threeMonthsAgo },
+    });
 
+    let totalUpdatedOrders = 0;
+
+    // Step 2: Iterate users and update qualifying orders
     for (const user of users) {
-      const originalOrderCount = user.orders.length;
+      let ordersUpdated = false;
 
-      // Keep only orders created after Jan 1, 2025
-      const updatedOrders = user.orders.filter(
-        (order) => new Date(order.createdAt) >= cutoffDate
-      );
+      user.orders.forEach((order) => {
+        const orderDate = new Date(order.createdAt);
+        if (
+          orderDate >= threeMonthsAgo &&
+          order.paymentStatus === true &&
+          order.shipped === false
+        ) {
+          order.shipped = true;
+          ordersUpdated = true;
+          totalUpdatedOrders++;
+        }
+      });
 
-      if (updatedOrders.length !== originalOrderCount) {
-        user.orders = updatedOrders;
+      if (ordersUpdated) {
         await user.save();
-
-        console.log(
-          `Deleted ${
-            originalOrderCount - updatedOrders.length
-          } old orders for user: ${user.name} (${user.email})`
-        );
+        console.log(`✅ Updated orders for user: ${user.name} (${user.email})`);
       }
     }
 
-    console.log("✅ Old orders deleted successfully.");
+    console.log(
+      `🎉 Marked ${totalUpdatedOrders} orders as shipped in the last 3 months.`
+    );
   } catch (error) {
-    console.error("❌ Error deleting old orders:", error);
+    console.error("❌ Error updating shipped status:", error);
   }
 };
 
-
-
-getUsers();
+getRecentPaidOrdersAndShip();
 
 // Save all users from data.js to the database
 // const saveAllUsers = async () => {
