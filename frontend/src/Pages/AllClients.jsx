@@ -340,6 +340,7 @@ const AllClients = () => {
               amount: selectedClient?.amount,
               gst: selectedClient?.gst,
               enrollment: selectedClient?.enrollment,
+              state: selectedClient?.state,
             }}
             onFinish={handleEditClient}
           >
@@ -392,6 +393,13 @@ const AllClients = () => {
               rules={[
                 { required: true, message: "Please input the GST number!" },
               ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="STATE"
+              name="state"
+              rules={[{ required: true, message: "Please input the state!" }]}
             >
               <Input />
             </Form.Item>
