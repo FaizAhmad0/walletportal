@@ -55,6 +55,7 @@ import ManagerPrivateRoute from "./components/ManagerPrivateRoute";
 import AccountantPrivateRoute from "./components/AccountantPrivateRoute";
 import NotFound from "./Pages/NotFound";
 import AboutUs from "./Pages/AboutUs";
+import DispatchAllClient from "./Pages/DispatchAllClient";
 function App() {
   return (
     <>
@@ -75,6 +76,7 @@ function App() {
             <Route path="/dispatch-dash" exact element={<DispatchDash />} />
             <Route path="/create-order" exact element={<CreateOrder />} />
             <Route path="/products" exact element={<UploadProducts />} />
+            <Route path="/dispatch-all-client" exact element={<DispatchAllClient />} />
             <Route
               path="/dispatch-bulkorder"
               exact

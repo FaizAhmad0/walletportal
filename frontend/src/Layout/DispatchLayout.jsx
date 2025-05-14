@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Layout, Menu, theme } from "antd";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+
 import "./UserLayout.css";
 import LayoutNav from "../components/LayoutNav";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -100,6 +102,11 @@ const DispatchLayout = ({ children }) => {
               key: "/create-order",
               icon: <AddBusinessIcon />,
               label: "Create Order",
+            },
+            {
+              key: "/dispatch-all-client",
+              icon: <AccountCircleIcon />,
+              label: "View Clients",
             },
             {
               key: "/products",
