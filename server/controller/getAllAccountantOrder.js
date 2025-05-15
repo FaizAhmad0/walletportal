@@ -62,7 +62,6 @@ module.exports = async (req, res) => {
       };
     });
 
-    console.log(filteredUsers);
     res.status(200).json({ orders: filteredUsers });
   } catch (error) {
     console.error("Error retrieving recent orders:", error);
