@@ -26,22 +26,22 @@ const User = require("../models/User");
 
 module.exports = async (req, res) => {
   try {
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1); // 1 month ago
 
-    // Step 1: Find users with at least one order in the last 3 months
+    // Step 1: Find users with at least one order in the last 1 month
     const usersWithRecentOrders = await User.find({
       orders: {
         $elemMatch: {
-          createdAt: { $gte: threeMonthsAgo },
+          createdAt: { $gte: oneMonthAgo },
         },
       },
     });
 
-    // Step 2: Filter orders to keep only those from the last 3 months
+    // Step 2: Filter orders to keep only those from the last 1 month
     const filteredUsers = usersWithRecentOrders.map((user) => {
       const recentOrders = user.orders.filter((order) => {
-        return new Date(order.createdAt) >= threeMonthsAgo;
+        return new Date(order.createdAt) >= oneMonthAgo;
       });
 
       return {
@@ -50,10 +50,10 @@ module.exports = async (req, res) => {
       };
     });
 
+    console.log(filteredUsers);
     res.status(200).json({ orders: filteredUsers });
   } catch (error) {
     console.error("Error retrieving recent orders:", error);
     res.status(500).json({ error: "Could not retrieve recent orders" });
   }
 };
-
