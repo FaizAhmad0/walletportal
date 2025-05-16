@@ -70,7 +70,7 @@ const ShippingDash = () => {
       );
 
       const newUsers = response.data.orders;
-      console.log(newUsers);
+      // console.log(newUsers);
 
       if (newUsers.length === 0) {
         setHasMore(false);
