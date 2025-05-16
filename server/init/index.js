@@ -20,184 +20,166 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-const deleteOldOrders = async () => {
+// const deleteOldOrders = async () => {
+//   try {
+//     const threeMonthsAgo = new Date();
+//     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+//     // Step 1: Find users who have any orders (optional optimization)
+//     const users = await User.find({ "orders.0": { $exists: true } });
+
+//     let totalDeletedOrders = 0;
+
+//     // Step 2: Iterate users and delete old orders
+//     for (const user of users) {
+//       const originalOrderCount = user.orders.length;
+
+//       // Keep only recent orders
+//       user.orders = user.orders.filter((order) => {
+//         const orderDate = new Date(order.createdAt);
+//         return orderDate >= threeMonthsAgo;
+//       });
+
+//       const deletedCount = originalOrderCount - user.orders.length;
+//       if (deletedCount > 0) {
+//         await user.save();
+//         totalDeletedOrders += deletedCount;
+//         console.log(
+//           `🗑️ Deleted ${deletedCount} old orders for ${user.name} (${user.email})`
+//         );
+//       }
+//     }
+
+//     console.log(
+//       `✅ Total old orders deleted across all users: ${totalDeletedOrders}`
+//     );
+//   } catch (error) {
+//     console.error("❌ Error deleting old orders:", error);
+//   }
+// };
+
+// deleteOldOrders();
+const markOrdersShippedByTrackingIds = async (trackingIds) => {
   try {
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    const users = await User.find({
+      "orders.items.trackingId": { $in: trackingIds },
+    });
 
-    // Step 1: Find users who have any orders (optional optimization)
-    const users = await User.find({ "orders.0": { $exists: true } });
+    let updatedOrdersCount = 0;
 
-    let totalDeletedOrders = 0;
-
-    // Step 2: Iterate users and delete old orders
     for (const user of users) {
-      const originalOrderCount = user.orders.length;
+      let updated = false;
 
-      // Keep only recent orders
-      user.orders = user.orders.filter((order) => {
-        const orderDate = new Date(order.createdAt);
-        return orderDate >= threeMonthsAgo;
-      });
-
-      const deletedCount = originalOrderCount - user.orders.length;
-      if (deletedCount > 0) {
-        await user.save();
-        totalDeletedOrders += deletedCount;
-        console.log(
-          `🗑️ Deleted ${deletedCount} old orders for ${user.name} (${user.email})`
+      for (const order of user.orders) {
+        const hasMatchingTrackingId = order.items.some((item) =>
+          trackingIds.includes(item.trackingId)
         );
+
+        if (hasMatchingTrackingId && !order.shipped) {
+          order.shipped = true;
+          updated = true;
+          updatedOrdersCount++;
+        }
+      }
+
+      if (updated) {
+        await user.save();
+        console.log(`✅ Updated orders for user: ${user.name}`);
       }
     }
 
-    console.log(
-      `✅ Total old orders deleted across all users: ${totalDeletedOrders}`
-    );
+    console.log(`🚚 Total orders marked as shipped: ${updatedOrdersCount}`);
   } catch (error) {
-    console.error("❌ Error deleting old orders:", error);
+    console.error("❌ Error updating orders by trackingId:", error);
   }
 };
 
-deleteOldOrders();
+// Example usage:
+const trackingIds = [
+  "246000102250",
+  "246000102239",
+  "246000102273",
+  "246000102278",
+  "246000102234",
+  "246000102238",
+  "246000102272",
+  "246000102213",
+  "246000102214",
+  "246000102233",
+  "246000102241",
+  "246000102275",
+  "246000102263",
+  "246000102271",
+  "246000102277",
+  "246000102269",
+  "246000102240",
+  "246000102267",
+  "246000102247",
+  "246000102236",
+  "246000102235",
+  "246000102248",
+  "W61768098",
+  "W61768135",
+  "W61768101",
+  "W61767969",
+  "W61767983",
+  "W61767956",
+  "W61768126",
+  "W61768113",
+  "W61767994",
+  "W61768099",
+  "W61767992",
+  "W61767990",
+  "W61768128",
+  "W61768088",
+  "W61767967",
+  "W61767984",
+  "W61767975",
+  "W61767965",
+  "W61767963",
+  "W61767957",
+  "W61768131",
+  "W61767960",
+  "D2001866768",
+  "W61767972",
+  "W61767964",
+  "W61768090",
+  "W61767971",
+  "W61767968",
+  "W61767977",
+  "W61767995",
+  "W61767961",
+  "W61767988",
+  "W61767991",
+  "W61767966",
+  "W61768134",
+  "W61768089",
+  "W61767962",
+  "W61767979",
+  "W61768133",
+  "W61768137",
+  "W61767982",
+  "W61767996",
+  "W61767993",
+  "W61767976",
+  "W61768132",
+  "W61768136",
+  "W61768091",
+  "W61767997",
+  "W61767970",
+  "W61767958",
+  "W61767959",
+  "W61767978",
+  "W61767989",
+  "W61768159",
+  "W61768130",
+  "W61767980",
+  "W61768142",
+  "W61767981",
+  "W61767974",
+];
 
-// Save all users from data.js to the database
-// const saveAllUsers = async () => {
-//   try {
-//     // Find products with the specified GST rate
-//     const products = await Product.find({ gstRate: 0.18 });
-//     const length = products.length;
-//     console.log(`Number of products to update: ${length}`);
-
-//     // Update GST rate for each product individually
-//     for (const product of products) {
-//       product.gstRate = 18; // Update GST rate
-//       await product.save(); // Save the updated product
-//     }
-
-//     console.log("All products updated successfully.");
-//   } catch (error) {
-//     console.error("Error updating products:", error);
-//   }
-// };
-
-// saveAllUsers();
-// const fetchOrdersWithInvalidGST = async () => {
-//   try {
-//     // Fetch orders that have at least one item with gstRate not in [18, 12]
-//     const orders = await User.aggregate([
-//       {
-//         $unwind: "$orders", // Unwind orders array to work with each order individually
-//       },
-//       {
-//         $unwind: "$orders.items", // Unwind items array to work with each item individually
-//       },
-//       {
-//         $match: {
-//           "orders.items.gstRate": { $nin: [18, 12] }, // Match items with gstRate not in [18, 12]
-//         },
-//       },
-//       {
-//         $project: {
-//           orderId: "$orders.orderId", // Include orderId
-//           items: "$orders.items", // Include only the items of the order
-//           finalAmount: "$orders.finalAmount", // Include finalAmount
-//           paymentStatus: "$orders.paymentStatus", // Include paymentStatus
-//           name: 1, // Include user name
-//           email: 1, // Include user email
-//           enrollment: 1, // Include user enrollment
-//           createdAt: "$orders.createdAt", // Include order's createdAt timestamp
-//           userCreatedAt: "$createdAt", // Include user's createdAt timestamp
-//         },
-//       },
-//     ]);
-
-//     console.log(
-//       "Orders with invalid GST rates and createdAt:",
-//       JSON.stringify(orders, null, 2)
-//     );
-//     console.log("Total orders with wrong GST rate:", orders.length);
-//   } catch (error) {
-//     console.error("Error fetching orders with invalid GST:", error);
-//   }
-// };
-
-// // Call the function to fetch the data
-// fetchOrdersWithInvalidGST();
-
-// const fetchByEnrollment = async (id) => {
-//   try {
-//     const users = await User.find({ enrollment: id });
-
-//     if (users.length > 0) {
-//       users.forEach((user) => {
-//         if (Array.isArray(user.transactions)) {
-//           // Filter transactions with credit: true and calculate their sum
-//           const creditedTotal = user.transactions
-//             .filter((transaction) => transaction.debit) // Filter only credited transactions
-//             .reduce((sum, transaction) => {
-//               const amount = parseFloat(transaction.amount); // Convert amount to a number
-//               return sum + (isNaN(amount) ? 0 : amount); // Add amount if it's valid
-//             }, 0);
-
-//           console.log(
-//             `Total Credited Amount for User ${user.name}: ${creditedTotal}`
-//           );
-//         } else {
-//           console.log("No transactions found for this user.");
-//         }
-//       });
-//     } else {
-//       console.log("User not found.");
-//     }
-//   } catch (error) {
-//     console.error("Error occurred:", error);
-//   }
-// };
-
-// fetchByEnrollment("AZ1797");
-// const fetchOrderByAmazonOrderId = async (amazonOrderId) => {
-//   try {
-//     const order = await User.aggregate([
-//       { $unwind: "$orders" },
-//       { $unwind: "$orders.items" },
-//       {
-//         $match: {
-//           "orders.items.amazonOrderId": amazonOrderId,
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 0, // Exclude internal MongoDB ID
-//           name: 1, // Include user details
-//           email: 1,
-//           enrollment: 1,
-//           userCreatedAt: "$createdAt",
-//           order: {
-//             orderId: "$orders.orderId",
-//             items: "$orders.items",
-//             finalAmount: "$orders.finalAmount",
-//             paymentStatus: "$orders.paymentStatus",
-//             createdAt: "$orders.createdAt",
-//           },
-//         },
-//       },
-//     ]);
-
-//     if (order.length > 0) {
-//       console.log(
-//         "Order with Amazon Order ID:",
-//         JSON.stringify(order[0], null, 2)
-//       );
-//     } else {
-//       console.log("No order found with the specified Amazon Order ID.");
-//     }
-//   } catch (error) {
-//     console.error("Error fetching order by Amazon Order ID:", error);
-//   }
-// };
-
-// // Call the function
-// fetchOrderByAmazonOrderId("408-8170367-7810747");
+markOrdersShippedByTrackingIds(trackingIds);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

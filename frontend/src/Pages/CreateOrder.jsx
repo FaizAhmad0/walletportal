@@ -14,6 +14,7 @@ import {
 import { SearchOutlined } from "@ant-design/icons";
 import DispatchLayout from "../Layout/DispatchLayout";
 import axios from "axios";
+
 const { Search } = Input;
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -23,6 +24,7 @@ const CreateOrder = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [gstValue, setGstValue] = useState("");
+  const [enrollmentSearch, setEnrollmentSearch] = useState("");
 
   const getUsers = async () => {
     try {
@@ -34,6 +36,31 @@ const CreateOrder = () => {
       setUsers(response.data.users || []);
     } catch (error) {
       console.error("Error fetching users:", error);
+    }
+  };
+
+  const searchByEnrollment = async () => {
+    if (!enrollmentSearch) return;
+    try {
+      const response = await axios.get(
+        `${backendUrl}/user/find/${enrollmentSearch}`,
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      if (response.data?.user) {
+        setUsers([response.data.user]); // Replace user list with found user
+        message.success("User found!");
+      } else {
+        setUsers([]);
+        message.warning("No user found with this enrollment.");
+      }
+    } catch (error) {
+      console.error("Error finding user:", error);
+      message.error("Something went wrong while searching.");
+      setUsers([]);
     }
   };
 
@@ -64,7 +91,6 @@ const CreateOrder = () => {
 
   const handleGstSubmit = async () => {
     try {
-      console.log(gstValue);
       const response = await axios.post(
         `${backendUrl}/user/add-gst/${selectedUser.enrollment}`,
         { gst: gstValue },
@@ -74,13 +100,12 @@ const CreateOrder = () => {
           },
         }
       );
-      console.log("GST saved successfully", response.data);
-      message.success("Gst updated successfully!");
+      message.success("GST updated successfully!");
       setIsModalVisible(false);
-      getUsers(); // Refresh user data after saving GST
+      setGstValue("");
+      getUsers();
     } catch (error) {
-      message.error("Could not update the gst!");
-
+      message.error("Could not update the GST!");
       console.error("Error saving GST:", error);
     }
   };
@@ -142,7 +167,7 @@ const CreateOrder = () => {
                 Add Items
               </Button>
             ) : (
-              <Tooltip title={!user.gst ? "Add GST to click" : ""}>
+              <Tooltip title="Add GST to enable">
                 <Button
                   disabled={!user.gst}
                   className="mr-5 text-sm text-white mb-2"
@@ -167,7 +192,33 @@ const CreateOrder = () => {
 
   return (
     <DispatchLayout>
-      {/* Search Container */}
+      {/* Enrollment Search */}
+      <div className="mb-6">
+        <Space>
+          <Input
+            placeholder="Enter Enrollment No."
+            value={enrollmentSearch}
+            onChange={(e) => setEnrollmentSearch(e.target.value)}
+            style={{ width: 300 }}
+          />
+          <Button type="primary" onClick={searchByEnrollment}>
+            Search Enrollment
+          </Button>
+          {enrollmentSearch && (
+            <Button
+              type="default"
+              onClick={() => {
+                setEnrollmentSearch("");
+                getUsers(); // Reset all users
+              }}
+            >
+              Reset
+            </Button>
+          )}
+        </Space>
+      </div>
+
+      {/* Table Search */}
       <div className="search-container mb-6">
         <Space style={{ width: "100%" }} align="center">
           <Search
@@ -178,7 +229,6 @@ const CreateOrder = () => {
             prefix={<SearchOutlined className="text-black-500" />}
             style={{ width: 400, borderRadius: "8px" }}
             className="shadow-md"
-            onSearch={(value) => console.log(value)} // Add your search action here
           />
           {searchTerm && (
             <Button
@@ -202,7 +252,7 @@ const CreateOrder = () => {
         style={{ borderRadius: "10px" }}
       />
 
-      {/* Modal for GST */}
+      {/* GST Modal */}
       <Modal
         title={<h2 className="text-lg font-semibold">Add GST</h2>}
         visible={isModalVisible}
