@@ -26,6 +26,8 @@ const { confirm } = Modal;
 const { Search } = Input;
 
 const ShippingDash = () => {
+  const [trackingId, setTrackingId] = useState("");
+
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [shippingPartnerFilter, setShippingPartnerFilter] = useState("");
   const handleShippingPartnerFilter = (value) => {
@@ -99,6 +101,21 @@ const ShippingDash = () => {
     timeFilter,
     orders,
   ]);
+
+  const handleTrackingIdSearch = async () => {
+    if (!trackingId.trim()) return;
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/orders/by-tracking/${trackingId}`
+      );
+      // console.log(response.data);
+      setFilteredOrders(response.data.orders); // assuming your backend sends an array
+    } catch (error) {
+      console.error("Error fetching order by tracking ID:", error);
+      message.error("Order not found or server error.");
+    }
+  };
 
   const handleSaveClick = async () => {
     try {
@@ -599,6 +616,17 @@ const ShippingDash = () => {
         <div className="w-full pb-2 px-4 bg-gradient-to-r from-blue-500 to-red-300 shadow-lg rounded-lg">
           <h1 className="text-2xl pt-4 font-bold text-white">All Order's</h1>
         </div>{" "}
+        <div className="flex items-center space-x-4 mt-4">
+          <Input.Search
+            placeholder="Search by Tracking ID"
+            value={trackingId}
+            onChange={(e) => setTrackingId(e.target.value)}
+            onSearch={handleTrackingIdSearch}
+            enterButton
+            className="text-sm text-black"
+            style={{ width: 300 }}
+          />
+        </div>
         {/* Search Input */}
         <div className="flex justify-between items-center">
           <div className="flex justify-between items-center">
