@@ -104,7 +104,7 @@ const DetailsReporting = () => {
           }
 
           // Count levelNotFound orders
-          if (order.paymentStatus === true && order.shipped === false) {
+          if (order.paymentStatus === true && order.shipped === false && ! productHold) {
             levelNotFound += 1;
           }
 
@@ -167,7 +167,8 @@ const DetailsReporting = () => {
         } else if (
           type === "levelNotFound" &&
           order.paymentStatus === true &&
-          order.shipped === false
+          order.shipped === false &&
+          order.items.some((item) => item.productAction == "Available")
         ) {
           filtered.push(order);
         } else if (
@@ -210,9 +211,7 @@ const DetailsReporting = () => {
         if (order.shipped === true) {
           shippedCount += 1;
         }
-        if (order.paymentStatus === true && order.shipped === false) {
-          levelNotFound += 1;
-        }
+        
 
         if (order.paymentStatus === false) {
           moneyIssueCount += 1; // Count hold money issues
@@ -225,6 +224,9 @@ const DetailsReporting = () => {
         if (productHold) {
           productNotAvailableCount += 1; // Count product not available holds
           orderHasHold = true;
+        }
+        if (order.paymentStatus === true && order.shipped === false && !productHold) {
+          levelNotFound += 1;
         }
 
         if (orderHasHold) {
@@ -478,7 +480,8 @@ const DetailsReporting = () => {
       } else if (
         filterType === "levelNotFound" &&
         order.paymentStatus === true &&
-        order.shipped === false
+        order.shipped === false &&
+        order.items.some((item) => item.productAction == "Available")
       ) {
         return true;
       }

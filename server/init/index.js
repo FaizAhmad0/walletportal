@@ -20,166 +20,125 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// const deleteOldOrders = async () => {
+// const printUnpaidOrdersWithDate = async () => {
 //   try {
-//     const threeMonthsAgo = new Date();
-//     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+//     const users = await User.find({});
 
-//     // Step 1: Find users who have any orders (optional optimization)
-//     const users = await User.find({ "orders.0": { $exists: true } });
+//     let totalUnpaid = 0;
 
-//     let totalDeletedOrders = 0;
-
-//     // Step 2: Iterate users and delete old orders
 //     for (const user of users) {
-//       const originalOrderCount = user.orders.length;
-
-//       // Keep only recent orders
-//       user.orders = user.orders.filter((order) => {
-//         const orderDate = new Date(order.createdAt);
-//         return orderDate >= threeMonthsAgo;
-//       });
-
-//       const deletedCount = originalOrderCount - user.orders.length;
-//       if (deletedCount > 0) {
-//         await user.save();
-//         totalDeletedOrders += deletedCount;
-//         console.log(
-//           `🗑️ Deleted ${deletedCount} old orders for ${user.name} (${user.email})`
-//         );
+//       for (const order of user.orders) {
+//         if (!order.paymentStatus) {
+//           console.log(`🔹 User: ${user.name}`);
+//           console.log(`   📦 Order ID: ${order._id}`);
+//           console.log(`   🗓️  Order Date: ${order.date || order.createdAt}`);
+//           console.log(`   💰 Payment Status: Unpaid\n`);
+//           totalUnpaid++;
+//         }
 //       }
 //     }
 
-//     console.log(
-//       `✅ Total old orders deleted across all users: ${totalDeletedOrders}`
-//     );
+//     console.log(`📢 Total unpaid orders found: ${totalUnpaid}`);
 //   } catch (error) {
-//     console.error("❌ Error deleting old orders:", error);
+//     console.error("❌ Error fetching unpaid orders:", error);
 //   }
 // };
 
-// deleteOldOrders();
-const markOrdersShippedByTrackingIds = async (trackingIds) => {
-  try {
-    const users = await User.find({
-      "orders.items.trackingId": { $in: trackingIds },
-    });
+// printUnpaidOrdersWithDate();
 
-    let updatedOrdersCount = 0;
+const shipAllUnshippedOrdersTill25June = async () => {
+  try {
+    const users = await User.find({});
+    let totalShipped = 0;
+
+    const cutoffDate = new Date("2025-06-25T23:59:59.999Z");
 
     for (const user of users) {
       let updated = false;
 
       for (const order of user.orders) {
-        const hasMatchingTrackingId = order.items.some((item) =>
-          trackingIds.includes(item.trackingId)
-        );
+        const orderDate = new Date(order.date || order.createdAt);
 
-        if (hasMatchingTrackingId && !order.shipped) {
+        if (!order.shipped && orderDate <= cutoffDate) {
+          console.log(`🔹 User: ${user.name}`);
+          console.log(`   📦 Order ID: ${order._id}`);
+          console.log(`   🗓️  Order Date: ${orderDate.toISOString()}`);
+          console.log(
+            `   🚚 Shipping Status: Not Shipped — ✅ Marking as Shipped\n`
+          );
+
+          // Update field
           order.shipped = true;
           updated = true;
-          updatedOrdersCount++;
+          totalShipped++;
         }
       }
 
       if (updated) {
         await user.save();
-        console.log(`✅ Updated orders for user: ${user.name}`);
       }
     }
 
-    console.log(`🚚 Total orders marked as shipped: ${updatedOrdersCount}`);
+    console.log(`✅ Total orders marked as shipped: ${totalShipped}`);
   } catch (error) {
-    console.error("❌ Error updating orders by trackingId:", error);
+    console.error("❌ Error shipping orders:", error);
   }
 };
 
-// Example usage:
-const trackingIds = [
-  "246000102250",
-  "246000102239",
-  "246000102273",
-  "246000102278",
-  "246000102234",
-  "246000102238",
-  "246000102272",
-  "246000102213",
-  "246000102214",
-  "246000102233",
-  "246000102241",
-  "246000102275",
-  "246000102263",
-  "246000102271",
-  "246000102277",
-  "246000102269",
-  "246000102240",
-  "246000102267",
-  "246000102247",
-  "246000102236",
-  "246000102235",
-  "246000102248",
-  "W61768098",
-  "W61768135",
-  "W61768101",
-  "W61767969",
-  "W61767983",
-  "W61767956",
-  "W61768126",
-  "W61768113",
-  "W61767994",
-  "W61768099",
-  "W61767992",
-  "W61767990",
-  "W61768128",
-  "W61768088",
-  "W61767967",
-  "W61767984",
-  "W61767975",
-  "W61767965",
-  "W61767963",
-  "W61767957",
-  "W61768131",
-  "W61767960",
-  "D2001866768",
-  "W61767972",
-  "W61767964",
-  "W61768090",
-  "W61767971",
-  "W61767968",
-  "W61767977",
-  "W61767995",
-  "W61767961",
-  "W61767988",
-  "W61767991",
-  "W61767966",
-  "W61768134",
-  "W61768089",
-  "W61767962",
-  "W61767979",
-  "W61768133",
-  "W61768137",
-  "W61767982",
-  "W61767996",
-  "W61767993",
-  "W61767976",
-  "W61768132",
-  "W61768136",
-  "W61768091",
-  "W61767997",
-  "W61767970",
-  "W61767958",
-  "W61767959",
-  "W61767978",
-  "W61767989",
-  "W61768159",
-  "W61768130",
-  "W61767980",
-  "W61768142",
-  "W61767981",
-  "W61767974",
-];
+// shipAllUnshippedOrdersTill25June();
 
-markOrdersShippedByTrackingIds(trackingIds);
+
+
+
+const updateProductActionForAmazonOrderId = async () => {
+  try {
+    const enrollmentId = "AZ2471";
+    const targetAmazonOrderId = "171-5191587-8182727";
+
+    // Find the user by enrollment ID
+    const user = await User.findOne({ enrollment: enrollmentId });
+
+    if (!user) {
+      console.log(`❌ User with enrollment "${enrollmentId}" not found.`);
+      return;
+    }
+
+    let itemFound = false;
+
+    // Loop through all orders
+    for (const order of user.orders) {
+      // Loop through all items in each order
+      for (const item of order.items) {
+        if (item.amazonOrderId === targetAmazonOrderId) {
+          item.productAction = "Available";
+          itemFound = true;
+
+          console.log(
+            `✅ Found item with Amazon Order ID: ${item.amazonOrderId}`
+          );
+          console.log(`🔁 Updated productAction to "Available"\n`);
+
+          break; // Remove this if you want to update all matches
+        }
+      }
+
+      if (itemFound) break;
+    }
+
+    if (itemFound) {
+      await user.save();
+      console.log("✅ Changes saved successfully.");
+    } else {
+      console.log(
+        `❌ No matching item with Amazon Order ID: ${targetAmazonOrderId}`
+      );
+    }
+  } catch (err) {
+    console.error("❌ Error updating productAction:", err);
+  }
+};
+
+// updateProductActionForAmazonOrderId();
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

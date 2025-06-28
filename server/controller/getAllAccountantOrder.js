@@ -39,7 +39,7 @@ const User = require("../models/User");
 module.exports = async (req, res) => {
   try {
     const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1); // 1 month ago
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 2); // 1 month ago
 
     // Step 1: Find users with at least one order in the last 1 month
     const usersWithRecentOrders = await User.find({
