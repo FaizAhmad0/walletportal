@@ -25,7 +25,6 @@ const DetailsReporting = () => {
 
   const handleShippingPartnerFilter = (value) => {
     setShippingPartnerFilter(value);
-    // You can add any additional logic here to handle the filter if necessary
   };
 
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
