@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { DatePicker, Table, Radio, Button, Select, Input } from "antd"; // Import Ant Design DatePicker
-import dayjs from "dayjs"; // For date formatting
+import { DatePicker, Table, Radio, Button, Select, Input } from "antd"; 
+import dayjs from "dayjs";
 import DispatchLayout from "../Layout/DispatchLayout";
 import { FilterOutlined } from "@ant-design/icons";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -13,10 +13,10 @@ const DetailsReporting = () => {
   const [userData, setUserData] = useState([]);
   const [managers, setManagers] = useState([]);
   const [managerFilter, setManagerFilter] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // State for search input
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value); // Update the search term on input change
+    setSearchTerm(e.target.value); 
   };
   const handleManagerFilter = (manager) => {
     setManagerFilter(manager);
@@ -53,7 +53,6 @@ const DetailsReporting = () => {
     setIsModalVisible(true);
   };
 
-  // Fetch user data and orders from the backend
   const getUserData = async () => {
     try {
       const response = await axios.get(`${backendUrl}/user/getalluserss`, {
