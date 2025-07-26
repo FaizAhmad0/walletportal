@@ -41,7 +41,7 @@ const DispatchDash = () => {
   // Fetch orders from backend
   const getOrders = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/orders/getallorders`, {
+      const response = await axios.get(`${backendUrl}/orders/getallYesterdayOrders`, {
         headers: {
           Authorization: localStorage.getItem("token"),
         },
